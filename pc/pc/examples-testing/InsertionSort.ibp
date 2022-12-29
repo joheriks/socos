@@ -1,0 +1,69 @@
+InsertionSortModule : MODULE BEGIN
+
+    USING icip@core;
+
+    sorted(a:dynarray[int].dynarray, i1:int, i2:int): bool =
+           FORALL (i:int) :  i1 < i AND i < i2 IMPLIES a(i - 1) <= a(i);
+
+
+    swap [VALRES a:dynarray[int].dynarray, i1, i2:int]: PROCEDURE BEGIN
+        PRE 0 <= i1 AND i1 < len(a) AND 0 <= i2 AND i2 < len(a);
+
+        POST a(i1) = OLD(a)(i2) AND a(i2) = OLD(a)(i1)
+             AND permutation(a,OLD(a))
+             AND (FORALL (k:int):
+                    0 <= k AND k < len(a)
+                    IMPLIES (k /= i1 AND k /= i2 IMPLIES a(k) = OLD(a)(k)));
+
+        t: PROGVAR int;
+        t := a(i1);
+        a:=update(a,i1,a(i2));
+        a:=update(a,i2,t);
+        EXIT
+    END swap
+
+
+    InsertionSort [VALRES a:dynarray[int].dynarray]: PROCEDURE BEGIN
+        POST sorted(a, 0, len(a)) AND permutation(a, OLD(a));
+
+        i, j: PROGVAR int;
+        i, j := 0, 0;
+        GOTO partially_sorted
+
+        sorting: SITUATION BEGIN
+            INVARIANT 0 <= i AND i <= len(a);
+            INVARIANT permutation(a, OLD(a));
+
+            partially_sorted: SITUATION BEGIN
+                INVARIANT sorted(a, 0, i);
+
+                SELECT
+                    i < len(a) THEN j := i; GOTO move DECREASING [ len(a) - i, j ]
+                    i = len(a) THEN EXIT
+                END
+            END partially_sorted
+
+            move: SITUATION BEGIN
+                INVARIANT i < len(a);
+                INVARIANT 0 <= j AND j <= i;
+                INVARIANT sorted(a, 0, j);
+                INVARIANT sorted(a, j, i + 1);
+                INVARIANT (0 < j AND j < i) IMPLIES a(j - 1) <= a(j + 1);
+
+                SELECT
+                    j < 1  THEN i := i + 1; GOTO partially_sorted
+                    j >= 1 THEN
+
+                    SELECT
+                        a(j - 1) <= a(j) THEN i := i + 1; GOTO partially_sorted
+                        a(j - 1) > a(j)  THEN CALL swap(a, j, j - 1);
+                                               j := j - 1;
+                                               GOTO move DECREASING [ len(a) - i, j ]
+                    END
+                END
+            END move
+        END sorting
+
+    END InsertionSort
+
+END InsertionSortModule

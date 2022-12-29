@@ -1,0 +1,157 @@
+vectors: context 
+begin
+    importing ds@vector[int];
+    
+    by "(endgame :lemmas (\"vector[int].update_prop_1\" 
+	                            \"vector[int].update_prop_2\"))";
+ 
+    % Acceptance tests for proof automation. Every lemma generated from 
+    % this file should be proved by the default by.
+    
+    basic: procedure
+    begin
+        a,b,c: pvar vector[int].vector;
+        i: pvar nat;
+        a := vector_val((:1,2,3:));
+        b := a;
+        c := b;
+        i := 1;
+        choice
+            [a=b] ; {b=a} ; exit
+            [a=b and b=c]; {a=c} ; exit
+            [0<=i and i<len(a)]; a:=update(a,i,0); { a(i)=0 }; exit
+        endchoice
+    end basic
+
+
+    pred: procedure
+    begin
+        a: vector[int].vector;
+        p: [int->bool];
+        k: int;
+
+        [ 0<=k and k<len(a) ];
+        [ forall (i:index(a)): i<k => p(a(i)) ];
+        [ p(a(k)) ];
+        { forall (i:index(a)): i<=k => p(a(i)) }; exit
+
+    end pred
+
+
+	linearsearch[ a:vector[int]; x:int; j:result int ]: procedure
+    post (0<=j and j<=len(a)) and
+         (j=len(a) => (forall (i:index(a)): a(i)/=x)) and
+         (j<len(a) => (forall (i:index(a)): i<j => a(i)/=x) and a(j)=x);
+	begin
+        s: situation
+        begin
+            * 0<=j and j<=len(a);
+            * forall (i:index(a)): 0<=i and i<j => a(i)/=x;
+            ** len(a)-j;
+            if
+              [j=len(a)]; exit
+              [j<len(a) and a(j)/=x]; j:=j+1; decreasing goto s
+              [j<len(a) and a(j)=x]; exit
+            endif
+        end s
+        j:=0; goto s
+	end linearsearch
+
+
+    binarysearch [ a:vector[int].vector; x:int; l: result int ]: procedure
+    pre len(a) > 1 and a(0) <= x and x < a(len(a) - 1);
+    post 0 <= l and l < len(a) - 1;
+    post a(l) <= x and x < a(l + 1);
+    begin
+        r : pvar int;
+        k : pvar int;
+        Split : situation
+        begin
+            * 0 <= l and l < r and r < len(a);
+            * a(l) <= x and x < a(r);
+            ** r-l;
+            if
+                [r-l = 1] ; exit
+                [r-l > 1] ; k := floor( (r + l) / 2);
+                             if
+                                 [a(k) <= x] ; l := k; decreasing goto Split 
+                                 [x < a(k)] ; r := k; decreasing goto Split 
+                             endif
+            endif
+        end Split
+        l,r,k := 0,len(a)-1,0;
+        goto Split
+    end binarysearch
+
+
+    palindrome [ a:vector[int].vector; b: result bool ] : procedure
+    post b = forall (i:index(a)) : a(i) = a(len(a)-1-i);
+    begin
+        k : pvar int;
+        loop: situation
+        begin
+            * 0 <= k and k <= len(a);
+            * forall (i:below(k)) : a(i) = a(len(a)-1-i);
+            ** len(a) - k;
+            if
+                [k<len(a)-1-k] ;
+                if
+                   [a(k) /= a(len(a)-1-k)] ; b:=false ; exit
+                   [a(k) = a(len(a)-1-k)] ; k := k+1 ; decreasing goto loop 
+                endif
+                [k>=len(a)-1-k] ; b:=true; exit
+            endif
+        end loop
+        b := false;
+        k := 0;
+        goto loop
+    end palindrome
+
+
+  fillwithzeroes[ a: valres vector[int] ]: procedure
+  post len(a)=len(a__0);
+  post forall (i:index(a)): a(i)=0;
+  begin
+      k: pvar int;
+      Loop: situation
+      begin
+          * len(a)=len(a__0);
+          * 0<=k and k<=len(a);
+          * forall (i:index(a)): i<k => a(i)=0;
+          ** len(a)-k;
+          if
+            [k=len(a)]; exit
+            [k<len(a)]; a := update(a,k,0); k:=k+1; decreasing goto Loop
+          endif
+      end Loop
+      k:=0; goto Loop
+  end fillwithzeroes
+
+
+  reverse[ a: valres vector[int] ]: procedure
+  post len(a)=len(a__0);
+  post forall (i:index(a)): a(i) = a__0(len(a)-1-i);
+  begin
+    k: pvar int;
+  
+    Loop: situation
+    begin
+      * len(a) = len(a__0);
+      * 0<=k and k<=len(a);
+      * forall (i:index(a)): 
+                  (i<k or len(a)-1-k<i =>
+              a(i) = a__0(len(a)-1-i)) and
+          (k<=i and i<=len(a)-1-k => a(i) = a__0(i));
+      ** len(a)-k;
+      if
+        [k<len(a)-1-k]; 
+          a := update(update(a,k,a(len(a)-1-k)),len(a)-1-k,a(k));
+          k:=k+1; decreasing goto Loop
+        [k>=len(a)-1-k]; exit
+      endif
+    end Loop
+
+    k:=0; goto Loop
+  end reverse
+
+end vectors

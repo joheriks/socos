@@ -1,0 +1,95 @@
+testconst
+test: CONTEXT BEGIN testproc [c:int]: PROCEDURE BEGIN c:=3; EXIT  END testproc END test
+
+testconst_ok:pass
+test: CONTEXT BEGIN testproc [c:int]: PROCEDURE BEGIN EXIT  END testproc END test
+
+testconstsituation:error
+test: CONTEXT BEGIN testproc [c:int]: PROCEDURE BEGIN sit : SITUATION BEGIN c:=3; EXIT; END sit GOTO sit END testproc END test
+
+testunreachablesituation:pass
+testm: CONTEXT BEGIN testp: PROCEDURE BEGIN sit1: SITUATION BEGIN sit2: SITUATION BEGIN EXIT  END sit2 END sit1 GOTO sit2  END testp END testm
+
+testunreachablepost:warn
+testm: CONTEXT BEGIN testp: PROCEDURE BEGIN sit1: SITUATION BEGIN GOTO sit1 END sit1 GOTO sit1 END testp END testm
+
+testunreachablelabeledpost:warn
+testm: CONTEXT BEGIN testp: PROCEDURE p: POST TRUE; BEGIN END testp END testm
+
+testmultiexitstatementcall:error
+testm: CONTEXT BEGIN testp: PROCEDURE p1: POST TRUE; p2: POST TRUE; BEGIN CHOICE EXIT p1; EXIT p2 ENDCHOICE END testp testa: PROCEDURE BEGIN testp[]; EXIT; END testa END testm
+
+testmultiexitunconnectedpost:warn
+testm: CONTEXT BEGIN testp: PROCEDURE p1: POST TRUE; p2: POST TRUE; BEGIN CHOICE EXIT p1; EXIT p2 ENDCHOICE END testp testa: PROCEDURE BEGIN testp[]; CALL p1: EXIT; ENDCALL END testa END testm
+
+testcyclecheck :pass
+testm: CONTEXT BEGIN p: PROCEDURE BEGIN s1: SITUATION BEGIN **x; CHOICE EXIT; DECREASING GOTO s1 ENDCHOICE END s1 GOTO s1; END p END testm
+
+mismatcheddecreasing :error
+testm: CONTEXT BEGIN p: PROCEDURE BEGIN s1: SITUATION BEGIN **x; CHOICE GOTO s1 DECREASING s1 GOTO s1 ENDCHOICE END s1 END p END testm
+
+testdubidprocedure :error
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN END testp1 testp1: PROCEDURE BEGIN END testp1 END testm
+
+testdubidprocedure :pass
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN EXIT END testp1 testp2: PROCEDURE BEGIN EXIT  END testp2 END testm
+
+testdubidsituation :error
+testm: CONTEXT BEGIN testp: PROCEDURE BEGIN sit1: SITUATION BEGIN GOTO sit1 END sit1 sit1: SITUATION BEGIN EXIT  END sit1 END testp END testm
+
+dubidinmodules :error
+testm: CONTEXT BEGIN STRATEGY cycletest1; testp: PROCEDURE BEGIN EXIT  END testp testp: PROCEDURE BEGIN EXIT  END testp END testm
+
+dublabelpostok :pass
+testm: CONTEXT BEGIN testp: PROCEDURE a:POST TRUE; b:POST TRUE; BEGIN  CHOICE EXIT a; EXIT b; ENDCHOICE END testp END testm
+
+dublabelpostbad :error
+testm: CONTEXT BEGIN testp: PROCEDURE a:POST TRUE; a:POST TRUE; BEGIN  CHOICE EXIT a; EXIT b; ENDCHOICE END testp END testm
+
+testDeclaration1  :pass
+testm: CONTEXT BEGIN v1: int; v2: nat = 3; v3,v4: bool;  END testm
+
+testDeclaration2  :pass
+testm: CONTEXT BEGIN v1: [[nat,nat]->int]; END testm
+
+testDeclaration3 :pass
+testm: CONTEXT BEGIN v1: {d:int,t:Nat | d*t} ; END testm
+
+testDeclaration4 :pass
+testm: CONTEXT BEGIN v2: (p) ; END testm
+
+testProcedureCalls :pass
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[];EXIT  END testp1 testp2: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testProcedureCallArgs :pass
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[2,3]; EXIT END testp1 testp2[y:int;z:int]: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testProcedureCallArgsWrongNumber1 :error
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[2]; EXIT END testp1 testp2[y:int;z:int]: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testProcedureCallArgsWrongNumber2 :error
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[2,3,4]; EXIT END testp1 testp2[y:int;z:int]: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testProcedureCallArgsMissing :error
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[]; EXIT END testp1 testp2[y:int;z:int]: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testProcedureArgs :pass
+testm: CONTEXT BEGIN testp1[a: valres int]: PROCEDURE BEGIN a:=1; EXIT  END testp1  END testm
+
+testProcedureCallPassingValueActualForResultFormal :error
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[1]; EXIT END testp1 testp2[y: result int]: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testProcedureCallPassingValueActualForValresFormal :error
+testm: CONTEXT BEGIN testp1: PROCEDURE BEGIN testp2[1]; EXIT END testp1 testp2[y: valres int]: PROCEDURE BEGIN EXIT END testp2 END testm
+
+testMixedPosts: error
+testm: CONTEXT BEGIN testp: PROCEDURE POST TRUE; a:POST TRUE; BEGIN END testp END testm
+
+testMultiExitLabel :pass
+testm: CONTEXT BEGIN testp: PROCEDURE a: POST TRUE; b:POST TRUE; BEGIN CHOICE EXIT a; EXIT b; ENDCHOICE END testp END testm
+
+testMultiExitDefaultLabel :error
+testm: CONTEXT BEGIN testp: PROCEDURE a: POST TRUE; b:POST TRUE; BEGIN CHOICE EXIT a; EXIT; ENDCHOICE END testp END testm
+
+testMultiExitWrongLabel :error
+testm: CONTEXT BEGIN testp: PROCEDURE a: POST TRUE; b:POST TRUE; BEGIN EXIT testp; END testp END testm

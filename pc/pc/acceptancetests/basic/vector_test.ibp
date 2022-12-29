@@ -1,0 +1,75 @@
+vector_test: context
+begin
+  extending vectors;
+  
+  linearsearch_test: procedure
+  begin
+    j: pvar int;
+    linearsearch[ vector_val((:1,2,3,4,5,6:)), 4, j ];
+    { j=3 };
+    linearsearch[ vector_val((:1,2,3,4,5,6:)), 1, j ];
+    { j=0 };
+    linearsearch[ vector_val((:1,2,3,4,5,6:)), 6, j ];
+    { j=5 };
+    linearsearch[ vector_val((:1,2,3,4,5,6:)), 41, j ];
+    { j=6 };
+    exit
+  end linearsearch_test
+  
+  
+  binarysearch_test: procedure
+  begin
+    l: pvar int;
+    binarysearch[ vector_val((:1,3,5,8,9,12,15,20:)), 9, l ];
+    { l=4 };
+    binarysearch[ vector_val((:1,3,5,8,9,12,15,20:)), 1, l ];
+    { l=0 };
+    binarysearch[ vector_val((:1,3,5,8,9,12,15,20:)), 20, l ];
+    { l=7 };
+    binarysearch[ vector_val((:1,3,5,8,9,12,15,20:)), 10, l ];
+    { l=8 };
+    exit
+  end binarysearch_test
+  
+  
+  palindrome_test: procedure
+  begin
+    b: pvar bool;
+    palindrome[ vector_val((:2,1,8,1,2:)), b];
+    { b=true };
+    palindrome[ vector_val((:2,1,8,1:)), b];
+    { b=false };
+    exit
+  end palindrome_test
+  
+  
+  fillwithzeroes_test: procedure
+  begin
+    a: pvar vector[int];
+    a:=vector_val((:1,2,3,4,5:));
+    fillwithzeroes[a];
+    { a=vector_val((:0,0,0,0,0:)) };
+    exit
+  end fillwithzeroes_test
+  
+  
+  reverse_test: procedure
+  begin
+    a: pvar vector[int];
+    a:=vector_val((:8,3,6:));
+    reverse[a];
+    { a= vector_val((:6,3,8:)) };
+    exit
+  end reverse_test
+  
+  
+  main: procedure
+  begin
+    linearsearch_test[];
+    binarysearch_test[];
+    palindrome_test[];
+    fillwithzeroes_test[];
+    reverse_test[];
+    exit
+  end main
+end vector_test

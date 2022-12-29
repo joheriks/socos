@@ -1,0 +1,13 @@
+badstrata1: context
+begin
+    % Bad strategy script
+    by "(((";
+
+    p1: procedure
+    post false;
+    begin
+        exit
+    end p1
+
+
+end badstrata1

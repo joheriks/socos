@@ -1,0 +1,11 @@
+nonterminating: context
+begin
+    by "(endgame)";
+
+    p[ x:nat ]: procedure
+    ** x;
+    begin
+        p[x]; exit
+    end p
+
+end nonterminating

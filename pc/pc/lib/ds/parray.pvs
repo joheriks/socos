@@ -1,0 +1,36 @@
+parray[n:nat,T:type+]: theory
+begin
+	index: type = below[n]
+	parray: type+ = [index -> T]
+
+	a,b,c: var parray
+	i,j,k: var index
+	x: var T
+
+	permutation(a,b): bool =
+	  (exists (f:[index->index]):
+	    bijective?(f) and
+	    forall (i:index): b(i) = a(f(i)))
+	auto_rewrite- permutation
+
+	permutation_rfl: lemma permutation(a,a)
+	permutation_sym: lemma permutation(a,b) => permutation(b,a)
+	permutation_trs: lemma permutation(a,b) and permutation(b,c) => permutation(a,c)
+
+	swap(a,i,j):parray = a with [i|->a(j),j|->a(i)]
+	auto_rewrite- swap
+
+	swap_acc: lemma swap(a,i,j)(k) = if k=i then a(j) elsif k=j then a(i) else a(k) endif
+	permutation_swap: lemma permutation(swap(a,i,j),a)
+	
+
+	array_val( a: list[T] ): parray = 
+	  lambda (i:below[n]): 
+	    if i<length(a) then nth(a,i)
+	    else epsilon!(t:T): true
+	    endif
+        
+	conversion+ array_val
+	
+    
+end parray

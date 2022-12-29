@@ -1,0 +1,24 @@
+proof3: context begin
+
+   by "(endgame)";
+
+   p1[a, b: valres int]: procedure
+
+      post a__0=b and b__0=a;
+
+   begin
+
+      a, b:=b, a;
+      a:=a+b;
+      b:=a-b;
+      a:=a-b;
+      a, b:=b, a;
+
+      exit;
+      proof
+         * lemma a_1=b_0; [];
+         * lemma b_1=a_0; [];
+      endproof
+   end p1
+
+end proof3

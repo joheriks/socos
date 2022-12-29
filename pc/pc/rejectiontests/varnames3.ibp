@@ -1,0 +1,12 @@
+varnames3: context
+begin
+
+    by "(assert)";
+
+    p: procedure
+    begin
+        {forall (x_6581: nat): true}; 
+        exit
+    end p
+
+end varnames3

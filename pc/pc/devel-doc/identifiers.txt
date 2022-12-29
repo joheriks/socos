@@ -1,0 +1,77 @@
+Ramblings about ibp identifiers, scoping rules etc.
+===================================================
+
+(feel free to add to this file)
+
+1. Restrictions imposed by PVS (since this is our target language)
+
+   * PVS allows `ad-hoc` overloading of symbols according to
+     type. There are four different types of symbols in PVS:
+
+     - type, for type declarations
+     - prop, for formula declarations (e.g. lemmas and axioms)
+     - expr, for variable and constant declarations
+     - theory, for theory declarations
+
+     Accordingly, if we allow similar overloading in IBP, we need to
+     make sure we map the different symbol classes in IBP to different
+     symbol classes in PVS.
+
+   * PVS allows local declarations (e.g. lambda/forall/exists argument
+     lists) to shadow global declarations. I cannot currently see a
+     reason why we should not allow this as well, but in the same
+     vein, I do not think we can easily support other kinds of name
+     shadowing, e.g. having variable declarations in nested situations
+     which shadow each other, since at some point, all those variables
+     will have to be declared at the top-level in the PVS file.
+
+     Local shadowing seems to work ok, according to the coding I've
+     done. BUT, there is one catch. The semantics for all the
+     different local bindingexpressions in PVS are quite badly
+     defined. For instance, are multiple bindings parallel or
+     sequential or recursive (i.e. let vs. let* vs. letrec)
+
+   * PVS allows overloading on type and arguments. IMO, this may be
+     hard to duplicate in ibp without considerable effort, especially
+     as PVS overloading on types uses structural equivalence of types
+     (instead of name equivalence) to decide which declaration an
+     identifier is referring to. I suggest we do not allow this kind
+     of overloading in IBP.
+
+   * In PVS, declarations are ordered. An earlier declaration may not
+     reference a later one. Hopefully, we do not have to restrict
+     ourselves in the same way in IBP, although we do have to work
+     around this somehow when compiling to PVS. Specifically, consider
+     this from the point of recursive procedures.
+
+     I've been thinking more about this. It seems fairly difficult to
+     work around this. Perhaps we should impose the same restrictions,
+     at least on variable/invariant/definition declarations.
+
+2. Scoping rules in IBP
+
+   * Current idea:
+
+     Procedure declarations, definitions, invariants and program
+     variables declared at the file level are in a semi-global scope,
+     i.e. using a module will import these declarations from the
+     module.
+
+     Declarations inside a procedure are in a scope private to the
+     procedure, and are not imported when using a module.
+
+     No name shadowing allowed, except in local binding expressions.
+
+     Could consider nested scopes inside procedures, but we must keep
+     in mind the points enumerated above in 1.
+
+3. Other things that must be considered
+
+   * When converting invariants and other things to pvs, we probably
+     have to prefix the names with the module name and/or procedure
+     name.
+
+   * What symbols should be exported from a module, i.e. what symbols
+     are introduced into the namespace when USING a module?
+
+

@@ -1,0 +1,66 @@
+exec__vectorupdate: theory
+begin
+	importing impl__vector2update__vector_update
+
+	loc__: type = { ini__,
+	       	      ini__trs_0,
+		      ini__trs_0__stmt_0,		% k := 0
+                      loop,
+		      loop__trs_0,			% [k<len(a)]
+		      loop__trs_0__trs_0, 		% [a(k)>=0]
+		      loop__trs_0__trs_0__stmt_0, 	% k :=k+1
+            	      loop__trs_0__trs_1, 		% [a(k)<0]
+		      loop__trs_0__trs_1__stmt_0, 	% a:=update(a,k,0::int)
+ 		      loop__trs_0__trs_1__stmt_1,  	% k :=k+1
+		      loop__trs_1,			% [k>=len(a)]
+	       	      fin__}
+
+         step(cur__: loc__,
+	      a: vector[int],
+	      k: int): [loc__,vector[int],int] =
+	      	 cases cur__ of
+
+		       ini__: (ini__trs_0, a, k),
+
+		       ini__trs_0: (ini__trs_0__stmt_0, a, k),
+
+		       ini__trs_0__stmt_0: (loop, a, 0),
+
+		       loop:
+			     cond
+				 k<len(a) -> (loop__trs_0, a, k),
+				 k>=len(a) -> (loop__trs_1, a, k),
+				 else -> (loop, a, k)
+			     endcond,
+
+		        loop__trs_0:
+				 cond
+				     a(k)>=0 -> ( loop__trs_0__trs_0, a, k),
+				     a(k)<0 -> (loop__trs_0__trs_1, a, k),
+				     else -> (loop, a, k)
+				 endcond,
+
+			loop__trs_0__trs_0: (loop__trs_0__trs_0__stmt_0, a, k),
+
+			loop__trs_0__trs_0__stmt_0: (loop, a, k+1),
+
+ 			loop__trs_0__trs_1: (loop__trs_0__trs_1__stmt_0, a, k),
+
+			loop__trs_0__trs_1__stmt_0: (loop__trs_0__trs_1__stmt_1, update(a, k, 0), k),
+
+			loop__trs_0__trs_1__stmt_1: (loop, a, k+1),
+
+			loop__trs_1: (fin__, a, k),
+			
+			fin__: (fin__, a, k)
+			
+		endcases
+
+end exec__vectorupdate
+
+
+test__exec__vectorupdate: theory
+begin
+
+
+end test__exec__vectorupdate

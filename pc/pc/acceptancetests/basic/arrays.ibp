@@ -1,0 +1,170 @@
+arrays: context
+begin
+    importing ds@parray;
+    
+    n: nat;
+
+    by "(endgame :lemmas (\"parray[n,int].permutation_rfl\" 
+			               \"parray[n,int].permutation_sym\"
+                           \"parray[n,int].permutation_trs\"
+                           \"parray[n,int].swap_acc\"
+                           \"parray[n,int].permutation_swap\"))";
+
+
+    min[ a:parray[n,int]; j: result int ]: procedure
+    pre n>0;
+    post 0<=j and j<n;
+    post forall (i:below[n]): a(j)<=a(i);
+    begin
+        i: pvar int;
+        s: situation
+        begin
+            * 0<=j and j<i and i<=n;
+            * forall (k:nat): k<i => a(j)<=a(k);
+            ** n-i;
+            if
+              [i=n]; exit
+              [i<n]; if 
+                        [a(i)<a(j)]; j:=i; i:=i+1; decreasing goto s
+                        [a(i)>=a(j)]; i:=i+1; decreasing goto s
+                     endif
+            endif
+        end s
+        i,j:=1,0; goto s
+    end min
+
+
+    find[ a:parray[n,int];  x:int; j: result int ]: procedure
+    post (0<=j and j<=n) and
+         (j=n => (forall (i:below[n]): a(i)/=x)) and
+         (j<n => (forall (i:below[n]): i<j => a(i)/=x) and a(j)=x);
+    begin
+        s: situation
+        begin
+            * 0<=j and j<=n;
+            * forall (i:below[n]): 0<=i and i<j => a(i)/=x; 
+            ** n-j;
+            if
+              [j=n]; exit
+              [j<n and a(j)/=x]; j:=j+1; decreasing goto s
+              [j<n and a(j)=x]; exit
+            endif
+        end s
+        j:=0; goto s
+    end find
+
+
+    partition[ a: valres parray[n,int]; x:int ]: procedure
+    pre n>0;
+    post forall (i,j:below[n]): a(i)<x and a(j)>=x => i<j;
+    post permutation(a,a__0);
+    begin
+        l,r: pvar int;
+
+        s: situation
+        begin
+            * 0<=l and l<=r and r<n;
+            * forall (i:below[n]): i<l => a(i)<x;
+            * forall (i:below[n]): r<i => a(i)>=x;
+            * permutation(a,a__0);
+            ** r-l;
+            if
+                [l=r]; exit
+                [l<r and a(l)<x]; l:=l+1; decreasing goto s
+                [l<r and a(l)>=x]; a:=swap(a,l,r); r:=r-1; decreasing goto s
+            endif
+        end s
+
+        l,r:=0,n-1; goto s
+
+    end partition
+
+
+    allpositive[
+        a:parray[n,int];
+        b:result bool;
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 138 50]
+    END
+    POST BEGIN %: [320 -1 310 50]
+        * b = (forall (i:nat): i<n => a(i)>=0);
+    END
+    BEGIN
+        k: pvar nat;
+        loop : SITUATION BEGIN %: [150 160 308 141]
+            * k<=n;
+            * forall (i:nat): i<k => a(i)>=0;
+            ** n-k;
+            IF 
+                %: [337 124] [ ] 
+                %: [493 164]
+                [k<n];
+                IF %: [586 196]
+                    %: [7 3] [ [656 196] [656 296] ] [337 186] 
+                    %: [528 242]
+                    [a(k)>=0];
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                    %: [5 2] [ ] [265 48] 
+                    %: [589 94]
+                    [a(k)<0];
+                    b:=false;
+                    EXIT post__
+                ENDIF
+                %: [239 4] [ [210 30] ] [68 48] 
+                %: [246 45]
+                [k=n];
+                b:=true;
+                EXIT post__
+            ENDIF
+        END loop
+        CHOICE 
+            %: [ [90 200] [130 240] ] [3 9] 
+            %: [123 143]
+            b:=false;
+            k:=0;
+            GOTO loop
+        ENDCHOICE
+    END allpositive
+    
+
+    reverse[
+        a: valres parray[n,int];
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 100 50]
+    END
+    POST BEGIN %: [580 10 203 50]
+        * forall (i:nat): i<n => a(i)=a__0(n-1-i);
+    END
+    BEGIN
+        k: pvar int;
+        s1 : SITUATION BEGIN %: [190 20 304 132]
+            * 0<=k and k<=n-k;
+            * forall (i:nat): i<k or (n-1-k<i and i<n) => a(i)=a__0(n-1-i);
+            * forall (i:nat): k<=i and i<=n-k-1 => a(i)=a__0(i);
+            ** n-1-k;
+            IF 
+                %: [293 25] [ ] [4 25] 
+                %: [501 40]
+                [k>=n-1-k];
+                EXIT post__
+                %: [25 130] [ [220 200] [430 200] ] [234 128] 
+                %: [274 204]
+                [k<n-1-k];
+                a:=swap(a,k,n-1-k);
+                k:=k+1;
+                decreasing;
+                GOTO s1
+            ENDIF
+        END s1
+        IF 
+            %: [98 25] [ ] [3 27] 
+            %: [137 38]
+            k:=0;
+            GOTO s1
+        ENDIF
+    END reverse
+
+
+end arrays

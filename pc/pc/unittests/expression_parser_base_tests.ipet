@@ -1,0 +1,222 @@
+typeexpr
+42 :: P54
+T: COLON_COLON
+    T: NUMBER, V: 42
+    T: name
+        T: idop
+            T: ID, V: P54
+
+name
+someid @ NOT [ 26+82, 99, "string" ] . anotherid
+T: name
+    T: ID, V: someid
+    T: idop
+        T: KEY_NOT, V: NOT
+    T: actuals
+        T: PLUS
+            T: NUMBER, V: 26
+            T: NUMBER, V: 82
+        T: NUMBER, V: 99
+        T: STRING, V: string
+    T: idop
+        T: ID, V: anotherid
+
+ifexpr
+if 1 then 2 elsif 3 then 4 elsif 5 then 6 else 7 endif
+T: ifthen
+    T: NUMBER, V: 1
+    T: NUMBER, V: 2
+    T: elsif
+        T: NUMBER, V: 3
+        T: NUMBER, V: 4
+    T: elsif
+        T: NUMBER, V: 5
+        T: NUMBER, V: 6
+    T: NUMBER, V: 7
+
+bindingexpr
+LAMBDA foo, bar : 2+2
+T: bindingexpr
+    T: KEY_LAMBDA, V: LAMBDA
+    T: lambdabindings
+        T: idop
+            T: ID, V: foo
+        T: idop
+            T: ID, V: bar
+    T: PLUS
+        T: NUMBER, V: 2
+        T: NUMBER, V: 2
+
+setbindingsorexpression
+{ d2 : test | ( foo, bar ) }
+T: setexpr
+    T: setbindings
+        T: setbinding
+            T: idop
+                T: ID, V: d2
+            T: name
+                T: idop
+                    T: ID, V: test
+    T: expression_list_1
+        T: name
+            T: idop
+                T: ID, V: foo
+        T: name
+            T: idop
+                T: ID, V: bar
+
+letbinding
+LET x ( z, d ) : y = 3 + 5, k = 1 * 2 IN 4 + 6
+T: let
+    T: letbinding
+        T: letbind
+            T: idop
+                T: ID, V: x
+            T: bindings
+                T: binding
+                    T: typedids
+                        T: typedids_pre
+                            T: idop
+                                T: ID, V: z
+                            T: idop
+                                T: ID, V: d
+            T: name
+                T: idop
+                    T: ID, V: y
+        T: PLUS
+            T: NUMBER, V: 3
+            T: NUMBER, V: 5
+    T: letbinding
+        T: letbind
+            T: idop
+                T: ID, V: k
+        T: STAR
+            T: NUMBER, V: 1
+            T: NUMBER, V: 2
+    T: PLUS
+        T: NUMBER, V: 4
+        T: NUMBER, V: 6
+
+where
+1 + 2 WHERE x = 3, y : z = 2
+T: where
+    T: PLUS
+        T: NUMBER, V: 1
+        T: NUMBER, V: 2
+    T: letbinding
+        T: letbind
+            T: idop
+                T: ID, V: x
+        T: NUMBER, V: 3
+    T: letbinding
+        T: letbind
+            T: idop
+                T: ID, V: y
+            T: name
+                T: idop
+                    T: ID, V: z
+        T: NUMBER, V: 2
+
+with
+74 / 12 WITH [ foo := 21, x |-> y ]
+T: with
+    T: SLASH
+        T: NUMBER, V: 74
+        T: NUMBER, V: 12
+    T: assignment_ce
+        T: assignargs
+            T: ID, V: foo
+        T: NUMBER, V: 21
+    T: assignment_vmg
+        T: assignargs
+            T: ID, V: x
+        T: name
+            T: idop
+                T: ID, V: y
+
+cases
+CASES 7 + (2 * 3) OF foo : 56, bar ( x, y, z ) : 94 ELSE IF a THEN b ELSE c ENDIF ENDCASES
+T: cases
+    T: PLUS
+        T: NUMBER, V: 7
+        T: expression_list_1
+            T: STAR
+                T: NUMBER, V: 2
+                T: NUMBER, V: 3
+    T: selection
+        T: idop
+            T: ID, V: foo
+        T: NUMBER, V: 56
+    T: selection
+        T: idop
+            T: ID, V: bar
+        T: idop
+            T: ID, V: x
+        T: idop
+            T: ID, V: y
+        T: idop
+            T: ID, V: z
+        T: NUMBER, V: 94
+    T: ifthen
+        T: name
+            T: idop
+                T: ID, V: a
+        T: name
+            T: idop
+                T: ID, V: b
+        T: name
+            T: idop
+                T: ID, V: c
+
+cond
+COND 56 + 4 -> 27, a -> b, ELSE -> "string" ENDCOND
+T: cond
+    T: MINUS_GT
+        T: PLUS
+            T: NUMBER, V: 56
+            T: NUMBER, V: 4
+        T: NUMBER, V: 27
+    T: MINUS_GT
+        T: name
+            T: idop
+                T: ID, V: a
+        T: name
+            T: idop
+                T: ID, V: b
+    T: STRING, V: string
+
+tableexpr
+TABLE 1+2, 3+4 |[ a+b | c=d | ELSE ]| | x*y | ELSE || ENDTABLE
+T: tableexpr
+    T: PLUS
+        T: NUMBER, V: 1
+        T: NUMBER, V: 2
+    T: PLUS
+        T: NUMBER, V: 3
+        T: NUMBER, V: 4
+    T: colheading
+        T: PLUS
+            T: name
+                T: idop
+                    T: ID, V: a
+            T: name
+                T: idop
+                    T: ID, V: b
+        T: EQUAL
+            T: name
+                T: idop
+                    T: ID, V: c
+            T: name
+                T: idop
+                    T: ID, V: d
+        T: KEY_ELSE, V: ELSE
+    T: tableentries
+        T: tableentry
+            T: STAR
+                T: name
+                    T: idop
+                        T: ID, V: x
+                T: name
+                    T: idop
+                        T: ID, V: y
+            T: KEY_ELSE, V: ELSE

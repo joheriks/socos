@@ -1,0 +1,15 @@
+logicold: context
+begin
+    x,y,z,u,v,w: var real;
+
+    p,q,r,s,t: var bool;
+
+    P,Q,R,S,T: var [real->bool];
+
+    f,g,h: var [real->real];
+
+    i,j,k: var int;
+
+    n,m: var nat;
+    
+end logicold

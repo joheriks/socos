@@ -1,0 +1,49 @@
+bijective[ T:type+, n:nat, k:upto(n) ]: theory
+begin
+    a,b,c: var [below[n]->T]
+    i,j: var upto[n]
+    index: type = below[n]
+
+    range(i,j):setof[nat] = {x:nat| i<=x and x<j}
+    range(i,j):type = (range(i,j))
+    j0: judgement range(i,j) subtype_of index
+
+    finite_index: lemma forall (s:setof[index]): is_finite(s)
+
+    num(a,(j,k:upto[n]))(x:T):nat =
+      card( {i:index | j<=i and i<k and a(i)=x } )
+
+    num(a):[T->nat] = num(a,0,n)
+
+    ibij_implies_vbij:lemma
+      (exists (f:[range(i,j)->range(i,j)]): bijective?(f) and forall (x:range(i,j)): b(x)=a(f(x))) 
+        implies
+         (forall (v:T): (exists (g:[{x:range(i,j)|a(x)=v}->{x:range(i,j)|b(x)=v}]): bijective?(g)))
+
+    vbij_implies_ibij: lemma
+      (forall (v:T): (exists (g:[{x:range(i,j)|a(x)=v}->{x:range(i,j)|b(x)=v}]): bijective?(g))) 
+        implies
+          (exists (f:[range(i,j)->range(i,j)]): bijective?(f) and forall (x:range(i,j)): b(x)=a(f(x)))
+
+    card_ranges_subset: lemma
+      forall (s1,s2:setof[index]):
+        ((card(s1)=card(s2)) iff exists (f:[(s1)->(s2)]): bijective?(f))
+
+    % uses card_ranges_subset, ibij_implies_vbij and vbij_implies_ibij
+    subrange_num_eq_implies_bij: lemma num(a,i,j) = num(b,i,j) iff
+          (exists (f:[range(i,j)->range(i,j)]): bijective?(f) and forall (x:range(i,j)): b(x)=a(f(x)))
+
+    num_numright_eq_implies_numleft_eq: lemma forall (j:upto[n]):
+               num(a) = num(b) and num(a,j,n) = num(b,j,n) implies
+               num(a,0,j) = num(b,0,j)
+
+    % uses subrange_num_eq_implies_bij and num_numright_eq_implies_numleft_eq
+    all_right_bij_implies_left_bij: theorem 
+      (exists (f:[range(0,n)->range(0,n)]):
+              bijective?(f) and forall (i:range(0,n)): b(i)=a(f(i))) and 
+      (exists (g:[range(k,n)->range(k,n)]): 
+              bijective?(g) and forall (i:range(k,n)): b(i)=a(g(i))) 
+      implies exists (h:[range(0,k)->range(0,k)]): 
+                     bijective?(h) and forall (i:range(0,k)): b(i)=a(h(i))
+                        
+end bijective

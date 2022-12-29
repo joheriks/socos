@@ -1,0 +1,54 @@
+Tree: datatype
+begin
+  leaf: Leaf?
+  node(l,r: Tree): Node?
+end Tree
+
+List2Tree: theory
+begin
+  importing Tree
+  t, r: var Tree
+  n, i: var nat
+  s, l, u: var list[nat]
+
+  add2list(n, l): list[nat] = map[nat, nat](lambda i: n + i)(l)
+
+  list_of_tree(t): recursive list[nat] = 
+     (cases t of
+        leaf: cons(0, null[nat]),
+        node(l,r): add2list(1, append(list_of_tree(l), list_of_tree(r)))
+      endcases)
+     measure t by <<;
+
+  null_append: lemma u = null => (u = append(s, l)) = (s = null and l = null)
+
+  auto_rewrite null_append
+
+  
+  add2list_null: lemma (add2list(n, s) = null) = (s = null)
+  auto_rewrite add2list_null
+
+
+  length_list_of_tree: lemma length(list_of_tree(t)) > 0
+
+  list_of_tree_not_null: lemma cons?(list_of_tree(t))
+  list_of_tree_not_null2: lemma null?(list_of_tree(t)) = False
+
+  list_of_tree_not_null3: lemma (list_of_tree(t) = null) = False
+
+  auto_rewrite list_of_tree_not_null, list_of_tree_not_null2, list_of_tree_not_null3
+
+  add2list_append: lemma add2list(n, append(s, l)) = append(add2list(n, s), add2list(n,l))
+
+  add2list_add2list: lemma add2list(n, add2list(i, s)) = add2list(n + i, s)
+
+
+  first_list_of_tree: lemma car(list_of_tree(node(t,r))) = car(list_of_tree(t)) + 1
+
+  list_of_tree_inj: lemma append(add2list(n, list_of_tree(t)), s) = append(add2list(n, list_of_tree(r)), l) => t = r and s = l
+
+  tr1: lemma s = null => (forall t, l: s /= append(add2list(n, list_of_tree(t)), l))
+  
+  auto_rewrite tr1
+  
+end List2Tree

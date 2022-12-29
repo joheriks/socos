@@ -1,0 +1,44 @@
+summation: context
+begin
+    by "(endgame)";
+
+    sumr(i:nat): recursive nat = (if i=0 then 0 else sumr(i-1)+i endif) measure i;
+
+    sum1[ n:nat; x: result nat ]: procedure
+    post x=sumr(n);
+    begin
+        i: pvar nat;
+        s: situation
+        begin
+            * 0<=i and i<=n;
+            * x = sumr(i);
+            ** n-i;
+            if
+                [i=n]; exit
+                [i<n]; i:=i+1; x:=x+i; decreasing goto s
+            endif
+        end s
+       x:=0; i:=0; goto s
+    end sum1
+
+
+    sumf(i:nat):nat = floor(i*(i+1)/2);
+
+    sum2[ n:nat; x: result nat ]: procedure
+    post x=sumf(n);
+    begin
+        i: pvar nat;
+        s: situation
+        begin
+            * 0<=i and i<=n;
+            * x = sumf(i);
+            ** n-i;
+            if
+                [i=n]; exit
+                [i<n]; i:=i+1; x:=x+i; decreasing goto s
+            endif
+        end s
+       x:=0; i:=0; goto s
+    end sum2
+
+end summation

@@ -1,0 +1,219 @@
+Sorting_ModuleSpec: theory
+begin
+    importing socos@vector[int]
+
+
+    modinv_Sorting: macro bool = true
+
+
+    sorted( a:vector ): bool =
+        forall (i,j:nat): 0<=i and i<=j and j<len(a) => a(i)<=a(j)
+    auto_rewrite+ sorted
+
+end Sorting_ModuleSpec
+
+
+Sorting_Min_Spec: theory
+begin
+    importing Sorting_ModuleSpec
+
+    PRE_( a:vector, m:nat ): macro bool = 
+        (0<=m and m<len(a))
+
+    POST_( a:vector, m,m_0:nat ): macro bool = 
+        ((let m=m_0 in m)<=m and m<len(a)) and
+        (forall (i:nat): (let m=m_0 in m)<=i and i<len(a) => a(m)<=a(i))
+
+end Sorting_Min_Spec
+
+
+Sorting_Min_Impl: theory
+begin
+    importing Sorting_Min_Spec
+
+    a:vector
+
+    m_0: nat
+
+    inv_Loop( m:nat, k:nat ): macro bool = 
+        ((let m=m_0 in m)<=m and m<len(a)) and
+        ((let m=m_0 in m)<=k and k<=len(a)) and
+        (forall (i:nat): (let m=m_0 in m)<=i and i<k => a(m)<=a(i))
+
+    %var_Loop( m:nat, k:nat | inv_Loop(m,k) ): macro nat =
+    %    len(a)-k;
+
+    var_Loop( s_: (inv_Loop) ):  macro nat =
+        let (m,k)=s_ in len(a)-k;
+
+    %|-vc_Loop: PROOF
+    %|- (skolem 1 (m k) :dont-simplify? T)
+    %|- (flatten-disjunct 1 1)
+    %|- (beta 1)
+    %|- (split-spread ("Loop_live" "Loop_b1" "Loop_b2")
+    %|-   ((endgame-def)
+    %|-    (then (flatten-disjunct 1 1)
+    %|-          (split-spread ("Loop_b2.POST_" "Loop_b2.modinv")
+	%|-                        ((endgame-def) (endgame-def))))
+    %|-    (then (flatten-disjunct 1 1)
+    %|-          (split-spread ("Loop_b2.live" "Loop_b2.1" "Loop_b2.2")
+    %|-           ((endgame-def)
+    %|-            (then (flatten-disjunct 1 1)
+    %|-                  (beta 1)(beta 1)
+    %|-                  (split-spread ("Loop_b2.1.dec" "Loop_b2.1.inv_Loop")
+    %|-                          ((endgame-def)
+    %|-                           (split-spread ("Loop_b2.1.inv_Loop.1" "Loop_b2.1.inv_Loop.2" "Loop_b3.1.inv_Loop.3")
+    %|-                                   ((endgame-def)(endgame-def)(endgame-def))))))))
+    %|-               (then (flatten-disjunct 1 1)
+    %|-                  (beta 1)
+    %|-                  (split-spread ("Loop_b2.2.dec" "Loop_b2.2.inv_Loop")
+    %|-                       ((endgame-def)
+    %|-                        (then
+    %|-                           (split-spread ("Loop_b2.2.inv_Loop.1" "Loop_b2.1.inv_Loop.2" "Loop_b3.1.inv_Loop.3")
+    %|-                             ((endgame-def)(endgame-def)(endgame-def))))))))))))
+    %|-                     
+    %|- QED
+    vc_Loop: lemma
+        forall ( m:nat, k:nat ):
+            inv_Loop(m,k) =>
+                (let (v_Loop_0:nat) = var_Loop(m,k) in
+                    ((k=len(a) or k<len(a)) and
+                     (k=len(a) =>
+                         POST_(a,m,m_0) and
+                         modinv_Sorting) and
+                     (k<len(a) =>
+                         (a(k)<a(m) or a(k)>=a(m)) and
+                         (a(k)<a(m) =>
+                             (let m:nat=k in
+                                 (let k:nat=k+1 in
+                                     var_Loop(m,k) < v_Loop_0 and
+                                     inv_Loop(m,k)))) and
+                         (a(k)>=a(m) =>
+                             (let k:nat=k+1 in
+		                 var_Loop(m,k) < v_Loop_0 and
+                                 inv_Loop(m,k))))))
+                    
+
+    %|- vc_Pre: PROOF
+    %|-  (skolem 1 (m k) :dont-simplify? T)
+    %|-  (flatten-disjunct 1 1)
+    %|-  (flatten-disjunct 1 1)
+    %|-  (beta 1)		  
+    %|-  (spread (split-conds ("Pre_b1.inv_Loop.1" "Pre_b1.inv_Loop.2" "Pre_b1.inv_Loop.3"))
+    %|-          ( (endgame-def) (endgame-def) (endgame-def)))
+    %|- QED
+    vc_Pre: lemma
+        forall ( m:nat, k:nat ):
+            PRE_(a,m) =>
+	    	    (m=m_0 =>
+                    (let k:nat=m in
+                        inv_Loop(m,k)))
+
+
+end Sorting_Min_Impl
+
+
+Sorting_Sort_Spec: theory
+begin
+    importing Sorting_ModuleSpec
+
+    PRE_( a:vector ): macro bool = 
+        true
+
+    POST_( a,a_0:vector ): macro bool = 
+        sorted(a) and permutation(a,(let a=a_0 in a))
+
+end Sorting_Sort_Spec
+
+
+Sorting_Sort_Impl: theory
+begin
+    importing Sorting_Sort_Spec
+
+    importing Sorting_Min_Spec
+
+    a_0: vector
+
+    sorted_to( b:vector, p:nat ): bool =
+        forall (i,j:index(b)): 0<=i and i<=j and j<p => b(i)<=b(j)
+    auto_rewrite+ sorted_to
+
+    partitioned( b:vector, p:nat ): bool =
+        forall (i,j:index(b)):  i<p and p<=j => b(i)<=b(j) 
+    auto_rewrite+ partitioned
+
+    inv_Loop( a:vector, m:nat, k:nat ): macro bool =
+	    (0<=k and k<=len(a)) and
+		(sorted_to(a,k)) and
+		(partitioned(a,k)) and
+		(permutation(a,(let a=a_0 in a)))
+    
+    var_Loop( a:vector, m:nat, k:nat | inv_Loop(a,m,k) ): macro nat =
+        len(a)-k;
+
+    %|- vc_Pre: PROOF
+    %|-  (skolem 1 (a m k) :dont-simplify? T)
+    %|-  (flatten-disjunct 1 1)
+    %|-  (flatten-disjunct 1 1)
+    %|-  (beta 1)          
+    %|-  (spread (split-conds ("Pre_b1.inv_Loop.1" "Pre_b1.inv_Loop.2" "Pre_b1.inv_Loop.3" "Pre_b1.inv_Loop.4"))
+    %|-          ( (endgame-def)
+    %|-            (endgame-def)
+    %|-            (endgame-def)
+    %|-            (endgame-def) ) )
+    %|- QED
+    vc_Pre: lemma
+        forall ( a:vector, m:nat, k:nat ):
+            PRE_(a) =>
+                (a=a_0 =>
+                    (let k:nat=0 in    
+                        inv_Loop(a,m,k)))
+
+    %|- vc_Loop: PROOF
+    %|-  (skolem 1 (a m k) :dont-simplify? T)
+    %|-  (flatten-disjunct 1 1)
+    %|-  (beta 1)
+    %|-  (spread (split-conds ("Loop_b1.live" "Loop_b1" "Loop_b2"))
+    %|-    ( (then (endgame-def)) 
+    %|-      (then (flatten-disjunct 1 1)
+    %|-            (endgame-def))
+    %|-      (then (flatten-disjunct 1 1)
+    %|-            (beta 1)
+    %|-            (spread (split-conds ("Loop_b2.call_Min_1_PRE" "Loop_b2.call_Min_1_POST"))
+    %|-                 ((then (endgame-def))
+    %|-                  (then (beta 1) 
+    %|-                        (skolem! 1)
+    %|-                        (beta 1)
+    %|-                        (beta 1)
+    %|-                        (flatten)
+    %|-                        (spread (split-conds ("Loop_b2.dec" "Loop_b2.inv_Loop"))
+    %|-                            ( (then (endgame-def))
+    %|-                              (then (spread (split-conds ("Loop_b2.inv_Loop.1" "Loop_b2.inv_Loop.2" "Loop_b2.inv_Loop.3" "Loop_b2.inv_Loop.4"))
+    %|-                                      ( (endgame-def)
+    %|-                                        (endgame-def)
+    %|-                                        (endgame-def)
+    %|-                                        (endgame-def))))))))))))
+    %|- QED
+    vc_Loop: lemma
+        forall ( a:vector, m:nat, k:nat ):
+            inv_Loop(a,m,k) =>
+                (let (v_Loop_0:nat) = var_Loop(a,m,k) in
+                    (k=len(a) or k<len(a)) and
+                    (k=len(a) =>
+                        Sorting_Sort_Spec.POST_(a,a_0)) and
+                    (k<len(a) =>
+                        (let (m:nat)=k in
+                            (Sorting_Min_Spec.PRE_(a,m) and
+                            (let (m_1:nat)=m in
+                                (forall (m:nat):
+                                    (Sorting_Min_Spec.POST_(a,m,m_1) =>
+                                        (let (a:vector)=swap(a,m,k) in
+                                            (let (k:nat)=k+1 in
+                                                (var_Loop(a,m,k) < v_Loop_0 and
+                                                inv_Loop(a,m,k)))))))))))
+
+
+
+
+end Sorting_Sort_Impl
+

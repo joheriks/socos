@@ -1,0 +1,54 @@
+test : CONTEXT BEGIN
+    importing ds@parray;
+    n:nat;
+    palindrome[
+        a: parray[n,int];
+        b: result bool;
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 100 50]
+        * n>0;
+    END
+    POST BEGIN %: [210 10 398 50]
+        * b=forall (i:int): 0<=i and i<n => a(i)=a(n-1-i);
+    END
+    BEGIN
+        k: pvar nat;
+        loop : SITUATION BEGIN %: [50 170 394 128]
+            * b;
+            * n>=0;
+            * 0<=k;
+            * k<=n-k;
+            * b=forall (i:int): 0<=i and i<k => a(i)=a(n-1-i);
+            ** n-k;
+            IF 
+                %: [218 96] [ [580 280] ] 
+                %: [634 246]
+                [k<n-1-k];
+                IF %: [580 200]
+                    %: [ ] [79 43] 
+                    %: [663 106]
+                    [a(k)/=a(n-1-k)];
+                    b:=false;
+                    EXIT post__
+                    %: [4 4] [ ] [227 25] 
+                    %: [509 168]
+                    [a(k)=a(n-1-k)];
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                ENDIF
+                %: [136 1] [ [230 80] ] [23 40] 
+                %: [283 89]
+                [k>=n-1-k];
+                EXIT post__
+            ENDIF
+        END loop
+        IF 
+            %: [67 46] [ ] [8 2] 
+            %: [85 86]
+            k:=0;
+            b:=true;
+            GOTO loop
+        ENDIF
+    END palindrome
+END test

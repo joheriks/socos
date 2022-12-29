@@ -1,0 +1,14 @@
+initconst_termfun: context
+begin
+    by "(endgame)";
+
+    % initial-value constants not allowed in termination function
+    p[ x:valres nat ]: procedure
+    ** x__0 + 10 - x; 
+    begin
+        y: pvar nat;
+	    y := x+1;
+        p[y]; exit
+    end p
+
+end initconst_termfun

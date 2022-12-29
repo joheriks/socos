@@ -1,0 +1,43 @@
+calls: context
+begin
+    by "(endgame)";
+
+    xx:int;
+    
+    % test various combinations of parameter types
+
+    p0: procedure pre xx>0; 
+    begin 
+        exit
+    end p0 % no parameters
+
+    p1[ x:int; y:valres int; z:result int ]: procedure
+    pre x>3;
+	post z>x and z>y and z>y__0;
+    begin
+        if [x>y]; z,y:=x+1,0; exit
+           [x<=y]; z:=y+1; exit
+        endif
+    end p1
+
+    swap[ x,y: valres int ]: procedure
+    post y=x__0 and x=y__0;
+    begin
+        x,y := y,x; exit
+    end swap
+
+
+    test: procedure
+    begin
+     	a,b,c,d: pvar int;
+
+        choice
+          [xx>0]; p0[]; exit;
+          a,b:=4,5; p1[a,b,c]; {c>a}; exit;
+          a,b:=1,2; swap[a,b]; {a=2 and b=1}; exit
+        endchoice
+    end test
+
+
+
+end calls

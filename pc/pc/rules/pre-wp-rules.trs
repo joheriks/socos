@@ -1,0 +1,165 @@
+##
+# Tree rewrites that are done before wp rewriting.
+# This is in a separate pass (mostly to keep things simpler)
+##
+
+
+# Generate initial assignments for module and valres variables
+
+init_assign_3
+::
+        module > proc:'procedure|pprocedure'
+                 (args(arg(valres:'KEY_VALRES', ID+, typ:'.*'*),
+                       &rest),
+                  &rest)
+        ->
+        arg := 'parg'('orig'(@children(arg)),
+                      'new'(@foreach(ID, 'ID'=$gensym($$ID))))
+::
+
+init_assign_4
+::
+        module > proc:'procedure|pprocedure'
+                   (args(parg(orig(oid:ID+, &rest), new(nid:ID+)), &rest),
+                    procedure_body(then, &rest),
+                    &rest)
+        ->
+        parg := 'pparg'(@children(parg))
+        then := then('prog'('assign'('left'(nid),
+                                     'right'(@foreach(oid, 'name'('idop'(oid)))))),
+                     @children(then))
+::
+
+init_assign
+::
+        module(var:'KEY_PROGVAR'(ID+, typ:'(?!ID$).*'), &rest)
+        ->
+        var := 'init_progvar'('orig_var'(@foreach(ID, 'KEY_PROGVAR'(ID, typ))),
+                              'new_var'(@foreach(ID, 'KEY_PROGVAR'(
+                                                        'ID'= $gensym($$ID),
+                                                        typ))))
+::
+
+init_assign_2
+::
+        module(init_progvar+(orig_var(KEY_PROGVAR+(oid:ID, &rest)),
+                             new_var(KEY_PROGVAR+(nid:ID, &rest))),
+               procedure(procedure_body(then, &rest), &rest),
+               KEY_PROGVAR!,
+               &rest)
+        ->
+        then := then('prog'('assign'('left'(nid),
+                                     'right'(@foreach(oid, 'name'('idop'(oid)))))),
+                     @children(then))
+        procedure := 'pprocedure'(@children(procedure))
+::
+
+
+# Insert dummy invariants if not defined (for pvs_rules)
+
+fix_module_inv
+::
+        module(invariant!, &rest)
+        ->
+        module := module(rest, 'invariant'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+fix_proc_pre
+::
+        module > procedure_body(KEY_PRE!, &rest)
+        ->
+        procedure_body := procedure_body(rest, 'KEY_PRE'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+fix_proc_post
+::
+        module > procedure_body(KEY_POST!(&any, id!), &rest)
+        ->
+        procedure_body := procedure_body(rest, 'KEY_POST'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+fix_situation_inv
+::
+        module > situation(invariant!, &rest)
+        ->
+        situation := situation(rest, 'invariant'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+
+# Translate if-fi statements into an assertion of the disjunction of guards
+# followed by demonic choice
+
+iffi_to_choice_1	# one guarded statement
+::
+        module > iffi(guarded_command(assume(expr:'.*'),then))
+        ->
+        iffi := 'prog'('assert'(expr)),'choice'(guarded_command)
+::
+
+
+iffi_to_choice_2	# two or more guarded statements
+::
+        module > iffi(guarded_command+(assume(expr:'.*'),then))
+        ->
+        iffi := 'prog'('assert'('KEY_OR'(@foreach(expr,'pgroup'(expr))))),'choice'(guarded_command)
+::
+
+guarded_commands_to_statements
+::
+        module > guarded_command(assume,then(&rest))
+        ->
+        guarded_command := 'then'('prog'(assume),rest)
+::
+
+
+# Translate magic and abort into [false] and {false}, respectively
+
+magic_to_assume_false
+::
+        module > KEY_MAGIC
+        ->
+        KEY_MAGIC := 'assume'('name'('idop'('KEY_FALSE'='false')))
+::
+
+abort_to_assert_false
+::
+        module > KEY_ABORT
+        ->
+        KEY_ABORT := 'assert'('name'('idop'('KEY_FALSE'='false')))
+::
+
+
+# Translate literal array syntactic sugar (| 1,2,3 |) into PVS array operations (||) <| 1 <| 2 
+
+array_literal_to_append_1
+::
+	module > expression_list_4( expr:'.*'+ )
+	-> 
+	expression_list_4 := 'pgroup'('append'('name'('idop'('LPAREN_VBAR_VBAR_RPAREN'='(||)')),@foreach(expr,expr)))
+
+::
+
+array_literal_to_append_2
+::
+        module > append(e1:'.*', e2:'.*', &rest)
+        ->
+        append := 'VBAR_GT'(e1, 'append'(e2, rest))
+::
+
+
+array_literal_to_append_3
+::
+        module > append(e1:'.*')
+        ->
+        append := e1
+::
+
+
+# Translate array update syntactic sugar a <| (i,v) to vector.update(a)(i,v)
+
+array_sweet_update_to_update
+::
+	module > LT_VBAR(a:'.*',expression_list_1(i:'.*',v:'.*'	))
+	->
+	LT_VBAR := 'expression_arguments'('expression_arguments'('name'('idop'('ID'='vector'),'idop'('ID'='update')),'arguments'('name'('idop'(a)))),'arguments'(i,v))
+::

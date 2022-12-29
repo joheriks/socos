@@ -1,0 +1,56 @@
+multi: MODULE BEGIN
+
+    USING icip@core;
+
+    % search for the first occurrence of x in array a beginning at j and return its index
+    search[ a:dynarray[int].dynarray, x:int, j:nat, result i:nat ]: PROCEDURE
+    BEGIN
+        PRE j<=len(a);
+        POST i>=j and i<len(a) and a(i)=x and forall (k:below(i)): k>=j IMPLIES a(k)/=x;
+        not_found: POST forall (k:index(a)): a(k)/=x;
+
+        SELECT
+            j<len(a) THEN 
+                SELECT 
+                    a(j)=x THEN i:=j; EXIT AT found
+                    a(j)/=x THEN 
+                        CALL search(a, x, j+1, i) DECREASING [len(a)-j]
+                            not_found THEN EXIT AT not_found
+                            found THEN EXIT AT found
+                        END
+                END
+            j=len(a) THEN EXIT AT not_found
+        END
+
+    END search
+
+    % replace all occurrences of value x with value y in a
+    replace[ valres a:dynarray[int].dynarray, x:int, y:int]: PROCEDURE
+    BEGIN
+        PRE x/=y;
+        POST a = mupdate(OLD(a),occurrences(OLD(a),x),lambda (i:index(a)):y);
+
+        GOTO loop
+
+        loop: SITUATION
+        BEGIN
+            i: PROGVAR nat;
+            invariant exists (p:setof[occurrences(OLD(a),x)]): a=mupdate(OLD(a),p,lambda (i:index):y) ;
+    
+            CALL search(a,x,0,i)
+                not_found THEN EXIT
+                found THEN a := update(a,i,y); GOTO loop DECREASING [card(occurrences(a,x))]
+            END
+        END loop
+        
+    END replace
+
+    % doubles all occurrences of value x in a
+    double[ valres a:dynarray[int].dynarray, x:int]: PROCEDURE
+    BEGIN
+        POST a = mupdate(OLD(a),occurrences(OLD(a),x),lambda (i:index(a)):2*x);
+
+        CALL replace(a,x,2*x); EXIT
+    END double
+
+END multi

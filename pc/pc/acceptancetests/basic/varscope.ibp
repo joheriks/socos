@@ -1,0 +1,41 @@
+% Scope of situation-local variables in transitions:
+% - A variable defined in the target situation can be assigned a value
+% - A variable defined in the source situation can be read
+
+varscope: context
+begin
+    
+    by "(assert)";
+
+    varscope: procedure
+    begin
+       x: pvar int;
+
+       s1: situation
+       begin
+           y: pvar int;
+           * y = 2;
+           s2: situation
+           begin
+               z: pvar int;
+               * z = 3;
+               exit
+           end s2
+
+           exit
+       end s1
+       
+       s0: situation
+       begin
+           * x = 1;
+           choice
+               y := x+1; goto s1
+               x := x+1; y := x; z:=y+1; goto s2
+          endchoice
+       end s0    
+
+       x:=0; x:=x+1; goto s0
+
+    end varscope
+
+end varscope

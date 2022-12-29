@@ -1,0 +1,8 @@
+varnames2: context
+begin
+    by "(assert)";
+    p: procedure
+    begin
+        {forall (x__1:nat):true}; exit
+    end p
+end varnames2

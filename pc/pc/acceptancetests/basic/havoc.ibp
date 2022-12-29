@@ -1,0 +1,30 @@
+h1: context begin
+
+   by "(assert)";
+
+   p1[x: result nat]: procedure
+      post x>=0;
+   begin
+      x:=?;
+      exit
+   end p1
+
+   p2[x: result nat]: procedure
+      post x>=1;
+   begin
+      x:=?;
+      x:=x+1;
+      exit
+   end p2
+
+   p3[x, y: result nat]: procedure
+      post x>=1;
+   begin
+      x, y:=?;
+      p2[y];
+      x:=x+y;
+      y:=?;
+      exit
+   end p3
+
+end h1

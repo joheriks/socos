@@ -1,0 +1,16 @@
+c1: context begin
+
+   by "(assert)";
+
+   n: nat;
+
+   p1[x: valres nat]: procedure 
+      pre x=0;
+      post x=0;
+   begin
+         x:=x-1;
+         x:=x+1;
+      exit
+   end p1
+
+end c1

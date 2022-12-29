@@ -1,0 +1,15 @@
+badstrata2: context
+begin
+
+    % An invalid PVS expression in the proof command causes the
+    % entire proof branch to fail. Test that this results in a failed
+    % verification, rather than being silently ignored.
+    by "(case \"[[[[[\")";
+
+    p1: procedure
+    post false;
+    begin
+        exit
+    end p1
+
+end badstrata2

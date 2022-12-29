@@ -1,0 +1,56 @@
+# many rules change the order of declarations FIXME
+
+combine_pre_conds
+::
+	module > pb:procedure_body( cond1:KEY_PRE(&any), cond2:KEY_PRE(&any) ,&rest)
+	->
+	pb:= pb( cond1('KEY_AND'('pgroup'(cond1.any), 'pgroup'(cond2.any))), pb.rest)
+
+::
+
+# only default, nameless, postconditions are combined
+combine_post_conds
+::
+	module > pb:procedure_body( cond1:KEY_POST(&any, id!), cond2:KEY_POST(&any,id!) ,&rest)
+	->
+	pb:= pb( cond1('KEY_AND'('pgroup'(cond1.any), 'pgroup'(cond2.any))), pb.rest)
+::
+
+# labeled postconditions must be unique in name
+# combine_labeled_post_conds
+# ::
+# 	module > pb:procedure_body(cond1:KEY_POST(pl:id, &any), cond2:KEY_POST(id=pb.cond1.pl, &any) ,&rest)
+# 	->
+# 	pb:= pb( cond1('KEY_AND'('pgroup'(cond1.any), 'pgroup'(cond2.any)), cond1.pl), pb.rest)
+# ::
+
+
+combine_invariants
+::
+	module > parent:'.*'(inv1:invariant(&any) , inv2:invariant(&any),  &rest)
+	->
+	parent := parent(parent.rest, 'invariant'('KEY_AND'('pgroup'(inv1.any) , 'pgroup'(inv2.any))))
+::
+
+combine_module_invariant
+::
+	module(inv1:invariant, inv2:invariant, &rest)
+	->
+	module := module(rest, 'invariant'('KEY_AND'(@children(inv1), @children(inv2))))
+
+::
+
+
+combine_args
+::
+	module > sit_inv:situation_invariant(source, name,arg:args(ID+), args+(ID+) , &rest)
+	->
+	sit_inv := sit_inv(source, name, 'args'(arg.ID, args.ID), rest)
+::
+
+delete_empty_args
+::
+        module > sit_inv:situation_invariant(source, name, args+() , &rest)
+	->
+	sit_inv := sit_inv(source, name, rest)
+::

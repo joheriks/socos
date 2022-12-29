@@ -1,0 +1,38 @@
+arrays_test: context
+begin
+  importing ds@parray;
+  
+  find[ a:parray[5,int];  x:int; j: result int ]: procedure
+ 
+    begin
+        s: situation
+        begin
+            * 0<=j and j<=5;
+            * forall (i:below[5]): 0<=i and i<j => a(i)/=x; 
+            ** 5-j;
+            if
+              [j=5]; exit
+              [j<5 and a(j)/=x]; j:=j+1; decreasing goto s
+              [j<5 and a(j)=x]; exit
+            endif
+        end s
+        j:=0; goto s
+    end find
+  
+  find_test: procedure
+  begin
+    j: pvar int;
+    find[array_val((:1,8,5,3,6:)), 8, j];
+    { j=1 };
+   exit
+  
+  end find_test
+
+ 
+  main: procedure
+   begin
+    find_test[];
+   exit
+  end main
+  
+end arrays_test

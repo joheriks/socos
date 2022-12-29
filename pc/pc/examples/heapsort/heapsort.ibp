@@ -1,0 +1,94 @@
+heapsort: context
+begin
+    importing sorting;
+
+    strategy "(endgame :lemmas (perm_len perm_ref perm_sym 
+                             perm_trs swap_acc swap_perm))";
+
+    heapsort[ a: valres vector[int] ]: procedure
+    post sorted(a);
+    post perm(a,a__0);
+    begin
+        k: pvar nat;
+
+        Constraints: situation
+        begin
+            * perm(a,a__0);
+            * k<=len(a);
+
+            BuildHeap: situation
+            begin
+                * heap(a,k,len(a));
+                ** k;
+                if  [k>0]; k:=k-1; 
+                           siftdown[a,k,len(a)];
+                           decreasing goto BuildHeap   
+                    [k=0]; k:=len(a); 
+                           goto TearHeap
+                endif
+            end BuildHeap
+
+            TearHeap: situation 
+            begin
+                * partitioned(a,k);
+                * sorted(a,k);
+                * heap(a,0,k);
+                ** k;
+                if  [k>1]; k:=k-1;
+                           a:=swap(a,0,k);
+                           siftdown[a,0,k];
+                           decreasing goto TearHeap    
+                    [k<=1]; exit
+                endif
+            end TearHeap
+        end Constraints
+
+        k:=floor(len(a)/2); goto BuildHeap
+    end heapsort
+
+    siftdown[ a: valres vector[int]; m,n:nat ]: procedure
+    pre m<=n and n<=len(a);
+    pre heap(a,m+1,n);
+    post heap(a,m,n);
+    post perm(a,a__0);
+    post eql(a,a__0,0,m);
+    post eql(a,a__0,n,len(a));
+    begin
+        k: pvar nat;
+        
+        Sift: situation
+        begin
+            * perm(a,a__0);
+            * m<=k and k<=n and n<=len(a);
+            * eql(a,a__0,0,m);
+            * eql(a,a__0,n,len(a));
+            * forall (i:nat): m<=i =>
+                (i/=k =>
+                  (l(i)<n => a(l(i))<=a(i)) and
+                  (r(i)<n => a(r(i))<=a(i))) and
+                ((l(i)=k or r(i)=k) =>
+                  (l(k)<n => a(l(k))<=a(i)) and
+                  (r(k)<n => a(r(k))<=a(i))) ;
+            ** n-k;
+
+            if  [n<=r(k) or (a(l(k))<=a(k) and a(r(k))<=a(k))];
+                if [r(k)=n]; if [a(l(k))<=a(k)]; exit
+                                [a(k)<a(l(k))]; a:=swap(a,k,l(k)); exit
+                             endif
+                   [r(k)/=n]; exit
+                endif
+
+                [r(k)<n and (a(k)<a(l(k)) or a(k)<a(r(k)))];
+                if  [a(r(k))<=a(l(k))]; 
+                    a:=swap(a,k,l(k)); k:=l(k); decreasing goto Sift
+
+                    [a(l(k))<=a(r(k))]; 
+                    a:=swap(a,k,r(k)); k:=r(k); decreasing goto Sift
+                endif
+            endif
+        end Sift
+
+        k:=m; goto Sift
+    end siftdown
+
+end heapsort

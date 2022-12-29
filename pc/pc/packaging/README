@@ -1,0 +1,5 @@
+Scripts for building source and binary packages. To get a consistent build,
+checkout should be clean from the repo.
+
+MANIFEST and the .spec.in file need both be updated when new files are
+added to the packaging.

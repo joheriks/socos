@@ -1,0 +1,57 @@
+rev_test:context
+begin
+  importing ds@vector;
+  
+reverse[ a: valres vector[int] ]: procedure
+  post len(a)=len(a__0);
+  post forall (i:index(a)): a(i) = a__0(len(a)-1-i);
+  begin
+    k: pvar int;
+  
+    Loop: situation
+    begin
+      * len(a) = len(a__0);
+      * 0<=k and k<=len(a);
+      * forall (i:index(a)): 
+                  (i<k or len(a)-1-k<i =>
+              a(i) = a__0(len(a)-1-i)) and
+          (k<=i and i<=len(a)-1-k => a(i) = a__0(i));
+      ** len(a)-k;
+      if
+        [k<len(a)-1-k]; 
+          a := update(update(a,k,a(len(a)-1-k)),len(a)-1-k,a(k));
+          k:=k+1; decreasing goto Loop
+        [k>=len(a)-1-k]; exit
+      endif
+    end Loop
+
+    k:=0; goto Loop
+  end reverse
+  
+  my_update[m:valres vector[int]]: procedure
+  begin
+       
+        m := update(m,0,3);
+        m := update(m,2,5);
+       exit;
+  end my_update
+  
+  
+main: procedure
+  begin
+    a: pvar vector[int];
+    m: pvar vector[int];
+    a:=vector_val((:8,3,6:));
+    %a:=update(update(a,1,1),0,a(1));
+    %{ a = vector_val((:3,1,6:)) };
+    reverse[a];
+    { a= vector_val((:6,3,8:)) };
+    %
+    %m:=vector_val((:0,0,0:));
+    %my_update[m];
+    %{ m= vector_val((:3,2,5:)) };
+      
+  exit
+  end main
+  
+  end rev_test

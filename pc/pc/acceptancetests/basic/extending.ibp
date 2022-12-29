@@ -1,0 +1,32 @@
+c1: context
+begin
+    importing ds@vector[int];
+    by "(assert)";
+    p: procedure
+    begin
+        exit
+    end p
+end c1
+
+c2: context
+begin
+    extending c1;
+end c2
+
+c3: context
+begin
+    extending c2;
+    by "(grind)","(grind)";
+end c3
+
+c4: context
+begin
+    extending c2,c3;
+    by c3,"(tcc)";
+
+    q: procedure
+    begin
+        p[]; exit
+    end q
+
+end c4

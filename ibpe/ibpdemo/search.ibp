@@ -1,0 +1,52 @@
+demo : CONTEXT BEGIN
+    importing ds@parray;
+    n: nat;
+    p1[
+        a: parray[n,int];
+        x: int;
+        i: result nat;
+    ] : PROCEDURE
+    PRE BEGIN %: [0 10 47 49]
+    END
+    not_found:POST BEGIN %: [180 260 334 72]
+        * forall (k:int): 0<=k and k<n => a(k)/=x;
+    END not_found
+    found:POST BEGIN %: [20 250 100 72]
+        * i<n;
+        * a(i)=x;
+    END found
+    BEGIN
+        loop : SITUATION BEGIN %: [170 10 366 198]
+            * 0<=i and i<=n;
+            * forall (k:int): 0<=k and k<i => a(k)/=x;
+            ** n-i;
+            IF 
+                %: [1 259] [ [350 230] ] 
+                %: [392 232]
+                [i=n];
+                EXIT not_found
+                %: [1 138] [ ] 
+                %: [135 106]
+                [i<n];
+                IF %: [90 90]
+                    %: [ [30 90] [30 190] ] 
+                    %: [-127 250]
+                    [a(i)=x];
+                    EXIT found
+                    %: [ [90 180] ] [2 190] 
+                    %: [120 209]
+                    [a(i)/=x];
+                    i:=i+1;
+                    decreasing;
+                    GOTO loop
+                ENDIF
+            ENDIF
+        END loop
+        IF 
+            %: [7 26] [ ] [2 98] 
+            %: [104 54]
+            i:=0;
+            GOTO loop
+        ENDIF
+    END p1
+END demo

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SVG
+Bundle-SymbolicName: fi.imped.socos.SVG;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: fi.imped.socos.svg.Activator
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.gmf.runtime.draw2d.ui.render;bundle-version="1.4.1",
+ org.eclipse.gmf.runtime.draw2d.ui.render.awt;bundle-version="1.4.1",
+ org.eclipse.gef,
+ fi.imped.socos.IBPE
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: IMPEd.fi

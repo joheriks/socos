@@ -1,0 +1,145 @@
+exec__min: THEORY
+ BEGIN
+
+  IMPORTING impl__min__min
+
+  invVal: TYPE = {U, T, F}
+
+  loc__: TYPE =
+  {ini__, ini__trs_0, ini__trs_0__stmt_0, ini__trs_0__stmt_1, loop,
+   loop__trs_0, loop__trs_0__trs_0, loop__trs_0__trs_0__stmt_0,
+   loop__trs_0__trs_1, loop__trs_0__trs_1__stmt_0,
+   loop__trs_0__trs_1__stmt_1, loop__trs_1, fin__}
+
+  step(cur__: loc__, n: nat, a: parray[n, int], m: int, k: int):
+        [loc__, nat, parray[n, int], int, int, bool, bool, bool] =
+      CASES cur__
+        OF ini__: (ini__trs_0, n, a, m, k, TRUE, TRUE, TRUE),
+           ini__trs_0: (ini__trs_0__stmt_0, n, a, m, k, TRUE, TRUE, TRUE),
+           ini__trs_0__stmt_0:
+             (loop, n, a, m, 1, sit__ini__(m, k), TRUE, TRUE),
+           ini__trs_0__stmt_1:
+             (loop, n, a, 0, k, sit__ini__(m, k), TRUE, TRUE),
+           loop:
+             COND k < n ->
+                    (loop__trs_0, n, a, m, k, TRUE, sit__loop(m, k), TRUE),
+                  k = n ->
+                    (loop__trs_1, n, a, m, k, TRUE, sit__loop(m, k), TRUE),
+                  ELSE -> (loop, n, a, m, k, TRUE, sit__loop(m, k), TRUE)
+             ENDCOND,
+           loop__trs_0:
+             COND a(m) < a(k) ->
+                    (loop__trs_0__trs_0, n, a, m, k, TRUE, sit__loop(m, k),
+                     TRUE),
+                  a(m) >= a(k) ->
+                    (loop__trs_0__trs_1, n, a, m, k, TRUE, sit__loop(m, k),
+                     TRUE),
+                  ELSE ->
+                    (loop__trs_0, n, a, m, k, TRUE, sit__loop(m, k), TRUE)
+             ENDCOND,
+           loop__trs_0__trs_0:
+             (loop__trs_0__trs_0__stmt_0, n, a, m, k, TRUE,
+              sit__loop(m, k), TRUE),
+           loop__trs_0__trs_0__stmt_0:
+             (loop, n, a, m, k + 1, TRUE, sit__loop(m, k), TRUE),
+           loop__trs_0__trs_1:
+             (loop__trs_0__trs_1__stmt_0, n, a, m, k, TRUE,
+              sit__loop(m, k), TRUE),
+           loop__trs_0__trs_1__stmt_0:
+             (loop__trs_0__trs_1__stmt_1, n, a, k, k, TRUE,
+              sit__loop(m, k), TRUE),
+           loop__trs_0__trs_1__stmt_1:
+             (loop, n, a, m, k + 1, TRUE, sit__loop(m, k), TRUE),
+           loop__trs_1:
+             (fin__, n, a, m, k, TRUE, TRUE, sit__fin__post__(m, k)),
+           fin__: (fin__, n, a, m, k, TRUE, TRUE, sit__fin__post__(m, k))
+        ENDCASES
+ END exec__min
+
+
+
+exec__minvector: THEORY
+ BEGIN
+
+  IMPORTING impl__minvector__minvector
+
+  IMPORTING exec[[int,int],int]
+  IMPORTING exec[[int,int],bool]
+  
+  counter( len:int, k:int ):int = len-k
+  cU: exec[[int,int],int].maybe = U
+ 
+  loc__: TYPE =
+  {ini__, ini__trs_0, ini__trs_0__stmt_0, ini__trs_0__stmt_1, loop,
+   loop__trs_0, loop__trs_0__trs_0, loop__trs_0__trs_0__stmt_0,
+   loop__trs_0__trs_1, loop__trs_0__trs_1__stmt_0,
+   loop__trs_0__trs_1__stmt_1, loop__trs_1, fin__}
+
+  step(cur__: loc__, a: vector[int], m, k: int):
+        [loc__, vector[int], int, int, exec[[int, int], bool].maybe,
+         exec[[int, int], bool].maybe, exec[[int, int], bool].maybe, exec[[int,int], int].maybe] =
+      CASES cur__
+        OF ini__: (ini__trs_0, a, m, k, U, U, U, cU),
+           ini__trs_0: (ini__trs_0__stmt_0, a, m, k, U, U, U, cU),
+           ini__trs_0__stmt_0:
+             (loop, a, m, 1, try_eval(sit__ini__, (m, k)), U, U, cU),
+           ini__trs_0__stmt_1: (loop, a, 0, k, try_eval(sit__ini__, (m, k)), U, U, cU),
+           loop:
+             COND k < len(a) ->
+                    (loop__trs_0, a, m, k, U, try_eval(sit__loop, (m, k)), U, cU),
+                  k = len(a) ->
+                    (loop__trs_1, a, m, k, U, try_eval(sit__loop, (m, k)), U, try_eval(counter, (len(a),k))),
+                  ELSE -> (loop, a, m, k, U, try_eval(sit__loop, (m, k)), U, try_eval(counter, (len(a),k)))
+             ENDCOND,
+           loop__trs_0: 
+             COND a(m) < a(k) ->
+                    (loop__trs_0__trs_0, a, m, k, U, try_eval(sit__loop, (m, k)),U, try_eval(counter, (len(a),k))),
+                  a(m) >= a(k) -> 
+                    (loop__trs_0__trs_1, a, m, k, U, try_eval(sit__loop, (m, k)),U, try_eval(counter, (len(a),k))),
+                  ELSE -> (loop__trs_0, a, m, k, U, try_eval(sit__loop, (m, k)), U, try_eval(counter, (len(a),k)))
+             ENDCOND,
+           loop__trs_0__trs_0:
+             (loop__trs_0__trs_0__stmt_0, a, m, k, U, try_eval(sit__loop, (m, k)),
+              U, try_eval(counter, (len(a),k))),
+           loop__trs_0__trs_0__stmt_0:
+             (loop, a, m, k + 1, U, try_eval(sit__loop, (m, k)), U, try_eval(counter, (len(a),k))),
+           loop__trs_0__trs_1:
+             (loop__trs_0__trs_1__stmt_0, a, m, k, U, try_eval(sit__loop, (m, k)),
+              U, try_eval(counter, (len(a),k))),
+           loop__trs_0__trs_1__stmt_0:
+             (loop__trs_0__trs_1__stmt_1, a, k, k, U, try_eval(sit__loop, (m, k)),
+              U, try_eval(counter, (len(a),k))),
+           loop__trs_0__trs_1__stmt_1:
+             (loop, a, m, k + 1, U, try_eval(sit__loop, (m, k)), U, try_eval(counter, (len(a),k))),
+           loop__trs_1:
+             (fin__, a, m, k, U, try_eval(sit__loop, (m, k)),
+              try_eval(sit__fin__post__, (m, k)), try_eval(counter, (len(a),k))),
+           fin__:
+             (fin__, a, m, k, U, try_eval(sit__loop, (len(a), k)),
+              try_eval(sit__fin__post__, (m, k)), cU)
+        ENDCASES
+ END exec__minvector
+
+test__exec__minvector: THEORY
+ BEGIN
+
+  IMPORTING exec__minvector
+
+  IMPORTING ds@parray
+
+  a: parray[5, int] = array_val((: 3, -1, 4, -2, 5 :))
+
+  b: vector[int] = vector_val((: 3, -1, 4, -2, 5 :))
+
+  c: real = NRANDOM(2)
+ END test__exec__minvector
+
+test__exec__min: THEORY
+ BEGIN
+
+  IMPORTING exec__min
+
+  IMPORTING ds@parray
+
+  a: parray[5, int] = array_val((: 3, -1, 4, -2, 5 :))
+ END test__exec__min

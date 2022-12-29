@@ -1,0 +1,135 @@
+heapsort : CONTEXT BEGIN
+    importing sorting;
+    strategy "(endgame :lemmas (perm_len perm_ref perm_sym perm_trs swap_acc swap_perm))";
+    heapsort[
+        a: valres vector[int];
+    ] : PROCEDURE
+    PRE BEGIN %: [210 0 100 50]
+    END
+    POST BEGIN %: [190 540 136 58]
+        * sorted(a);
+        * perm(a,a__0);
+    END
+    BEGIN
+        k: pvar nat;
+        s1 : SITUATION BEGIN %: [0 80 528 448]
+            * perm(a,a__0);
+            * k<=len(a);
+            sort : SITUATION BEGIN %: [80 200 291 114]
+                * partitioned(a,k);
+                * sorted(a,k);
+                * heap(a,0,k);
+                ** k;
+                IF 
+                    %: [289 40] [ [430 390] [430 517] [320 517] ] [233 110] 
+                    %: [502 445]
+                    [k>1];
+                    k:=k-1;
+                    a:=swap(a,0,k);
+                    siftdown[a,0,k];
+                    decreasing;
+                    GOTO sort
+                    %: [217 0] [ ] [31 56] 
+                    %: [230 500]
+                    [k<=1];
+                    EXIT post__
+                ENDIF
+            END sort
+            buildheap : SITUATION BEGIN %: [80 20 285 110]
+                * heap(a,k,len(a));
+                ** k;
+                IF 
+                    %: [284 28] [ [424 200] [424 333] [320 333] ] [226 105] 
+                    %: [517 256]
+                    [k>0];
+                    k:=k-1;
+                    siftdown[a,k,len(a)];
+                    decreasing;
+                    GOTO buildheap
+                    %: [136 106] [ ] [141 3] 
+                    %: [183 317]
+                    [k=0];
+                    k:=len(a);
+                    GOTO sort
+                ENDIF
+            END buildheap
+        END s1
+        IF 
+            %: [ ] [125 2] 
+            %: [344 69]
+            k:=floor(len(a)/2);
+            GOTO buildheap
+        ENDIF
+    END heapsort
+    siftdown[
+        a: valres vector[int];
+        m,n: nat;
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 228 52]
+        * m<=n and n<=len(a);
+        * heap(a,m+1,n);
+    END
+    POST BEGIN %: [830 10 176 94]
+        * heap(a,m,n);
+        * perm(a,a__0);
+        * eql(a,a__0,0,m);
+        * eql(a,a__0,n,len(a));
+    END
+    BEGIN
+        k: pvar nat;
+        s1 : SITUATION BEGIN %: [10 160 836 266]
+            * perm(a,a__0);
+            * eql(a,a__0,0,m);
+            * eql(a,a__0,n,len(a));
+            * m<=k and k<=n and n<=len(a);
+            * forall (i:nat): m<=i and i/=k => (l(i)<n => a(l(i))<=a(i)) and (r(i)<n => a(r(i))<=a(i));
+            * forall (i:nat): m<=i and (l(i)=k or r(i)=k) => (l(k)<n => a(l(k))<=a(i)) and (r(k)<n => a(r(k))<=a(i));
+            ** n-k;
+            IF 
+                %: [832 25] [ [990 190] [1080 190] ] 
+                %: [1026 162]
+                [r(k)<n and (a(k)<a(l(k)) or a(k)<a(r(k)))];
+                IF %: [1080 320]
+                    %: [2 6] [ ] [832 156] 
+                    %: [974 256]
+                    [a(r(k))<=a(l(k))];
+                    a:=swap(a,k,l(k));
+                    k:=l(k);
+                    decreasing;
+                    GOTO s1
+                    %: [5 6] [ [1080 410] ] [832 245] 
+                    %: [973 362]
+                    [a(l(k))<=a(r(k))];
+                    a:=swap(a,k,r(k));
+                    k:=r(k);
+                    decreasing;
+                    GOTO s1
+                ENDIF
+                %: [318 0] [ [330 30] ] 
+                %: [486 150]
+                [n<=r(k) or (a(l(k))<=a(k) and a(r(k))<=a(k))];
+                IF %: [380 30]
+                    %: [6 5] [ [430 30] ] [1 36] 
+                    %: [477 9]
+                    [n/=r(k)];
+                    EXIT post__
+                    %: [6 2] [ [380 130] [840 130] ] [5 80] 
+                    %: [535 111]
+                    [n=r(k) and a(l(k))<=a(k)];
+                    EXIT post__
+                    %: [5 3] [ [380 80] ] [1 67] 
+                    %: [540 56]
+                    [n=r(k) and a(k)<a(l(k))];
+                    a:=swap(a,k,l(k));
+                    EXIT post__
+                ENDIF
+            ENDIF
+        END s1
+        IF 
+            %: [80 49] [ ] [83 4] 
+            %: [150 106]
+            k:=m;
+            GOTO s1
+        ENDIF
+    END siftdown
+END heapsort

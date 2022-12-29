@@ -1,0 +1,194 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
+# Web service interface for socos-pc
+
+import os,os.path
+import getopt
+import sys
+import shutil
+import pwd
+import grp
+import socket
+import time
+import random
+import multiprocessing
+import json
+
+from util.SharedData import *
+
+
+def error( msg ):
+    print >> sys.stderr, "check_server: %s"%msg
+    sys.exit(1)
+
+def getgroupname(user):
+    try:
+        gid = pwd.getpwnam(user).pw_gid
+    except KeyError:
+        error("No such user: %s"%user)
+    return grp.getgrgid(gid).gr_name
+
+
+def change_effective_user_group( user, group ):
+    try:
+        if group is not None:
+            gid = grp.getgrnam(group).gr_gid
+            os.setgid(gid)
+
+        if user is not None:
+            uid = pwd.getpwnam(user).pw_uid
+            os.setuid(uid)
+
+    except (KeyError,OSError),e:
+        error("Unable to set group/user id: %s"%str(e))
+
+
+if __name__ == "__main__":
+    from server_config import *
+    
+    apache_commands = ["apache2","httpd"]
+    module_dirs = [os.path.join(os.path.expanduser("~"),"modules"),
+                   "/usr/lib/apache2/modules",
+                   "/etc/httpd/modules",
+                   "/usr/libexec/apache2"]
+    typesconfig_files = ["/etc/mime.types","/etc/apache2/mime.types"]
+
+    USER = USER or pwd.getpwuid(os.geteuid()).pw_name
+    GROUP = GROUP or grp.getgrgid(os.getegid()).gr_name
+
+    opts,commands = getopt.getopt(sys.argv[1:],"",["data-dir=",
+                                                   "apache=",
+                                                   "module-dir=",
+                                                   "user=",
+                                                   "group=",
+                                                   "port=",
+                                                   "max-processes=",
+                                                   "defer-hosts=",
+                                                   "validate-user",
+                                                   "ssl",
+                                                   "debug",
+                                                   "id"])
+    for o,a in opts:
+        if o=="--data-dir": DATA_DIR = a
+        if o=="--apache": apache_commands = [a]
+        if o=="--module-dir": module_dirs = [a]
+        if o=="--user": USER = a
+        if o=="--group": GROUP = a
+        if o=="--port":
+            PORT = int(a)
+            SSL_PORT = int(a)
+        if o=="--max-processes":
+            if a.strip()=="auto":
+                MAX_PROCESSES = multiprocessing.cpu_count()
+            elif a.isdigit():
+                MAX_PROCESSES = int(a)
+        if o=="--defer-hosts": DEFER_HOSTS = a.strip().split(",") if a.strip() else []
+        if o=="--validate-user": VALIDATE_USER = True
+        if o=="--ssl":
+            SSL = True
+            print "using ssl"
+        if o=="--debug": DEBUG_SERVER = True
+        if o=="--id": ID = a
+
+    if SSL:
+        PORT = SSL_PORT
+
+    # change effective user and group ids before importing init_socos
+    # this also makes clean below work correctly
+    change_effective_user_group(USER,GROUP)
+    from init_socos import *
+    from pc.util.ShellUtils import find_executable
+
+
+    apache_dir = os.path.join(socos_dir,"server")
+    if not os.path.isdir(apache_dir):
+        error("no such apache config directory: '%s'"%apache_dir)
+
+    apache = None
+    for a in apache_commands:
+        apache = find_executable(a)
+        if apache:
+            break
+    if not apache:
+        error("no such command: '%s'"%(", ".join(apache_commands)))
+
+    module_dir = None
+    for a in module_dirs:
+        if os.path.isdir(a):
+            module_dir = a
+            break
+    if not module_dir:
+        error("no such apache module directory: '%s'"%(", ".join(module_dirs)))
+
+    typesconfig_file = None
+    for a in typesconfig_files:
+        if os.path.exists(a):
+            typesconfig_file = a
+            break
+    if not typesconfig_file:
+        error("no such MIME config file: '%s'"%(", ".join(typesconfig_files)))
+
+    if SSL:
+        data_dir = "ssl_data"
+    else:
+        data_dir = "data"
+        
+    if DATA_DIR is None:
+        DATA_DIR = os.path.join(socos_dir,"server","%s_%d" % (data_dir, os.geteuid()))
+        
+    elif not os.path.isabs(DATA_DIR):
+        DATA_DIR = os.path.join(socos_dir,DATA_DIR)
+
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+        
+    if not os.path.exists(os.path.join(DATA_DIR, "history")):
+        os.makedirs(os.path.join(DATA_DIR, "history"))
+
+    # Generate a (hopefully unique) server identity if ID is null
+    server_id = ID or "%s.%d.%x"%(socket.gethostname(),
+                                  PORT,
+                                  int(time.time()*1000))
+    config = { "id": ID,
+               "debug": DEBUG,
+               "defer_hosts": DEFER_HOSTS,
+               "max_processes": MAX_PROCESSES,
+               "validate_user": VALIDATE_USER }
+    f = open(os.path.join(DATA_DIR,"config.json"),"w")
+    try:
+        json.dump(config,f)
+    finally:
+        f.close()
+ 
+    if len(commands)!=1 or not commands[0] in ("start","stop","restart","clean"):
+        error("usage: check_server <clean|start|stop|restart>")
+        
+    cmd = commands[0]
+    print cmd + "..."
+
+    if cmd=="clean":
+        if os.path.isdir(server_data_dir):
+            try:
+                shutil.rmtree(server_data_dir)
+            except OSError,e:
+                error("unable to fully clean: %s"%str(e))
+    else:
+        conf_dir = os.path.join(apache_dir,"conf")
+        if SSL:
+            conf_dir = os.path.join(conf_dir, "ssl")
+            
+        os.environ["SOCOS_DIR"] = socos_dir
+        os.environ["SOCOS_DATA_DIR"] = DATA_DIR
+        os.environ["SOCOS_DEBUG"] = str(int(DEBUG))
+        os.environ["APACHE_MODULE_DIR"] = module_dir
+        os.environ["APACHE_TYPESCONFIG"] = typesconfig_file
+        os.environ["APACHE_USER"] = USER
+        os.environ["APACHE_GROUP"] = GROUP
+        os.environ["APACHE_PORT"] = str(PORT)
+        apachecmd = "%s -d %s -f %s " % (apache, conf_dir, "apache2.conf")
+        if DEBUG: apachecmd += "-D SocosDebug "
+        apachecmd += "-k %s "%cmd
+        os.system(apachecmd)
+
+    
+

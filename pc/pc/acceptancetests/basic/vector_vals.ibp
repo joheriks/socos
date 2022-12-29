@@ -1,0 +1,16 @@
+vector_vals: context
+begin                  
+    importing ds@vector;
+
+    by "(then (lemma \"vector[int].val_access_prop_1\") (lemma \"vector[int].val_access_prop_2\") (grind))";
+    
+    p: procedure
+    begin
+        v: pvar vector[int];
+        v := (: 1::int, 2::int, 3::int :);
+        { len(v)= 3 };
+        { v(0)=1 and v(1)=2 and v(2)=3 };
+        exit
+    end p
+
+end vector_vals

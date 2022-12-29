@@ -1,0 +1,80 @@
+multi: MODULE BEGIN
+
+    USING icip@core;
+	
+	MAX_INT: PROGVAR nat;
+
+
+    % replace all occurrences of value x with value y in a
+    replace[ valres a:dynarray[int].dynarray, x:int, y:int]: PROCEDURE
+    BEGIN
+        PRE x/=y and len(a)>0;
+        POST a = mupdate(OLD(a),occurrences(OLD(a),x),lambda (i:index(a)):y);
+
+        goto loop
+
+        loop: situation
+        begin
+	        i: PROGVAR nat;
+            invariant exists (p:setof[occurrences(OLD(a),x)]): a=mupdate(OLD(a),p,lambda (i:index):y) ;
+   
+            call search(a,x,i)
+    	        	not_found THEN goto loop decreasing [card(occurrences(a,x))]
+    	        	not_found2 THEN exit
+            		found THEN
+                        a := update(a,i,y);
+            		    goto loop decreasing [card(occurrences(a,x))]
+            end
+        end loop
+        
+    END replace
+        
+    % search for the first occurrence of x in array a and return its index
+    search[ a:dynarray[int].dynarray, x:int, result i:nat ]: PROCEDURE
+    BEGIN
+        PRE len(a)>0;
+        found: POST i<len(a) and a(i)=x and forall (j:below(i)):a(j)/=x;
+        not_found: POST forall (j:index(a)): a(j)/=x;
+        not_found2: POST forall (j:index(a)): a(j)/=x;
+
+        k:=0; goto loop
+
+        loop: SITUATION
+        BEGIN
+            k: PROGVAR nat;
+            INVARIANT k<=len(a);
+            INVARIANT forall (j:below(k)): a(k)/=x;
+
+            SELECT
+                k<len(a) THEN 
+                    SELECT 
+                        a(k)=x THEN i:=k;  exit
+                        a(k)>x THEN k:=k+1; goto loop decreasing [len(a)-k]
+                        a(k)<x THEN k:=k+1; exit at not_found2
+						
+                    END
+                k=len(a) THEN exit at not_found
+            END
+                    
+        END loop
+        
+
+    END search
+
+
+
+
+    % doubles all occurrences of value x in a
+    double[ valres a:dynarray[int].dynarray, x:int]: PROCEDURE
+    BEGIN
+        PRE x<MAX_INT/2 and forall (j:index(a)): a(j)<MAX_INT;
+        POST a = mupdate(OLD(a),occurrences(OLD(a),x),lambda (i:index(a)):2*x)
+             and forall (j:index(a)): a(j)<MAX_INT;
+
+		call replace(a,x, 2*x);
+		exit
+        
+    END double
+
+
+END multi

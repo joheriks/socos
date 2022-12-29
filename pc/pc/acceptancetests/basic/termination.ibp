@@ -1,0 +1,130 @@
+termination: context
+begin
+
+    by "(endgame)";
+
+    p0: procedure
+    begin
+        % no decreasing---no termination checking, but prints
+        % warning
+        s: situation
+        begin
+            choice goto s; exit endchoice
+        end s
+        goto s
+    end p0
+
+    p1[ n:nat ]: procedure
+    begin
+        % single variant, multiple decreasing, 
+        % no nonincreasing conditions
+        k: pvar nat;
+        s1: situation
+        begin 
+          ** k;
+          if
+            [k>0]; k:=k-1; decreasing goto s1
+            [k>1]; k:=k-2; decreasing goto s1
+            [k=0]; exit
+          endif
+        end s1
+        k:=n; goto s1
+    end p1
+    
+
+    p2[ n:nat ]: procedure
+    begin
+        % multiple variants, single component
+        % nonincreasing conditions for  
+        %  s1->s2 (s1)
+        %  s2->s2 (s1)
+        s1: situation
+        begin 
+          k: pvar nat;
+          ** k;
+          s2: situation
+          begin 
+            j: pvar nat;
+            * k>0;
+            ** j;
+            if
+              [j>0]; j:=j-1; decreasing s2 goto s2
+              [j=0]; k:=k-1; decreasing s1 goto s1
+            endif
+          end s2
+          if
+            [k>0]; j:=k; goto s2
+            [k=0]; exit
+          endif
+        end s1
+        k:=n; goto s1
+    end p2
+
+
+    p3[ n:nat ]: procedure
+    begin
+        % multiple variants, disjoint components 
+        % no nonincreasing conditions should be generated
+        s1: situation
+        begin 
+          k: pvar nat;
+          ** k;
+          if
+            [k>0]; k:=k-1; decreasing s1 goto s1
+            [k=0]; j:=n; goto s2
+          endif
+        end s1
+
+        s2: situation
+        begin 
+          j: pvar nat;
+          ** j;
+          if
+            [j>0]; j:=j-1; decreasing goto s2
+            [j=0]; exit
+          endif
+        end s2
+
+        k:=n; goto s1
+    end p3
+
+
+    p4[ n:nat ]: procedure
+    begin
+        % test for termination decomposition algorithm
+        % multiple variants, more than one decomposition, but
+        % only one acceptable (c is the major variant)
+
+        i,j: pvar nat;
+
+        a: situation
+        begin
+            ** i;
+            if
+                [i=0]; exit
+                [i>0]; i:=i-1; decreasing a goto b
+            endif
+        end a
+
+        b: situation
+        begin
+            if
+              [j=0]; goto c
+              [j>0]; j:=j-1; decreasing c goto b
+            endif
+        end b
+
+        c: situation
+        begin
+            ** j;
+            if 
+              [j=0]; exit;
+              [j>0]; j:=j-1; decreasing c goto a
+            endif
+        end c
+
+        i,j:=n,n; goto a
+    end p4
+
+
+end termination

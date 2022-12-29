@@ -1,0 +1,56 @@
+max : CONTEXT BEGIN
+    importing ds@parray;
+    n: nat;
+    max[
+        a:parray[n,int];
+        m: result int;
+    ] : PROCEDURE
+    PRE BEGIN %: [40 10 100 50]
+        * n>0;
+    END
+    POST BEGIN %: [300 20 380 76]
+        * n>0;
+        * 0<=m and m<n;
+        * forall (i:int): 0<=i and i<n => a(i) <= a(m);
+    END
+    BEGIN
+        k: pvar int;
+        loop : SITUATION BEGIN %: [50 180 387 150]
+            * 0<k and k<=n;
+            * 0<=m and m<k;
+            * forall (i:int): 0<=i and i<k => a(i) <= a(m);
+            ** n-k;
+            IF 
+                %: [34 116] [ [100 440] ] [92 96] 
+                %: [74 378]
+                [k<n];
+                IF %: [250 440]
+                    %: [7 4] [ [430 440] ] 
+                    %: [438 354]
+                    [a(k)>a(m)];
+                    m:=k;
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                    %: [194 7] [ [250 370] ] [172 118] 
+                    %: [262 350]
+                    [a(k)<=a(m)];
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                ENDIF
+                %: [ [250 70] ] 
+                %: [223 107]
+                [k=n];
+                EXIT post__
+            ENDIF
+        END loop
+        CHOICE 
+            %: [49 35] [ [90 100] ] [129 23] 
+            %: [115 96]
+            k:=1;
+            m:=0;
+            GOTO loop
+        ENDCHOICE
+    END max
+END max

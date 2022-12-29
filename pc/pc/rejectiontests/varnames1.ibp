@@ -1,0 +1,8 @@
+varnames1: context
+begin
+    p: procedure
+    begin
+        x: pvar int;
+        x:=0; [x__1=0]; exit
+    end p
+end varnames1

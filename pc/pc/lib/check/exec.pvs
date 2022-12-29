@@ -1,0 +1,13 @@
+exec[F: TYPE, T: TYPE]: THEORY
+ BEGIN
+
+  maybe: DATATYPE
+   BEGIN
+    V(x: T): Value?
+    U: Unknown?
+   END maybe
+
+   try_eval(f: [F -> T], x: F): maybe  
+
+
+ END exec

@@ -1,0 +1,41 @@
+sdtex2: context
+begin
+    by "(grind)";
+
+    
+    * d1: derivation;
+    - [add] :: $def f \left( \gamma : \ZZ \right) \left( \delta: \ZZ \right) : \ZZ =  \gamma + \delta $;
+    - [add] :: $ def \alpha : \RR $;
+    - [add] :: $ def z : \RR $ ;
+    - [add] :: $ def y : \NN $ ;
+    - [add] :: a: nat;
+    - [add] :: z = 0;
+    - ass :: $ a = \alpha $;
+    |- $ a = 2 \cdot \alpha / 2 $;
+    = { add ass  };
+      *  derivation; 
+      |- $ a + y + 1 $;
+      =  {  };
+         $ a + z + f\left(y\right)\left(1\right) $;
+      [];
+    true;
+    [];
+
+    * d2: derivation;
+    - [add] :: $def \unit{km} : \RR = 1000 $;
+    - [add] :: $def \unit{m} : \RR = 1 $;
+    - [add] :: $def \unit{dm} : \RR = 1/10 $;
+    - [add] :: $def \unit{cm} : \RR = 1/100 $;
+    - [add] :: $def \unit{mm} : \RR = 1/1000 $;
+    |- $ \unit{km} = 1000000 \cdot \unit{mm} $;
+    =  {};
+       $ \unit{km} = 1000 \cdot \unit{m} $;
+    [];
+
+    * d3: derivation;
+    |- $ 2 \text{two} + \text{plus} 2 \text{two}$;
+    =  { } ;
+       $4 \text{four}$;
+    [];
+
+end sdtex2

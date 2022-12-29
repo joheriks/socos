@@ -1,0 +1,82 @@
+Sorting: context
+
+    extending vectors;
+
+    sorted( a:vector[int] ): bool =
+        forall (i,j:nat): 0<=i and i<=j and j<len(a) => a(i)<=a(j)
+
+ 
+    min[ a:vector[int], valres m:nat ]: procedure
+    begin
+        k: pvar nat;
+    	pre begin
+            0<=m and m<len(a);
+        end
+    
+    	post begin
+            m_0<=m and m<len(a);
+            forall (i:nat): m_0<=i and i<len(a) => a(m)<=a(i);
+        end
+    
+    
+        Loop: situation begin
+            m_0<=m and m<len(a);
+            m_0<=k and k<=len(a);
+            forall (i:nat): m_0<=i and i<k => a(m)<=a(i);
+    
+            variant len(a)-k;
+             
+    	    if
+                [k=len(a)]; exit
+                [k<len(a)]; 
+                    if 
+    		        [a(k)<a(m)]; m:=k; k:=k+1; decreasing goto Loop
+                        [a(k)>=a(m)]; k:=k+1; decreasing goto Loop
+                    endif
+            endif
+    	end Loop
+    
+        k:=m; goto Loop
+           
+    end min
+
+
+    sort[ a: valres vector[int] ]
+    begin
+        post sorted(a) and permutation(a,a_0);
+
+        sorted_to( b:vector[int], p:nat ): bool =
+            forall (i,j:nat): 0<=i and i<=j and j<p => b(i)<=b(j)
+
+        partitioned( b:vector[int], p:nat ): bool =
+            forall (i,j:index(b)): i<p and p<=j => b(i)<=b(j)
+
+        Loop: situation begin
+            k,m: pvar nat;
+
+            0<=k and k<=len(a);
+            sorted_to(a,k);
+            partitioned(a,k);
+            permutation(a,a_0);
+
+            variant len(a)-k;
+
+            if 
+                [k=len(a)]; exit
+
+                [k<len(a)]; m := k; 
+                            call min(a,m); 
+                            a := a <| (k,a(m)) <| (m,a(k)); 
+                            k := k+1; 
+                            decreasing goto Loop
+                    
+            endif
+
+        end Loop
+
+        k := 0; goto Loop
+
+    end sort
+
+
+end Sorting

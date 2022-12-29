@@ -1,0 +1,12 @@
+h1: context begin
+
+   by "(assert)";
+
+   p1[x: result nat]: procedure
+      post x>=1;
+   begin
+      x:=?;
+      exit
+   end p1
+
+end h1

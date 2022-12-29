@@ -1,0 +1,205 @@
+sorting: context
+begin
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Examples of some toy sorting algorithms
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    importing ds@parray;
+
+    strategy "(endgame :lemmas 
+               (\"parray[n,int].permutation_rfl\" 
+                \"parray[n,int].permutation_sym\" 
+                \"parray[n,int].permutation_trs\" 
+                \"parray[n,int].swap_acc\" 
+                \"parray[n,int].permutation_swap\"))";
+
+    n: nat;
+
+    sorted(a:parray[n,int],k:upto[n],m:upto[n]): bool =
+        forall (i,j:int): k<=i and i<=j and j<m => a(i)<=a(j);
+
+    sorted(a:parray[n,int],k:upto[n]): bool =
+        sorted(a,0,k);
+
+    sorted(a:parray[n,int]): bool = sorted(a,0,n);
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Bubble sort
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    bubblesort [ a: valres parray[n,int] ]: procedure 
+    post sorted(a);
+    post permutation(a,a__0);
+    begin
+        i,j: pvar int;
+
+        loop1: situation
+        begin
+            %  _________________________________________________________
+            % |                             |###########################|
+            % |    unsorted                 |###### sorted #############|
+            % |_____________________________|###########################|
+            %   0                             i                           n
+
+            * permutation(a,a__0);
+            * 0<=i and i<=n;
+            * sorted(a,i,n);
+            * i<n implies forall (k:int): 0<=k and k<=i => a(k)<=a(i);
+            ** i;
+
+            loop2: situation
+            begin
+                %  _________________________________________________________
+                % |           |   |             |###########################|
+                % | <= a(j)   |   |             |###### sorted #############|
+                % |___________|___|_____________|###########################|
+                %   0           j                 i                           n
+
+                * 0<=j and j<i;
+                * forall (k:int): 0<=k and k<j => a(k)<=a(j);
+                ** n-j;
+
+                if
+                    [j=i-1]; i:=i-1; decreasing goto loop1
+                    [j<i-1 and a(j)<=a(j+1)]; j:=j+1; decreasing goto loop2
+                    [j<i-1 and a(j)>a(j+1)]; a:=swap(a,j,j+1); j:=j+1; decreasing goto loop2
+                endif
+            end loop2
+
+            if
+                [i>0]; j:=0; goto loop2
+                [i=0]; exit
+            endif
+
+        end loop1
+
+        i:=n; goto loop1
+
+    end bubblesort
+    
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Insertion sort
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    insertionsort [ a: valres parray[n,int] ]: procedure 
+    post sorted(a);
+    post permutation(a,a__0);
+    begin
+        i,j: pvar int;
+
+        sorting: situation begin
+            * 0<=i and i<=n;
+            * permutation(a,a__0);
+
+            extend: situation begin
+                %  _________________________________________________________
+                % |#############################|                           |
+                % |### sorted ##################|     unsorted              |
+                % |#############################|___________________________|
+                %   0                             i                           n
+
+                * sorted(a,i);
+                ** n-i;
+
+                if
+                    [i<n]; j:=i; goto insert
+                    [i=n]; exit
+                endif
+            end extend
+
+            insert: situation begin
+                %  ________________________________________________________
+                % |########|   |###|###|############|                      |
+                % |########|   |###|###|############|                      |
+                % |########|___|###|###|############|______________________|
+                %   0       j-1  j  j+1           i                          n
+                %
+                %  a(j-1) <= a(j+1)
+
+                * 0<=j and j<=i and i<n;
+                * sorted(a, j);
+                * sorted(a, j, i + 1);
+                * (0<j and j<i) implies a(j-1)<=a(j+1);
+                ** j;
+
+                if
+                    [j<1]; i:=i+1; decreasing goto extend
+                    [j>=1]; if
+                                [a(j-1)<=a(j)]; i:=i+1; 
+                                                decreasing goto extend
+                                [a(j-1)>a(j)]; a:=swap(a,j,j-1);
+                                               j := j - 1;
+                                               decreasing goto insert
+                            endif
+                endif
+            end insert
+        end sorting
+
+        i:=0; goto extend
+
+    end insertionsort
+
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Selection sort
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    selectionsort[ a:valres parray[n,int] ]: procedure
+    post sorted(a);
+    post permutation(a,a__0);
+    begin
+        s,k,m: pvar int;
+
+        sort: situation
+        begin
+            % The outer loop maintains:
+            %  _________________________________________________________
+            % |###############|                                         |
+            % |### sorted ####|     unsorted and >= elms. in [0..k-1]   |
+            % |###############|_________________________________________|
+            %   0               k                                         n
+
+            * 0<=k and k<=n;
+            * sorted(a,k);
+            * forall (i,j:int): 0<=i and i<k and k<=j and j<n => a(i)<=a(j);
+            * permutation(a,a__0);
+            ** n-k;
+
+            findmin: situation
+            begin
+                % The inner loop maintains additionally:
+                %  _________________________________________________________
+                % |###############|   |       |   |         |   |           |  
+                % |###############|   |       |   |         |   |           |  
+                % |###############|___|_______|___|_________|___|___________|
+                %   0               k           m             s               n
+                %
+                % a(m) is the smallest of a(k)..a(s-1)
+
+                * k<=s and s<=n;
+                * k<=m and m<n;
+                * forall (i:int): k<=i and i<s => a(m)<=a(i);
+                ** n-s;
+
+                if
+                    [s=n]; a:=swap(a,k,m); k:=k+1; decreasing goto sort
+                    [s<n and a(s)<a(m)]; m,s:=s,s+1; decreasing goto findmin
+                    [s<n and a(s)>=a(m)]; s:=s+1; decreasing goto findmin
+                endif
+
+            end findmin
+
+            if
+                [k=n]; exit
+                [k<n]; s,m:=k,k; goto findmin
+            endif
+        end sort
+        
+        k:=0; goto sort
+
+    end selectionsort
+
+
+end sorting

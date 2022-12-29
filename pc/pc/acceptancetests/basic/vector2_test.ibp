@@ -1,0 +1,17 @@
+vector2_test: context
+begin
+  extending vectors;
+   linearsearch_test: procedure
+  begin
+    j: pvar int;
+    linearsearch[ vector_val((:1,2,3,4,5,6:)), 4, j ];
+    { j=3 };
+  exit
+  end linearsearch_test
+  
+  main: procedure
+  begin
+    linearsearch_test[];
+  exit
+  end main
+end vector2_test

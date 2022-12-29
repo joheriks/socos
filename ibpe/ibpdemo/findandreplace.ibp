@@ -1,0 +1,77 @@
+findandreplace : CONTEXT BEGIN
+    importing ds@parray;
+    N,M: nat;
+    by "(endgame)";
+    findandreplace[
+        m: parray[M,int];
+        r: parray[M,int];
+        a: valres parray[N,int];
+    ] : PROCEDURE
+    PRE BEGIN %: [180 20 330 50]
+        * forall (i,j:below[M]): m(i)=m(j) => i=j;
+    END
+    POST BEGIN %: [60 550 638 56]
+        * forall (i,j:nat): i<N and j<M and a__0(i)=m(j) => a(i)=r(j);
+        * forall (i:nat): i<N => (forall (j:nat): j<M => a__0(i)/=m(j)) => a(i)=a__0(i);
+    END
+    BEGIN
+        k,l: pvar int;
+        replace : SITUATION BEGIN %: [30 130 730 371]
+            * 0<=k and k<=N;
+            * forall (i,j:nat): i<M and j<M and m(i)=m(j) => i=j;
+            * forall (i,j:nat): i<k and j<M and a__0(i)=m(j) => a(i)=r(j);
+            * forall (i:nat): i<k => (forall (j:nat): j<M => a__0(i)/=m(j)) => a(i)=a__0(i);
+            * forall (i:nat): k<=i and i<N => a(i)=a__0(i);
+            ** N-k;
+            match : SITUATION BEGIN %: [150 40 282 100]
+                * k<N;
+                * 0<=l and l<=M;
+                * forall (i:nat): i<l => a(k)/=m(i);
+                ** M-l;
+                IF 
+                    %: [264 13] [ ] 
+                    %: [494 295]
+                    [l<M];
+                    IF %: [540 320]
+                        %: [3 3] [ [740 320] ] 
+                        %: [659 444]
+                        [a(k)=m(l)];
+                        a:=a with [k:=r(l)];
+                        k:=k+1;
+                        decreasing;
+                        GOTO replace
+                        %: [5 3] [ [540 480] [410 480] ] 
+                        %: [476 440]
+                        [a(k)/=m(l)];
+                        l:=l+1;
+                        decreasing;
+                        GOTO match
+                    ENDIF
+                    %: [218 96] [ ] [369 345] 
+                    %: [274 438]
+                    [l=M];
+                    k:=k+1;
+                    decreasing;
+                    GOTO replace
+                ENDIF
+            END match
+            IF 
+                %: [0 199] [ [120 340] ] 
+                %: [126 314]
+                [k<N];
+                l:=0;
+                GOTO match
+                %: [326 345] [ ] [324 1] 
+                %: [339 520]
+                [k=N];
+                EXIT post__
+            ENDIF
+        END replace
+        IF 
+            %: [181 46] [ ] [285 1] 
+            %: [375 101]
+            k,l:=0,0;
+            GOTO replace
+        ENDIF
+    END findandreplace
+END findandreplace

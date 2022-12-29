@@ -1,0 +1,194 @@
+##
+#  Rewrite rules for generating proof obligations from programs.
+#
+#  Still missing: wp for call, ???
+#
+##
+
+# wp:s for simple statements
+
+wp_prog
+::
+        module > then(prog, &rest)
+        ->
+        prog := 'wp'(prog)
+::
+
+wp_assign_simple
+::
+        module > wp(prog(assign(left(ID+), right(expr:'.*'+))), post:predicate(&any))
+        ->
+        wp := 'predicate'('pgroup'(
+                'let'('letbinding'(@foreach(ID, 'letbind'('idop'(ID))),
+                                   'expression_list_1'(assign.right.expr)),
+                      post.any)))
+::
+
+wp_assert
+::
+	module > wp(prog(assert(expr:'.*')), post:predicate(&any))
+	->
+	wp := 'predicate'('pgroup'('KEY_AND'('pgroup'(assert.expr), post.any)))
+::
+
+wp_assume
+::
+        module >  wp(prog(assume(expr:'.*')), post:predicate(&any))
+        ->
+        wp := 'predicate'('pgroup'('EQUAL_GT'('pgroup'(assume.expr), post.any)))
+::
+
+wp_havoc
+::
+        module >  wp(prog(havoc(ID+)), post:predicate(&any))
+        ->
+        wp := 'predicate'('pgroup'('bindingexpr'('KEY_FORALL'='forall',
+                                                 'lambdabindings'(@foreach(ID, 'idop'(ID))),
+                                                  post.any)))
+::
+
+# Sequenced statements. Convert sequential (wp, wp) or (wp,predicate)
+# into parent-child.
+
+# Note: we really need two rules. Don't think about it too hard
+
+wp_sequence
+::
+        module > parent:'then|wp'(first:wp, second:'wp|predicate', &rest)
+        ->
+        parent := parent(first(@children(first), second), parent.rest)
+::
+
+wp_sequence2
+::
+        module > wp(&any, first:wp, second:'wp|predicate', &rest)
+        ->
+        wp := wp(any, first(@children(first), second), wp.rest)
+::
+
+# Branch statements
+
+wp_goto
+::
+        module > then(wp, goto(ID))
+        ->
+        then := wp(@children(wp), 'predicate'('inv' = $$ID))
+::
+
+wp_goto_2
+::
+        module > then(goto(ID))
+        ->
+        then := 'predicate'('inv' = $$ID)
+::
+
+wp_goto_decreasing
+::
+        module > then(wp, goto(ID, decreasing))
+        ->
+        then := wp(@children(wp), 'predicate'('pgroup'('KEY_AND' ('inv' = $$ID, decreasing))))
+::
+
+wp_goto_decreasing_2
+::
+        module > then(goto(ID, decreasing))
+        ->
+        then := 'predicate'('pgroup'('KEY_AND' ('inv' = $$ID, decreasing)))
+::
+
+wp_exit
+::
+        module > then(wp, exit(id!))
+        ->
+        then := wp(@children(wp), 'predicate'('inv' = 'POST'))
+::
+
+wp_exit_2
+::
+        module > then(exit(id!))
+        ->
+        then := 'predicate'('inv' = 'POST')
+::
+
+wp_exit_at
+::
+        module > then(wp, exit(pl:id))
+        ->
+        then := wp(@children(wp), 'predicate'('inv' = $concat('POST_', $$pl)))
+::
+
+wp_exit_at_2
+::
+        module > then(exit(pl:id))
+        ->
+        then := 'predicate'('inv' = $concat('POST_', $$pl))
+::
+
+wp_choice
+::
+        module > then(choice(predicate+(expr:'.*')))
+        ->
+        then := 'predicate'('pgroup'('KEY_AND'(@foreach(expr, 'pgroup'(expr)))))
+::
+
+wp_choice_2
+::
+        module > then(wp,choice(predicate+(expr:'.*')))
+        ->
+        then := wp(@children(wp),
+                   'predicate'('pgroup'('KEY_AND'(@foreach(expr, 'pgroup'(expr))))))
+::
+
+
+# Transform variants
+
+variant_naming
+::
+        module > parent:'situation|procedure_body'(
+                    predicate > decreasing(expr:'(?!pd_expr).*', &rest), &rest)
+        ->
+        decreasing := 'decreasing'('pd_expr'('ID' = $gensym('V'), decreasing.expr),
+                                   decreasing.rest)
+::
+
+variants
+::
+        module > parent:'situation|procedure_body'(
+                    predicate(&any) > decreasing(pd_expr+(ID, expr:'.*')), &rest)
+
+        ->
+
+        decreasing := 'pgroup'('KEY_OR'(
+                                  @foreach(pd_expr,
+                                           'pgroup'('LT'('pgroup'(@snd(pd_expr)),
+                                                         'name'('idop'(@fst(pd_expr))))))))
+        predicate :=
+
+        'predicate'('pgroup'(
+                    'let'('letbinding'(@foreach(ID, 'letbind'('idop'(ID),
+                                                              'name'('idop'('ID'='nat')))),
+                                       'expression_list_1'(pd_expr.expr)),
+                          predicate.any)))
+::
+
+
+# Turn predicates at top level into proofconditions (and add situation invariants)
+
+predicate_to_pc
+::
+        module > p:'p?procedure'(pid:ID, &rest)
+                  > situation(sid:ID, predicate(expr:'.*'), &rest)
+        ->
+        predicate := 'proof_condition'('ID' = $join('_', 'pc', $$pid, $$sid),
+                                       'pgroup'('EQUAL_GT'('inv'=$$sid,
+                                                           predicate.expr)))
+::
+
+predicate_to_pc_2
+::
+        module > p:'p?procedure'(ID, procedure_body(predicate(expr:'.*'), &rest), &rest)
+        ->
+        predicate := 'proof_condition'('ID' = $join('_', 'pc', $$ID, 'PRE'),
+                                       'pgroup'('EQUAL_GT'('inv'='PRE',
+                                                           predicate.expr)))
+::

@@ -1,0 +1,325 @@
+;-*- mode: Lisp -*-
+
+(load "pvs-interface.lisp")
+
+; Check if y is an allowed skolem constant name in context
+; Source: src/prover/equantifiers.lisp: skolemize-step
+(defun disallowed-skolem-name? (context y)
+  (and (not (eq (id y) '_))
+       (or (not (typep y 'name-expr))
+	   (declared? (id y) context)
+	   (not (every #'(lambda (r)
+			   (typep (declaration r)
+				  'var-decl))
+		       (resolve y 'expr nil context))))))
+
+
+(defun top-level? (def defs)
+  (not (equal (find-if #'(lambda (d) (equal (first d) def)) defs) nil)))
+
+
+(defun defs-exp-order (defs)
+  (loop for d in defs append
+	(append (when (equal (length d) 3) (defs-exp-order (nth 2 d)))
+		(list (list (first d) (second d))))))
+
+
+(defun new-skos (ps goalnum vars)
+  (let* ((vars (loop for x in vars collect (pc-parse x 'expr)))
+	(sforms (select-seq (s-forms (current-goal ps)) (list goalnum)))
+	(fmla (when sforms (formula (car sforms))))
+	(boundvars (when sforms
+		     (if (forall-expr? fmla)
+			 (bindings fmla))))
+	(context *current-context*)
+	(skos (new-sko-symbol-list boundvars context nil nil))
+	(newskos (loop for i to (1- (length vars))
+		       collect (let ((pref (nth i vars))
+				     (alt (nth i skos)))
+				 (if (disallowed-skolem-name? context pref)
+				     alt
+				   pref)))))
+    newskos))
+  
+
+
+(defstep skolem-prefer (vars)
+  (let ((newskos (new-skos *ps* 1 vars)))
+    (skolem 1 newskos :dont-simplify? t))
+  "Skolemizes using the given names when possible"
+  "Skolemizing")
+
+
+(defstep skolem-2 ()
+  (let ((sforms (select-seq (s-forms (current-goal *ps*)) '(1)))
+	(fmla (when sforms (formula (car sforms))))
+	(boundvars (when sforms
+		     (when (forall-expr? fmla)
+			 (bindings fmla))))
+	(varids (mapcar #'id boundvars)))
+     (skolem-prefer varids))
+  "Skolemizes forall-quantifier in fmla 1 using the bound names when possible"
+  "Skolemizing")
+
+
+(defstep skosimp-2 ()
+  (repeat (then (skolem-2) (flatten)))
+  "Repeatedly skolmizes and flattens using the bound names when possible"
+  "Skolemizing and flattening")
+
+;;(list (+ 1 2) 3)
+;;`( ,@(list 1 2) 3)
+;;(1 2 3)
+
+;;(list 'ertertert lemmaname)
+;;(list 'lemma lemmaname insts)
+
+;;`(then ,@(loop for lemma in lemmas append `((lemma ,lemma ,insts))))
+;;(cons then (loop for lemma in lemmas append `((lemma ,lemma ,insts))))
+
+(defstep skolemize-and-instantiate (vars lemmas)
+  (let ((skos (new-skos *ps* 1 vars))
+	(insts (loop for x in vars for y in skos append (list x y)))
+	(x `(then ,@(loop for lemmaname in lemmas append `((lemma ,lemmaname ,insts))))))
+    (then
+     (skolem 1 skos :dont-simplify? t) 
+     x))     
+  "Assuming the consequent formula goalnum and all supplied lemmas are universally
+   quantified over v1,...,v2, skolemizes the consequent and instantiates all antecedents"
+  "Skolemizing and instantiating")
+   
+
+(defstep expand-nested-defs (fnum defs)
+  (let ((x (cons `then
+		 (mapcar #'(lambda (d) `(expand ,(first d) ,fnum :assert? none))
+			 (defs-exp-order defs)))))
+    x)
+  "Expands all definitions in defs" 
+  "Expanding all definitions")
+
+
+; Expand and split into constraints---this is currently disabled since
+; it does not seem possible to prevent (expand) from simplifying away the
+; trivial conjuncts in the definition, which messes up the number of 
+; conjuncts in certain cases.
+
+; (defstep expand-defs (defs)
+;   (then
+;    (expand-nested-defs - defs)
+;    (let ((x (cons `then@
+; 		  (mapcar #'(lambda (d)
+; 			      `(try (expand ,(first d) 1 :assert? none)
+; 				    ,(if (top-level? (first d) defs)
+; 					 `(split-n ,(second d))
+; 				       (if (> (second d) 0) 
+; 					   `(spread (split 1 :depth 1) ((skip) (split-n ,(second d))))
+; 					 `(skip)))
+; 				    (skip)))
+; 			  (defs-exp-order defs)))))
+;      x))
+;   "Expands all situations, splits goal"
+;   "Expanding all situations, splitting goal")
+
+
+
+(defstep split-n (n)
+  (if (<= n 1)
+      (skip)
+    (branch (split 1 :depth 1) ((skip) (let ((m (1- n))) (split-n m)))))
+  "Splits right hand conjuncts repeatedly into max n branches"
+  "Splitting conjunction into branches")
+
+
+(defstrat uid (x)
+  (let ((u (format nil "~a" x))
+	(cmds `(then (comment ,u) (socos-skip-msg (uid ,u)))))
+    cmds)
+  "Annotate sequent with unique id for element"
+  "Annotate sequent with unique id for element")
+
+
+
+(defstrat expand-defs (defs)
+  (then
+   (expand-nested-defs$ - defs)
+   (flatten-disjunct -)
+   (expand-nested-defs$ + defs))
+  "Expands all situations, splits goal into conjunctions"
+  "Expanding all situations, splitting goal into conjunctions")
+  
+
+(defun check-lisp-call (strat)
+  (if (listp strat)
+      (if (or (eq (car strat) 'let)
+              (eq (car strat) 'lisp))
+          t
+        (reduce #'(lambda (x y) (or x y)) (mapcar #'check-lisp-call (cdr strat)) :initial-value nil))
+    nil))
+
+
+(defun get-antecedents (ps)
+  (loop for sf in (neg-s-forms (current-goal ps)) collect (format nil "~a" (unparse-sform sf))))
+
+
+(defun get-consequents (ps)
+  (loop for sf in (pos-s-forms (current-goal ps)) collect (format nil "~a" (unparse-sform sf))))
+
+
+(defun get-sequent-sexp (ps)
+  (let* ((sequent (current-goal ps))
+	 (ass (loop for sf in (neg-s-forms sequent) collect (format nil "~a" (unparse-sform sf))))
+	 (con (loop for sf in (pos-s-forms sequent) collect (format nil "~a" (unparse-sform sf))))
+	 (seq (list ass con)))
+    seq))
+
+
+(defun uncomment (s)
+  (string-left-trim " " (string-left-trim ";" s)))
+		   
+
+
+(defstep socos-skip-msg (msg)
+  (lisp (socos-print-sexp (quote msg)))
+  "Print msg as S-expression"
+  "Printing msg...")
+
+
+(defstrat check-report (strata &optional (timeout nil))
+  (let ((uid (uncomment (comment *ps*)))
+	(stratb (if (check-lisp-call strata) 
+		    `(socos-skip-msg (error ,(format nil "illegal strategy: '~a'" strata)))
+		  strata)))
+    (then 
+
+     (socos-skip-msg (check-condition uid))
+     (expand "id" :assert? none)
+
+     (lisp (setq *proof-timeout* timeout))
+
+     (beta)
+
+     ; try the strategy, fail if sequent is not proved, then catch failure
+     ; and continue
+     (try (try stratb
+               (fail)
+               (fail))
+          (skip) 
+          (skip))
+     
+     ; if we get here, communicate to the proof checker that a subcondition was left 
+     ; unproved by the strategy
+     (let ((loc (if (generated-by (declaration (context *ps*)))
+		    (let* ((decl (generated-by (declaration (context *ps*))))
+			   (thid (id (module decl)))
+			   (plc (place decl)))
+		      (list thid (starting-row plc) (starting-col plc)))
+		  nil))
+	   (ass (get-antecedents *ps*))
+	   (con (get-consequents *ps*)))
+       (socos-skip-msg (left-condition uid loc ass con)))
+     
+     (lisp (setq *proof-timeout* nil))))
+
+  "Run strategy and report"
+  "Running strategy and reporting")
+
+
+;; This works around a bug with (yices) in PVS 5.0 (which is fixed in r5862)
+(addrule 'yices1 () ((fnums *))
+  (yices fnums)
+  "Invokes Yices as an endgame SMT solver to prove that the conjunction
+of the negations of the selected formulas is unsatisfiable. "
+  "~%Simplifying with Yices,")
+
+
+(defstep yices-with-lemmas (lemmas)
+  (then
+   (let ((lemmata (if (listp lemmas) lemmas (list lemmas)))
+	 (x `(then ,@(loop for lemma in lemmata
+		       append `((lemma ,lemma))))))
+     x)
+   (yices1))
+  "Yices with lemmas"
+  "Running yices, supplying the following lemmas: ~@{~%  ~a~}")
+
+
+(defstep endgame (&optional (lemmas nil)
+			    (extra-lemmas nil)
+			    (timeout 10))
+  (let ((lemmata (concatenate 'list lemmas extra-lemmas))
+	(introduce-lemmas 
+	 `(then ,@(loop for lemma in lemmata append `((lemma ,lemma))))))
+     (then
+      (skolem-typepred)
+      (flatten -)
+      (replace-dashed-variable-equalities)
+
+      (auto-rewrite-defs :always? t)
+      (do-rewrite)
+      ;(record)
+      (ground)
+      introduce-lemmas
+      (lisp (setq *yices-call* 
+		  (format nil "yices -e -st -mi 50000 -tm ~a" timeout)))
+      (yices1)
+      (fail)))
+  "End-game strategy"
+  "Running yices, supplying lemmas: ~{~a~^, ~} , ~{~a~^, ~}")
+  
+  
+(defstep invoke-tccs ()
+  (let ((decl (declaration (context *ps*)))
+	(tccs (remove-if-not #'subtype-tcc? (generated decl)))
+	(invks (mapcar #'(lambda (tcc) `(lemma ,(id tcc))) tccs))
+	(x (cons `then invks)))
+    x)
+  "Introduce all TCCs generated from current declaration as hypotheses"
+  "Introducing all TCCs as hypotheses")
+
+
+;; Assuming formula -1 is of the form "x1=e1 and ... and xn=en",
+;; replace the equalities throughout and hide the formulas
+
+(defstrat replace-equalities (n)
+  (let ((s  (cond ((eq n 0) `(skip))
+		  ((eq n 1) `(replace -1 :hide? t))
+		  ((> n 1) `(then 
+			     (flatten-disjunct -1 :depth 1)
+			     (replace -1 :hide? t)
+			     (replace-equalities ,(1- n)))))))
+    s)
+  "Splits of equalities from fnum and replaces throughout"
+  "Replacing equalities")
+
+
+(defstep replace-dashed-variable-equalities ()
+  (let ((goal (current-goal *ps*))
+	(formnums (gather-fnums (s-forms goal)
+				'-
+				:pred #'(lambda (x)
+					  (let ((fmla (formula x)))
+					    (and
+					     (negation? fmla)
+					     (equation? (args1 fmla))
+					     (name-expr? (args1 (args1 fmla)))
+					     (let* ((ss (string (id (args1 (args1 fmla)))))
+						    (pos (search "_" ss :from-end t)))
+					       (and ss
+						    pos
+						    (parse-integer (subseq ss (+ 1 pos)) :junk-allowed t))))))))
+						    
+						      
+	(rplca `(then ,@(loop for fn in formnums append `((replace ,fn :dont-delete? t)))
+		 (hide ,@formnums)
+		 )))
+    rplca)
+  "Replaces all equalities of the form X_N, where X is an arbitrary prefix
+   and N is a positive integer"
+  "Replacing equalities,")
+   
+
+(defstep case-by (case-fmla lemma)
+  (spread (case case-fmla) ((use lemma)))
+  "Case split on case-fmla, use lemma followed by case-strat on left branch, use 
+   rest-strat on right branch and TCCs"
+  "Case by lemma,")

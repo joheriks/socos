@@ -1,0 +1,7 @@
+badpvs: context
+begin
+
+    % type error
+    x: int = "x";
+    
+end badpvs

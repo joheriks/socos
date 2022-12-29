@@ -1,0 +1,47 @@
+flag: context
+begin
+    by "(endgame :lemmas 
+            (\"parray[n,below[3]].permutation_rfl\" 
+             \"parray[n,below[3]].permutation_sym\" 
+             \"parray[n,below[3]].permutation_trs\" 
+             \"parray[n,below[3]].swap_acc\" 
+             \"parray[n,below[3]].permutation_swap\"))";
+
+    n: nat;
+
+    importing ds@parray;
+
+    R: int = 0;
+    W: int = 1;
+    B: int = 2;
+
+    flag[ a: valres parray[n,below[3]]; rw,wb: result int ]: procedure
+    post 0<=rw and rw<=wb and wb<=n;
+    post forall (i:int): 0<=i and i<rw => a(i)=R;
+    post forall (i:int): rw<=i and i<wb => a(i)=W;
+    post forall (i:int): wb<=i and i<n => a(i)=B;
+    post permutation(a,a__0);
+    begin
+        k: pvar int;
+        
+        loop: situation
+        begin
+            * 0<=rw and rw<=k and k<=wb and wb<=n;
+            * forall (i:int): 0<=i and i<rw => a(i)=R;
+            * forall (i:int): rw<=i and i<k => a(i)=W;
+            * forall (i:int): wb<=i and i<n => a(i)=B;
+            * permutation(a,a__0);
+            ** wb-k;
+
+            if
+              [k=wb]; exit
+              [k<wb and a(k)=R]; a:=swap(a,k,rw); k:=k+1; rw:=rw+1; decreasing goto loop
+              [k<wb and a(k)=W]; k:=k+1; decreasing goto loop
+              [k<wb and a(k)=B]; wb:=wb-1; a:=swap(a,k,wb); decreasing goto loop
+            endif
+         end loop
+
+         rw,k,wb := 0,0,n; goto loop
+    end flag
+
+end flag

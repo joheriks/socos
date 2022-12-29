@@ -1,0 +1,20 @@
+ctx__logicold: theory
+begin
+    
+    x, y, z, u, v, w: var real;
+    p, q, r, s, t: var bool;
+    P, Q, R, S, T: var [real -> bool];
+    f, g, h: var [real -> real];
+    i, j, k: var int;
+    n, m: var nat;
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "logic:context;") 
+%|-            (then 
+%|-                (expand-nested-defs -  nil) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (skip)))) QED
+end ctx__logicold 
+

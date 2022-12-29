@@ -1,0 +1,25 @@
+proof2: context begin
+
+   by "(assert)";
+
+   p1: procedure
+
+   begin
+
+      a: pvar int;
+      b: pvar int;
+
+      a:=1;
+      b:=2;
+      a:=a+1;
+      b:=a+b;
+      exit;
+      proof
+         * lemma a_1=1; [];
+         * lemma b_1=2; [];
+         * lemma a_2=2; [];
+         * lemma b_2=4; [];
+      endproof
+   end p1
+
+end proof2

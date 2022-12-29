@@ -1,0 +1,74 @@
+BuildTree : CONTEXT BEGIN
+    importing List2Tree;
+    addtest(n:nat, l:list[nat]): list[nat] = map[nat,nat](lambda (i:nat): n + i)(l);
+    BuildTree[
+        s: list[nat];
+        d: nat;
+        t: result Tree;
+        l: result list[nat];
+    ] : PROCEDURE
+    PRE BEGIN %: [20 40 100 50]
+    END
+    final:POST BEGIN %: [10 290 216 60]
+        * length(l) < length(s);
+        * s = append(add2list(d, list_of_tree(t)), l);
+    END final
+    fail:POST BEGIN %: [420 50 357 114]
+        * (forall (t: Tree, l: list[nat]): s /= append(add2list(d, list_of_tree(t)), l));
+    END fail
+    BEGIN
+        x,y: pvar list[nat];
+        u, v: pvar Tree;
+        IF 
+            %: [98 21] [ ] 
+            %: [183 10]
+            [s = null];
+            t, l := leaf, null;
+            by "(then (skosimp*) (use tr1) (assert))";
+            EXIT fail
+            %: [ ] 
+            %: [22 107]
+            [s /= null];
+            IF %: [90 150]
+                %: [5 4] [ ] 
+                %: [174 108]
+                [car(s) < d];
+                t, l := leaf, null;
+                EXIT fail
+                %: [4 5] [ [90 200] ] 
+                %: [17 200]
+                [car(s) = d];
+                t:=leaf;
+                l := cdr(s);
+                EXIT final
+                %: [ [120 210] [330 210] ] 
+                %: [177 182]
+                [car(s) > d];
+                CALL BuildTree[s, d+1, u, x];
+                %: [360 250]
+                    %: [110 20] [ [450 250] ] [2 107] 
+                    %: [369 179]
+                    fail:;
+                    t, l:=leaf, null;
+                    EXIT fail
+                    %: [ ] 
+                    %: [408 273]
+                    final:;
+                    CALL BuildTree[x, d+1, v, y];
+                    %: [400 330]
+                        %: [110 9] [ [490 330] ] 
+                        %: [505 193]
+                        fail:;
+                        t, l := leaf, null;
+                        EXIT fail
+                        %: [108 21] [ [270 330] ] 
+                        %: [245 288]
+                        final:;
+                        t, l := node(u, v), y;
+                        EXIT final
+                    ENDCALL
+                ENDCALL
+            ENDIF
+        ENDIF
+    END BuildTree
+END BuildTree

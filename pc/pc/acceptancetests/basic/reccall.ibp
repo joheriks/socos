@@ -1,0 +1,61 @@
+reccall: context
+begin
+    by "(endgame)";
+    
+    %% Single recursion, no variant, no termination
+    p[x:nat]: procedure
+    begin
+        if [x>0]; p[x]; exit
+           [x=0]; exit
+        endif
+    end p
+    
+
+    p0[x:nat]: procedure
+    ** x;
+    begin
+        if [x>0]; p0[x-1]; exit
+           [x=0]; exit
+        endif
+    end p0
+
+
+    %% Mutual recursion
+
+    p1[x:nat]: procedure
+    ** x;
+    begin
+        if [x=0]; exit
+           [x>0]; p2[x-1]; exit
+        endif
+    end p1
+
+    p2[x:nat]: procedure
+    ** x;
+    begin
+        if [x>0]; p1[x-1]; exit
+           [x=0]; exit
+        endif
+    end p2
+
+
+    %% Combined mutual and single recursion
+
+    p3[x:nat]: procedure
+    ** x;
+    begin
+        if [x=0]; exit
+           [x>0]; p4[x-1]; exit
+        endif
+    end p3
+
+    p4[x:nat]: procedure
+    ** x;
+    begin
+        if [x>10]; p3[x-2]; exit
+           [0<x and x<=10]; p4[x-1]; exit
+           [x=0]; exit
+        endif
+    end p4
+
+end reccall

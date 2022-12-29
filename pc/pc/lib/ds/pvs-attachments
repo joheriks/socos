@@ -1,0 +1,58 @@
+(defattach parray.array_val (x)
+  "Array constant"
+ (setf len (list-length x))
+  (setf a (make-array len))
+
+  (loop for r in x
+    for i from 0 to len
+    do (setf (aref a i) r))
+    a)
+
+
+(defattach vector.vector_val (x)
+  "Vector constant"
+  
+  (setf len (list-length x))
+  (setf a (make-array len))
+  
+  (loop for r in x
+	for i from 0 to len
+	do (setf (aref a i) r))
+  (setf y (make-array 2))
+  (setf (aref y 0) a)
+  (setf (aref y 1) len)
+  y)
+
+(defattach vector.access (x i)
+  "Vector access"
+  (let ((arr (aref x 0))
+	(len (aref x 1)))
+    (if (and (<= 0 i) (< i len))
+	(aref arr i)
+      (error 'socos-runtime-error :format-control "array index out of bounds"))))
+
+ 
+(defattach exec.try_eval(f x)
+ "invariant evaluation"
+  (apply f (list x))      
+)
+
+
+(defattach vector.update (x i val)
+  "Vector update"
+  
+  (setf len (aref x 1))
+  (if (and (<= 0 i) (< i len))
+	(setf (aref (aref x 0) i) val)
+      (error 'socos-runtime-error :format-control "array index out of bounds"))
+  x)
+  
+(defattach vector.vector_n_val(n k)
+  "Vector constructor"
+  (setf arr (make-array n))
+  
+  (loop for i from 0 to (- n 1)
+	do (setf (aref arr i) k))
+    
+  (make-array 2 :initial-contents (list arr n)))
+  

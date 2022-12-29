@@ -1,0 +1,113 @@
+exec__state__minvector: DATATYPE
+BEGIN
+  IMPORTING impl__minvector__minvector
+
+  ini__                         (a:vector[int],uid__:string):                ini__? 
+
+  ini__trs_0                    (a:vector[int],m:int,k:int,uid__:string):    ini__trs_0? 
+  ini__trs_0__stmt_0            (a:vector[int],m:int,k:int,uid__:string):    ini__trs_0__stmt_0? 
+  ini__trs_0__stmt_1            (a:vector[int],m:int,k:int,uid__:string):    ini__trs_0__stmt_1? 
+  loop                          (a:vector[int],m:int,k:int,uid__:string):    loop?
+  loop__trs_0                   (a:vector[int],m:int,k:int,uid__:string):    loop__trs_0? 
+  loop__trs_0__trs_0            (a:vector[int],m:int,k:int,uid__:string):    loop__trs_0__trs_0? 
+  loop__trs_0__trs_0__stmt_0    (a:vector[int],m:int,k:int,uid__:string):    loop__trs_0__trs_0__stmt_0?
+  loop__trs_0__trs_1            (a:vector[int],m:int,k:int,uid__:string):    loop__trs_0__trs_1? 
+  loop__trs_0__trs_1__stmt_0    (a:vector[int],m:int,k:int,uid__:string):    loop__trs_0__trs_1__stmt_0?
+  loop__trs_0__trs_1__stmt_1    (a:vector[int],m:int,k:int,uid__:string):    loop__trs_0__trs_1__stmt_1? 
+  loop__trs_1                   (a:vector[int],m:int,k:int,uid__:string):    loop__trs_1? 
+
+  fin__                         (m:int,uid__:string):                fin__? 
+
+END exec__state__minvector
+
+
+exec__minvector: THEORY
+BEGIN
+  IMPORTING exec__state__minvector
+
+  enter( a: vector[int] ): exec__state__minvector = ini__(a,"minvector:context/minvector/ini__;")
+
+  step2( s__: exec__state__minvector ): exec__state__minvector =
+    CASES s__ OF
+         ini__(a,uid__):                       ini__trs_0(a, 0, 0, "minvector/minvector/ini__/trs1/trs1__branch/trs1__branch__trs1;"),
+         ini__trs_0(a,m,k,uid__):              ini__trs_0__stmt_0(a, m, k, "minvector/minvector/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt1;"),
+         ini__trs_0__stmt_0(a,m,k,uid__):      ini__trs_0__stmt_1(a, m, 1, "minvector/minvector/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt2;"),
+         ini__trs_0__stmt_1(a,m,k,uid__):      loop(a, 0, k, "minvector/minvector/loop;"),
+         loop(a,m,k,uid__):
+           COND                                k < len(a) -> loop__trs_0(a, m, k, "minvector/minvector/loop/trs1/trs1__branch/trs1__branch__trs1;"),
+                                               k = len(a) -> loop__trs_1(a, m, k, "minvector/minvector/loop/trs1/trs1__branch/trs1__branch__trs2;"),
+                                               ELSE -> loop(a, m, k, "minvector/minvector/loop;")
+           ENDCOND,
+         loop__trs_0(a,m,k,uid__): 
+           COND                                a(m) < a(k) -> loop__trs_0__trs_0(a, m, k, "minvector/minvector/loop/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__trs1__branch/trs1__branch__trs1__branch__trs1;"),
+                                               a(m) >= a(k) -> loop__trs_0__trs_1(a, m, k, "minvector/minvector/loop/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__trs1__branch/trs1__branch__trs1__branch__trs2;"),
+                                               ELSE -> loop__trs_0(a, m, k, "minvector/minvector/loop/trs1/trs1__branch/trs1__branch__trs1;")
+           ENDCOND,
+         loop__trs_0__trs_0(a,m,k,uid__):             loop__trs_0__trs_0__stmt_0(a, m, k, "minvector/minvector/loop/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__trs1__branch/trs1__branch__trs1__branch__trs1/trs1__branch__trs1__branch__stmt2"),
+
+         loop__trs_0__trs_0__stmt_0(a,m,k,uid__):     loop(a, m, k + 1, "minvector/minvector/loop;"),
+         loop__trs_0__trs_1(a,m,k,uid__):             loop__trs_0__trs_1__stmt_0(a, m, k, "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt1:transition"),
+         loop__trs_0__trs_1__stmt_0(a,m,k,uid__):     loop__trs_0__trs_1__stmt_1(a, k, k, "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt2:transition"),
+         loop__trs_0__trs_1__stmt_1(a,m,k,uid__):     loop(a, m, k + 1, "minvector/minvector/loop;"),
+         loop__trs_1(a,m,k,uid__):                    fin__(m,"minvector/minvector/fin__post__;"),
+         fin__(m,uid__):                              fin__(m,"minvector/minvector/fin__post__;")
+    ENDCASES
+
+END exec__minvector
+
+
+exec__state__main: DATATYPE
+BEGIN
+  IMPORTING exec__state__minvector
+
+  ini__                       (uid__:string):                           ini__?
+  ini__trs1                   (k:int,b:vector[int],uid__:string):       ini__trs1?
+  ini__trs1__stmt1            (k:int,b:vector[int],uid__:string):       ini__trs1__stmt1?
+  ini__trs1__stmt2            (k:int,b:vector[int],uid__:string):       ini__trs1__stmt2?
+  ini__trs1__call1            (k:int,b:vector[int],
+                               cs__:exec__state__minvector,
+                               st__:[exec__state__minvector->exec__state__minvector],
+                               uid__:string):                           ini__trs1__call1?
+                                    
+  ini__trs1__stmt3            (k:int, b:vector[int],uid__:string):      ini__trs1__stmt3?
+  fin__                       (k:int,uid__:string):                     fin__?           
+
+
+END exec__state__main
+
+
+exec__main: THEORY
+BEGIN
+  IMPORTING exec__state__main
+
+  IMPORTING exec__minvector
+
+
+  % this step function corresponds to the following transition:
+  %
+  %         k,b:=0,(:1,2,3:); minvector[b,k]; k:=k+1
+  % ini__ --------------------------------------------> fin__(k)
+  %
+
+  enter: exec__state__main = ini__("minvector/main/ini__;")
+
+
+  step( s__: exec__state__main ): exec__state__main =
+    CASES s__ OF
+      ini__(uid__):                               ini__trs1(0,vector_n_val(10,1),"minvector/main/ini__/trs1/trs1__branch/trs1__branch__trs1;"),
+      ini__trs1(k,b,uid__):                       ini__trs1__stmt1(k,b,"minvector/main/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt1;"),
+      ini__trs1__stmt1(k,b,uid__):                ini__trs1__stmt2(0,vector_n_val(100000,1),"minvector/main/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt2;"),
+      ini__trs1__stmt2(k,b,uid__):                ini__trs1__call1(k,b,
+                                                        exec__minvector.enter(b),
+                                                        exec__minvector.step2,
+                                                        "minvector/main/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt2;"),
+      ini__trs1__call1(k,b,cs__,st__,uid__):      CASES cs__ OF
+                                                    fin__(m,uid__): ini__trs1__stmt3(m,b,"minvector/main/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt3;")
+                                                    ELSE  ini__trs1__call1(k,b,cs__,st__,"minvector/main/ini__/trs1/trs1__branch/trs1__branch__trs1/trs1__branch__stmt2;")
+                                                  ENDCASES,
+      
+      ini__trs1__stmt3(k,b,uid__):                fin__(k+1,"minvector/main/fin__post__;"),
+      fin__(k,uid__):                             fin__(k,"minvector/main/fin__post__;")
+    ENDCASES
+
+END exec__main

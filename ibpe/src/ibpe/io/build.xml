@@ -1,0 +1,36 @@
+<project default="parsers" basedir=".">
+
+	<target name="parsers" depends="IBP,JSON"/>
+	
+	<uptodate property="IBP.uptodate" srcfile="IBP.g" targetfile="IBPLexer.java"/>
+	
+	<target name="IBP" unless="IBP.uptodate">
+			
+        <java jar="../../../lib/antlr-3.4-complete.jar" failonerror="true" fork="true">
+       	<arg value="-verbose"/>
+          <arg value="-o"/>
+          <arg path="."/>
+          <arg path="IBP.g"/>
+       </java>
+    </target>
+
+	<uptodate property="JSON.uptodate" srcfile="JSON.g" targetfile="JSONLexer.java"/>
+
+	<target name="JSON" unless="JSON.uptodate">
+       <java jar="../../../lib/antlr-3.4-complete.jar" failonerror="true" fork="true">
+       	<arg value="-verbose"/>
+          <arg value="-o"/>
+          <arg path="."/>
+          <arg path="JSON.g"/>
+       </java>
+    </target>
+ 
+    <target name="clean">
+    	<delete file="IBP.tokens"/>
+        <delete file="IBPLexer.java"/>
+        <delete file="IBPParser.java"/>
+        <delete file="JSON.tokens"/>
+        <delete file="JSONLexer.java"/>
+        <delete file="JSONParser.java"/>
+    </target>
+</project>

@@ -1,0 +1,121 @@
+sorting : CONTEXT BEGIN
+    importing ds@parray;
+    n:nat;
+    sorted(a:parray[n,int],l,r:upto[n]): bool = forall (i,j:int): l<=i and i<=j and j<r => a(i)<=a(j);
+    sorted(a:parray[n,int]):bool = sorted(a,0,n);
+    partitioned(a:parray[n,int],l,r:upto[n],k:subrange[l,r-1]): bool = forall (i:int): (l<=i and i<k => a(i)<a(k)) and (k<=i and i<r => a(k)<=a(i));
+    unchanged(a,b:parray[n,int],l,r:upto[n]): bool = forall (i:int): l<=i and i<r => a(i)=b(i);
+    by "(endgame :lemmas (\"parray[n,int].permutation_rfl\" \"parray[n,int].permutation_sym\" \"parray[n,int].permutation_trs\" \"parray[n,int].swap_acc\" \"parray[n,int].permutation_swap\"))";
+    partition[
+        l,r: int;
+        a: valres parray[n,int];
+        k: result int;
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 188 50]
+        * 0<=l and l<r and r<=n;
+    END
+    POST BEGIN %: [850 20 298 112]
+        * 0<=l and l<=k and k<r and r<=n;
+        * partitioned(a,l,r,k);
+        * permutation(a,a__0);
+        * unchanged(a,a__0,0,l);
+        * unchanged(a,a__0,r,n);
+    END
+    BEGIN
+        m: pvar int;
+        loop : SITUATION BEGIN %: [214 15 502 152]
+            * permutation(a,a__0);
+            * 0<=l and l<=k and k<=m and m<r and r<=n;
+            * forall (i:int): l<=i and i<k => a(i)<a(r-1);
+            * forall (j:int): m<=j and j<r => a(r-1)<=a(j);
+            * unchanged(a,a__0,0,l);
+            * unchanged(a,a__0,r,n);
+            ** m-k;
+            IF 
+                %: [332 21] [ [800 80] ] [117 72] 
+                %: [782 106]
+                [k=m];
+                a:=swap(a,r-1,k);
+                EXIT post__
+                %: [480 95] [ [430 240] [220 240] ] [131 94] 
+                %: [322 206]
+                [k<m and a(m-1)>=a(r-1)];
+                m:=m-1;
+                decreasing;
+                GOTO loop
+                %: [322 105] [ [490 250] [710 250] ] [638 103] 
+                %: [595 208]
+                [k<m and a(m-1)<a(r-1)];
+                a:=swap(a,m-1,k);
+                k:=k+1;
+                decreasing;
+                GOTO loop
+            ENDIF
+        END loop
+        IF 
+            %: [45 49] [ [50 90] ] [13 2] 
+            %: [89 106]
+            k,m:=l,r-1;
+            GOTO loop
+        ENDIF
+    END partition
+    quicksort[
+        l,r: int;
+        a: valres parray[n,int];
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 236 70]
+        * 0<=l and l<=r and r<=n;
+    END
+    POST BEGIN %: [400 10 240 148]
+        * permutation(a,a__0);
+        * 0<=l and l<=r and r<=n;
+        * sorted(a,l,r);
+        * unchanged(a,a__0,0,l);
+        * unchanged(a,a__0,r,n);
+    END
+    ** r-l;
+    BEGIN
+        k: pvar int;
+        s1 : SITUATION BEGIN %: [180 170 654 276]
+            * 0<=l and l<=k and k<r and r<=n;
+            * permutation(a,a__0);
+            * partitioned(a,l,r,k);
+            * unchanged(a,a__0,0,l);
+            * unchanged(a,a__0,r,n);
+            s2 : SITUATION BEGIN %: [120 20 354 124]
+                * sorted(a,l,k);
+                s3 : SITUATION BEGIN %: [180 0 160 63]
+                    * sorted(a,k+1,r);
+                    IF 
+                        %: [70 1] [ [560 280] ] [112 103] 
+                        %: [591 216]
+                        EXIT post__
+                    ENDIF
+                END s3
+                IF 
+                    %: [71 1] [ [360 410] ] 
+                    %: [413 393]
+                    quicksort[k+1,r,a];
+                    GOTO s3
+                ENDIF
+            END s2
+            IF 
+                %: [0 149] [ [260 380] ] 
+                %: [185 395]
+                quicksort[l,k,a];
+                GOTO s2
+            ENDIF
+        END s1
+        IF 
+            %: [193 29] [ ] [6 27] 
+            %: [299 23]
+            [l>=r];
+            EXIT post__
+            %: [39 47] [ [70 220] ] [1 62] 
+            %: [90 245]
+            [l<r];
+            partition[l,r,a,k];
+            GOTO s1
+        ENDIF
+    END quicksort
+END sorting

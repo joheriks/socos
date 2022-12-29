@@ -1,0 +1,13 @@
+badlisp: context
+begin
+
+    % Crash into lisp.
+    by "(lisp xyzzy)";
+
+    p1: procedure
+    post false;
+    begin
+        exit
+    end p1
+
+end badlisp

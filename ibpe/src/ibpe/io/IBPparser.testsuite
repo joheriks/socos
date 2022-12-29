@@ -1,0 +1,62 @@
+gunit IBP;
+
+module:
+"testModule : MODULE BEGIN end testModule" OK
+
+
+
+arg:
+"[ a : dynarray[int].dynarray,  x : int, RESULT n : int]" OK
+
+procedure:
+"testP: PROCEDURE BEGIN END testP" OK
+" BinarySearch [ a : dynarray[int].dynarray,  x : int, RESULT n : int]: PROCEDURE
+    BEGIN
+        PRE len(a) > 1 AND a(0) <= x AND x < a(len(a) - 1);
+        POST 0 <= n AND n < len(a) - 1;
+        POST a(n) <= x AND x < a(n + 1);
+
+        m : PROGVAR int;
+        k : PROGVAR int;
+
+        n := 0;
+        m:= len(a)-1;
+        GOTO split
+
+        split : SITUATION
+        BEGIN
+            INVARIANT 0 <= n AND n < m AND m < len(a);
+            INVARIANT a(n) <=x AND x < a(m);
+
+            SELECT
+                m-n = 1 THEN EXIT
+                m-n > 1 THEN k := div(m + n, 2);
+                             SELECT
+                                 a(k) <= x THEN n := k; GOTO split DECREASING [ m - n ]
+                                 x < a(k)  THEN m := k; GOTO split DECREASING [ m - n ]
+                             END
+            END
+        END split
+    END BinarySearch" OK
+    
+situation:
+"move: SITUATION BEGIN
+                INVARIANT i < len(a);
+                INVARIANT 0 <= j AND j <= i;
+                INVARIANT sorted(a, 0, j);
+                INVARIANT sorted(a, j, i + 1);
+                INVARIANT (0 < j AND j < i) IMPLIES a(j - 1) <= a(j + 1);
+
+                SELECT
+                    j < 1  THEN i := i + 1; GOTO partially_sorted
+                    j >= 1 THEN
+
+                    SELECT
+                        a(j - 1) <= a(j) THEN i := i + 1; GOTO partially_sorted
+                        a(j - 1) > a(j)  THEN CALL swap(a, j, j - 1);
+                                               j := j - 1;
+                                               GOTO move DECREASING [ len(a) - i, j ]
+                    END
+                END
+            END move" OK
+    

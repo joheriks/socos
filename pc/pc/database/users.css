@@ -1,0 +1,76 @@
+body, input, select, td {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 85%;
+}
+
+div.Container {
+    border: Solid 2px #F0F0F0;
+}
+
+.inputtext {
+    width: 230px;
+}
+
+div.ContainerTitle {
+    border-bottom: Solid 2px #F0F0F0;
+    color: #3030FF;
+    font-weight: bold;
+    padding: 2px 2px 2px 12px;
+/*
+    font-size: 120%;
+    visibility: hidden;
+    height: 0px;
+*/
+}
+
+div.Padding {
+    padding: 6px;
+}
+
+span.FieldError {
+    color: #FF0000;
+}
+
+a.Menu {
+    display: block;
+    padding: 2px;
+    vertical-align: middle;
+    text-decoration: none;
+    padding-right: 8px;
+    padding-left: 8px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border: Solid 2px #FFFFFF;
+}
+
+div.AllContent{
+    min-width: 500px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+a.Menu:hover
+{
+	border-color: #A0A0A0;
+	background-color: #E0E0E0;	
+}
+
+div.MainFormPos, div.MenuPos
+{
+	position: absolute;
+        top: 70px;
+}
+
+
+div.MenuPos {
+    width: 135px;
+    left: 20px;
+}
+
+div.MainFormPos
+{
+    left: 175px;
+    right: 20px;
+}

@@ -1,0 +1,29 @@
+declarations: context
+begin
+    % PVS syntax test
+
+    by "(grind-with-ext)";
+
+
+    a,b,c: var int;
+
+    f1: [int,int->int] = lambda (a:int),(b:int): a+b;
+
+    f2: [int,int->int] = lambda a,b: a+b;
+
+    f3: [int,int->int] = lambda a,(b:int): a+b;
+
+    * d1: theorem f1=f2 and f2=f3;
+    [];
+
+
+    f4: [int->[int,int->int]] = lambda (a:int)(b,c:int): a+b;
+
+    f5: [int->[int,int->int]] = lambda (a)(b,c): a+b;
+
+    f6: [int->[int,int->int]] = lambda (a)(b:int,c): a+b;
+
+    * d2: theorem f4=f5 and f5=f6;
+    [];
+
+end declarations

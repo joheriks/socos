@@ -1,0 +1,2 @@
+instructions.install = \
+    chmod(targetDir:@artifact,targetFile:pc/socos,permissions:755);

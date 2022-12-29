@@ -1,0 +1,65 @@
+sorting: theory
+begin
+    importing ds@vector[int]
+
+    sorted(a:vector,k:upto(len(a)),l:upto(len(a))):bool =
+      forall (i,j:nat): k<=i and i<j and j<l => access(a,i)<=access(a,j) 
+
+    sorted(a:vector,k:upto(len(a))):bool = sorted(a,k,len(a));
+
+    sorted(a:vector):bool = sorted(a,len(a))
+
+    partitioned(a:vector,k:upto(len(a))):bool =
+      forall (i,j:nat): i<k and k<=j and j<len(a) => access(a,i)<=access(a,j)
+
+    a,b,c: var vector
+
+    perm(a,b) : bool =
+      exists (f:(bijective?[index(b),index(a)])):
+        forall (i:index(b)): access(a,f(i)) = access(b,i)
+
+    perm_len: lemma perm(a,b) => len(a)=len(b)
+    perm_ref: lemma perm(a,a)
+    perm_sym: lemma perm(a,b) => perm(b,a)
+    perm_trs: lemma perm(a,b) and perm(b,c) => perm(a,c)
+
+    swap(a:vector,i,j:index(a)):{b|len(b)=len(a)} =
+      update(update(a,i,access(a,j)),j,access(a,i))
+
+    swap_acc: lemma forall (a,(i,j,k:index(a))):
+      access(swap(a,i,j),k) = access(a,if k=i then j 
+                                       elsif k=j then i 
+                                       else k endif)
+
+    swap_perm: lemma forall (a,(i,j:index(a))): perm(swap(a,i,j),a)
+    
+    auto_rewrite- perm,swap
+
+
+
+
+    
+    l(i:nat):nat = 2*i+1
+    r(i:nat):nat = 2*i+2
+
+    heap(a:vector,m,n:nat): bool = 
+      m<=n and n<=len(a) and
+      forall (i:nat):
+        m<=i =>
+          (l(i)<n => access(a,i)>=access(a,l(i))) and
+          (r(i)<n => access(a,i)>=access(a,r(i)))
+
+    heap_max: lemma 
+      forall (a:vector,k:nat):
+        heap(a,0,k) => forall (i:nat): 0<=i and i<k => access(a,i)<=access(a,0)
+
+    importing bijective
+    
+    perm_partitioned: lemma 
+      forall (a,b:vector,k:upto(len(a))):
+        perm(a,b) and partitioned(a,k) and eql(a,b,k,len(a)) 
+        => partitioned(b,k)
+
+end sorting
+
+

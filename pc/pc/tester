@@ -1,0 +1,207 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Automated test driver for socos, written by Miki
+# last update 2012-02-01
+
+import sys
+import os, os.path
+import shutil
+import tempfile
+import datetime
+import argparse
+
+class PlainTextFormatter:
+
+  def __init__(self, strip_messages = False, skip_no_errors = False, omit_decoration = False):
+    self.strip_messages = strip_messages
+    self.skip_no_errors = skip_no_errors
+    self.omit_decoration = omit_decoration
+
+  def format(self, data):
+    if self.skip_no_errors and not 'errors' in data:
+      return None
+    strp1 = data['path']+": "
+    if 'time' in data:
+      strp1+= str(data['time'])+" seconds: "
+    if 'errors' in data: 
+      strp1 += "%d errors"%len(data['errors'])
+      if not self.strip_messages:
+        for error in data['errors']:
+          strp1 = strp1+"\n"+prefix_lines(error['message'],'> ')
+    else:
+      strp1 = strp1 + "ok"
+    if not self.omit_decoration:
+      strp1 = strp1 + "\n" + "-"*len(data['path'])
+    strp1+="\n"
+    return strp1
+
+def store_error(map, error):
+  loc = error.location()
+  fname = os.path.split(loc[0])[1]
+  noext, ext = os.path.splitext(fname)
+  message = error.get_message()
+  # interestingly, some errors return .pvs file as its location, yet driver cares only about .ibp files
+  # we modify the message then
+  if ext!=".ibp":
+    message = "(in generated file %s) %s"%(fname, message)
+    fname = noext+".ibp"
+  # print "** storing error for "+loc[0]+", message "+error.msg
+  if 'errors' not in map[fname]:
+    map[fname]['errors'] = []
+  error_map = {'message': message, 'object': error}
+  if len(loc)>1:
+    error_map['line'] = loc[1]
+  if len(loc)>2:
+    error_map['column'] = loc[2]
+  map[fname]['errors'].append(error_map)
+
+def store_time_report(map, rep):
+  fname = os.path.split(rep.location()[0])[1]
+  map[fname]['time'] = rep.attributes['time_file']
+
+def info(msg, quiet=False):
+  if not quiet:
+    print msg
+
+# importing socos
+from init_socos import *
+from pc.semantic import Message
+from pc.semantic.IBPEnvironment import IBPEnvironment
+from pc.util.Utils import *
+
+if __name__ == "__main__":
+    Message.opts = set(["detailed"])
+
+    parser = argparse.ArgumentParser(description = "Socos IBP test driver")
+    parser.add_argument('-o', '--output', nargs='?', default=None, help='specify output file name (stdout by default)')
+    parser.add_argument('-e', '--extension', nargs='?', default='ibp', help='use custom extension of files (defaults to ibp)')
+    parser.add_argument('-q', '--quiet', action='store_true', default=False, help='omit progress messages of the driver (but not socos)')
+    parser.add_argument('--no_msg', action='store_true', default=False, help='skip error messages in the report')
+    parser.add_argument('--no_ok',  action='store_true', default=False, help='do not report files with no errors')
+    parser.add_argument('--no_decoration', action='store_true', default=False, help='do not decorate the output')
+    parser.add_argument('directories', metavar='DIR', nargs='*', default=['.'], help='directories to be scanned for files (defaults to current)')
+    args = parser.parse_args()
+    
+    info("Welcome to Socos IBT test driver.", args.quiet)
+    info("Checking system requirements...", args.quiet)
+    if os.system("pvs --version > /dev/null") != 0:
+      print "PVS not found in path. Cannot continue."
+      sys.exit(1)
+    info(" - done.", args.quiet)
+
+    # make standard output line-buffered
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
+    # the directory to fetch the files from comes from the command line, or is current by default
+    dirs = args.directories
+    
+    files = {}
+    
+    # recursive scanning of the directory to fetch all .ibp files
+    for dir in dirs:
+      info("Scanning [%s] for .ibp files..."%dir, args.quiet)
+      for top, sub, fset in os.walk(dir):
+        for nm in fset:
+          if nm.endswith("."+args.extension):
+            files[nm] = {'path': os.path.abspath(os.path.join(top, nm)), 'name': nm}
+
+    info(" - found %d suitable files."%len(files), args.quiet)
+
+    info("Creating temporary working directory and copying files...", args.quiet)
+    
+    # making temp dir and copying files there
+    dir_path = tempfile.mkdtemp()
+    info(" - created "+dir_path+"...", args.quiet)
+    for data in files.itervalues():
+      shutil.copy(data['path'], os.path.join(dir_path, data['name']))
+    info(" - done.", args.quiet)
+
+    # out directory
+    info("Creating temporary output directory...", args.quiet)
+    out_path = tempfile.mkdtemp()
+    info(" - created "+out_path+"...", args.quiet)
+    info(" - done.", args.quiet)
+
+    info("Constructing report formatter...", args.quiet)
+    formatter = PlainTextFormatter(args.no_msg, args.no_ok, args.no_decoration)
+    info(" - done.", args.quiet)
+
+    info("Processing the files with Socos checker (this may take time)...", args.quiet)
+    info(" - instantiating IBP environment...", args.quiet)
+    # socos all the files
+    # Create environment, do semantic checking
+    # there might be syntax errors, in which case the whole thing just breaks
+    # this workaround retries the try/exception block, as described in http://stackoverflow.com/questions/2083987/how-to-retry-after-exception-in-python
+    while True:
+      try:
+        files_to_go = []
+        for d in files.itervalues():
+          if 'errors' not in d:
+            files_to_go.append(d['name'])
+        if len(files_to_go)==0:
+          break;
+        env = IBPEnvironment(socos_dir,
+                             dir_path,
+                             out_path,
+                             files_to_go,
+                             set(["process-info"]),
+                             {"timeout":400})
+        info(" - checking...", args.quiet)
+        progress = None
+        for r in env.check():
+          # results of the verification
+          if (r.__class__==Message.VerificationResult or r.__class__==Message.ImpreciseError or r.type=="ERROR") and r.location():
+            store_error(files, r)
+          # progress is reported gradually
+          elif r.__class__==Message.ProgressMessage:
+            progress = r
+          # file message indicates the end of file processing
+          elif r.__class__==Message.FileMessage and progress!=None:
+            store_time_report(files, progress)
+            progress = None
+
+      except Message.ProgramException as exception:
+        info(" - storing errors found in some files and ignoring these files...", args.quiet)
+        for error in exception.msgs:
+          if error.location():
+            store_error(files, error)
+        info(" - retrying...", args.quiet)
+        continue
+
+      info(" - done.", args.quiet)
+      break
+
+    info("Preparing the test report...", args.quiet)
+    log_filename = args.output
+    #log_filename = "test.%s.log"%datetime.datetime.now().strftime("%Y%m%d.%H%M%S")
+    if log_filename:
+      info(" - writing log to [%s]..."%(log_filename), args.quiet)
+    else:
+      info(" - writing log:", args.quiet)
+
+    log_file = open(log_filename, "w") if log_filename else sys.stdout
+
+    file_counter = 1
+    errors = False
+    
+    try:
+      for key in sorted(files.keys()):
+        data = files[key]
+        errors = errors or ('errors' in data)
+        strp1 = formatter.format(data)
+        if strp1:
+          log_file.write("%04d. %s"%(file_counter, formatter.format(data)))
+        file_counter += 1
+    finally:
+      if log_filename:
+        log_file.close()
+
+    info(" - done.", args.quiet)
+
+    info("Removing temporary files and directories...", args.quiet)
+    shutil.rmtree(dir_path)
+    shutil.rmtree(out_path)
+    info(" - done.", args.quiet)
+    info("Testing completed.", args.quiet)
+    if errors:
+      sys.exit(1)

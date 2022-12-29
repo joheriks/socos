@@ -1,0 +1,471 @@
+binop_exp
+2+2*3
+T: PLUS
+    T: NUMBER, V: 2
+    T: STAR
+        T: NUMBER, V: 2
+        T: NUMBER, V: 3
+
+binop_exp_2
+2*(2+3)
+T: STAR
+    T: NUMBER, V: 2
+    T: expression_list_1
+        T: PLUS
+            T: NUMBER, V: 2
+            T: NUMBER, V: 3
+
+binop_exp_3
+2*3*4*5
+T: STAR
+    T: STAR
+        T: STAR
+            T: NUMBER, V: 2
+            T: NUMBER, V: 3
+        T: NUMBER, V: 4
+    T: NUMBER, V: 5
+
+binop_unaryop_exp
+2- -2
+T: MINUS
+    T: NUMBER, V: 2
+    T: MINUS
+        T: NUMBER, V: 2
+
+bin_id!number_exp
+2 + (a ! 2)
+T: PLUS
+    T: NUMBER, V: 2
+    T: expression_list_1
+        T: EXCLAMATION_MARK
+            T: ID, V: a
+            T: NUMBER, V: 2
+
+exp::type_exp
+a::b
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: a
+    T: name
+        T: idop
+            T: ID, V: b
+
+binop_quote_braces_exp
+2+3`23
+T: PLUS
+    T: NUMBER, V: 2
+    T: SINGLE_QUOTE
+        T: NUMBER, V: 3
+        T: NUMBER, V: 23
+
+list_exp
+(a, 2 / 2, 42)
+T: expression_list_1
+    T: name
+        T: idop
+            T: ID, V: a
+    T: SLASH
+        T: NUMBER, V: 2
+        T: NUMBER, V: 2
+    T: NUMBER, V: 42
+
+binding_exp
+lambda (NOT, a) : 4 * 2
+T: bindingexpr
+    T: KEY_LAMBDA, V: lambda
+    T: lambdabindings
+        T: bindings
+            T: binding
+                T: typedids
+                    T: typedids_pre
+                        T: idop
+                            T: KEY_NOT, V: NOT
+                        T: idop
+                            T: ID, V: a
+    T: STAR
+        T: NUMBER, V: 4
+        T: NUMBER, V: 2
+
+binding_exp_2
+foo! (NOT, a) : 4 * 2
+T: bindingexpr
+    T: EXCLAMATION_MARK
+        T: ID, V: foo
+    T: lambdabindings
+        T: bindings
+            T: binding
+                T: typedids
+                    T: typedids_pre
+                        T: idop
+                            T: KEY_NOT, V: NOT
+                        T: idop
+                            T: ID, V: a
+    T: STAR
+        T: NUMBER, V: 4
+        T: NUMBER, V: 2
+
+enumerationtype
+e :: { a, +, b, c, TRUE }
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: e
+    T: enumerationtype
+        T: idop
+            T: ID, V: a
+        T: idop
+            T: PLUS, V: +
+        T: idop
+            T: ID, V: b
+        T: idop
+            T: ID, V: c
+        T: idop
+            T: KEY_TRUE, V: TRUE
+
+subtype
+s :: { x:int | (a, b, c) }
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: s
+    T: subtype
+        T: setexpr
+            T: setbindings
+                T: setbinding
+                    T: idop
+                        T: ID, V: x
+                    T: name
+                        T: idop
+                            T: ID, V: int
+            T: expression_list_1
+                T: name
+                    T: idop
+                        T: ID, V: a
+                T: name
+                    T: idop
+                        T: ID, V: b
+                T: name
+                    T: idop
+                        T: ID, V: c
+
+typeapplication
+t :: foo (bar, baz, 77)
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: t
+    T: typeapplication
+        T: name
+            T: idop
+                T: ID, V: foo
+        T: arguments
+            T: name
+                T: idop
+                    T: ID, V: bar
+            T: name
+                T: idop
+                    T: ID, V: baz
+            T: NUMBER, V: 77
+
+functiontype
+f :: FUNCTION [ x:int, y:int -> z ]
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: f
+    T: functiontype
+        T: KEY_FUNCTION, V: FUNCTION
+        T: idoptypeexpr
+            T: idop
+                T: ID, V: x
+            T: name
+                T: idop
+                    T: ID, V: int
+        T: idoptypeexpr
+            T: idop
+                T: ID, V: y
+            T: name
+                T: idop
+                    T: ID, V: int
+        T: name
+            T: idop
+                T: ID, V: z
+
+tupletype
+t :: [ int, x:int ]
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: t
+    T: tupletype
+        T: idoptypeexpr
+            T: name
+                T: idop
+                    T: ID, V: int
+        T: idoptypeexpr
+            T: idop
+                T: ID, V: x
+            T: name
+                T: idop
+                    T: ID, V: int
+
+recordtype
+r :: [# a, b : int, c: int #]
+T: COLON_COLON
+    T: name
+        T: idop
+            T: ID, V: r
+    T: recordtype
+        T: fielddecls
+            T: ID, V: a
+            T: ID, V: b
+            T: name
+                T: idop
+                    T: ID, V: int
+        T: fielddecls
+            T: ID, V: c
+            T: name
+                T: idop
+                    T: ID, V: int
+
+empty_lists
+( (: :), [| |], (| |), {| |} )
+T: expression_list_1
+    T: expression_list_2
+    T: expression_list_3
+    T: expression_list_4
+    T: expression_list_5
+
+well_founded_stack_example
+LAMBDA (x, y: stack): CASES y OF empty: FALSE, push(push1_var, push2_var): x = push2_var OR x << push2_var ENDCASES
+T: bindingexpr
+    T: KEY_LAMBDA, V: LAMBDA
+    T: lambdabindings
+        T: bindings
+            T: binding
+                T: typedids
+                    T: typedids_pre
+                        T: idop
+                            T: ID, V: x
+                        T: idop
+                            T: ID, V: y
+                        T: name
+                            T: idop
+                                T: ID, V: stack
+    T: cases
+        T: name
+            T: idop
+                T: ID, V: y
+        T: selection
+            T: idop
+                T: ID, V: empty
+            T: name
+                T: idop
+                    T: KEY_FALSE, V: FALSE
+        T: selection
+            T: idop
+                T: ID, V: push
+            T: idop
+                T: ID, V: push1_var
+            T: idop
+                T: ID, V: push2_var
+            T: KEY_OR
+                T: EQUAL
+                    T: name
+                        T: idop
+                            T: ID, V: x
+                    T: name
+                        T: idop
+                            T: ID, V: push2_var
+                T: LT_LT
+                    T: name
+                        T: idop
+                            T: ID, V: x
+                    T: name
+                        T: idop
+                            T: ID, V: push2_var
+
+nonempty_stack_example
+nonemptystack?(s) IMPLIES push(top(s), pop(s)) = s
+T: KEY_IMPLIES
+    T: expression_arguments
+        T: name
+            T: idop
+                T: ID, V: nonemptystack?
+        T: arguments
+            T: name
+                T: idop
+                    T: ID, V: s
+    T: EQUAL
+        T: expression_arguments
+            T: name
+                T: idop
+                    T: ID, V: push
+            T: arguments
+                T: expression_arguments
+                    T: name
+                        T: idop
+                            T: ID, V: top
+                    T: arguments
+                        T: name
+                            T: idop
+                                T: ID, V: s
+                T: expression_arguments
+                    T: name
+                        T: idop
+                            T: ID, V: pop
+                    T: arguments
+                        T: name
+                            T: idop
+                                T: ID, V: s
+        T: name
+            T: idop
+                T: ID, V: s
+
+ackerman_example
+IF m = 0 THEN n + 1 ELSIF n = 0 THEN ack(m - 1, 1) ELSE ack(m - 1, ack(m, n - 1)) ENDIF
+T: ifthen
+    T: EQUAL
+        T: name
+            T: idop
+                T: ID, V: m
+        T: NUMBER, V: 0
+    T: PLUS
+        T: name
+            T: idop
+                T: ID, V: n
+        T: NUMBER, V: 1
+    T: elsif
+        T: EQUAL
+            T: name
+                T: idop
+                    T: ID, V: n
+            T: NUMBER, V: 0
+        T: expression_arguments
+            T: name
+                T: idop
+                    T: ID, V: ack
+            T: arguments
+                T: MINUS
+                    T: name
+                        T: idop
+                            T: ID, V: m
+                    T: NUMBER, V: 1
+                T: NUMBER, V: 1
+    T: expression_arguments
+        T: name
+            T: idop
+                T: ID, V: ack
+        T: arguments
+            T: MINUS
+                T: name
+                    T: idop
+                        T: ID, V: m
+                T: NUMBER, V: 1
+            T: expression_arguments
+                T: name
+                    T: idop
+                        T: ID, V: ack
+                T: arguments
+                    T: name
+                        T: idop
+                            T: ID, V: m
+                    T: MINUS
+                        T: name
+                            T: idop
+                                T: ID, V: n
+                        T: NUMBER, V: 1
+
+binding_chain
+FORALL (x: int) : EXISTS (y:int, z:int) : y+z <= z
+T: bindingexpr
+    T: KEY_FORALL, V: FORALL
+    T: lambdabindings
+        T: bindings
+            T: binding
+                T: typedids
+                    T: typedids_pre
+                        T: idop
+                            T: ID, V: x
+                        T: name
+                            T: idop
+                                T: ID, V: int
+    T: bindingexpr
+        T: KEY_EXISTS, V: EXISTS
+        T: lambdabindings
+            T: bindings
+                T: binding
+                    T: typedids
+                        T: typedids_pre
+                            T: idop
+                                T: ID, V: y
+                            T: name
+                                T: idop
+                                    T: ID, V: int
+                T: binding
+                    T: typedids
+                        T: typedids_pre
+                            T: idop
+                                T: ID, V: z
+                            T: name
+                                T: idop
+                                    T: ID, V: int
+        T: LT_EQUAL
+            T: PLUS
+                T: name
+                    T: idop
+                        T: ID, V: y
+                T: name
+                    T: idop
+                        T: ID, V: z
+            T: name
+                T: idop
+                    T: ID, V: z
+
+unaryop_with_symbol
+not a
+T: KEY_NOT
+    T: name
+        T: idop
+            T: ID, V: a
+
+unaryop_precedence
+not a IMPLIES b
+T: KEY_IMPLIES
+    T: KEY_NOT
+        T: name
+            T: idop
+                T: ID, V: a
+    T: name
+        T: idop
+            T: ID, V: b
+
+name_actuals
+foo [ bar, {x, y, z} ]
+T: name
+    T: idop
+        T: ID, V: foo
+    T: actuals
+        T: name
+            T: idop
+                T: ID, V: bar
+        T: enumerationtype
+            T: idop
+                T: ID, V: x
+            T: idop
+                T: ID, V: y
+            T: idop
+                T: ID, V: z
+
+name_actuals_dot
+parray[int].parray
+T: name
+    T: idop
+        T: ID, V: parray
+    T: actuals
+        T: name
+            T: idop
+                T: ID, V: int
+    T: idop
+        T: ID, V: parray

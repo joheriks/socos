@@ -1,0 +1,267 @@
+(ctx__min)
+(spec__min__min
+ (post___TCC1 0
+  (post___TCC1-1 nil 3549283273
+   (""
+    (then (skosimp-2) (uid "min:context/min:procedure;")
+     (then (expand-nested-defs - (("pre__" 1) ("post__" 3)))
+      (flatten-disjunct -) (check-report (skip))))
+    nil)
+   nil nil))
+ (post___TCC2 0
+  (post___TCC2-1 nil 3549283273
+   (""
+    (then (skosimp-2) (uid "min:context/min:procedure;")
+     (then (expand-nested-defs - (("pre__" 1) ("post__" 3)))
+      (flatten-disjunct -) (check-report (skip))))
+    nil)
+   nil nil)))
+(impl__min__min
+ (sit__loop_TCC1 0
+  (sit__loop_TCC1-1 nil 3549283273
+   (""
+    (then (skosimp-2) (uid "min:context/min:procedure;")
+     (then
+      (expand-nested-defs -
+       (("spec__min__min.pre__" 1 (("sit__ini__" 1))) ("sit__loop" 3)
+        ("spec__min__min.post__" 3 (("sit__fin__post__" 3)))))
+      (flatten-disjunct -) (check-report (skip))))
+    nil)
+   nil nil))
+ (sit__loop_TCC2 0
+  (sit__loop_TCC2-1 nil 3549283273
+   (""
+    (then (skosimp-2) (uid "min:context/min:procedure;")
+     (then
+      (expand-nested-defs -
+       (("spec__min__min.pre__" 1 (("sit__ini__" 1))) ("sit__loop" 3)
+        ("spec__min__min.post__" 3 (("sit__fin__post__" 3)))))
+      (flatten-disjunct -) (check-report (skip))))
+    nil)
+   nil nil))
+ (cc__ini__ 0
+  (cc__ini__-1 nil 3549283273
+   (""
+    (uid "min:context/min:procedure/ini__:situation/trs1:transition;")
+    (("" (flatten-disjunct 1 :depth 1)
+      (("" (expand sit__ini__)
+        (("" (flatten-disjunct -1 :depth 1)
+          ((""
+            (spread (split-n 1)
+             ((then
+               (uid
+                "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;")
+               (flatten-disjunct 1 :depth 1)
+               (flatten-disjunct 1 :depth 1)
+               (then
+                (uid
+                 "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition;")
+                (expand-defs
+                 (("spec__min__min.pre__" 1 (("sit__ini__" 1)))
+                  ("sit__loop" 3)
+                  ("spec__min__min.post__" 3
+                   (("sit__fin__post__" 3)))))
+                (spread (split-n 3)
+                 ((then
+                   (uid
+                    "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition/trs1__branch__trs1__goto_check_loop_1:transition;")
+                   (check-report (skip)))
+                  (then
+                   (uid
+                    "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition/trs1__branch__trs1__goto_check_loop_2:transition;")
+                   (check-report (skip)))
+                  (then
+                   (uid
+                    "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition/trs1__branch__trs1__goto_check_loop_3:transition;")
+                   (check-report (skip)))))))))
+            nil)))))))))
+   nil shostak))
+ (cc__loop_TCC1 0
+  (cc__loop_TCC1-1 nil 3549283273
+   (""
+    (then (skosimp-2) (uid "min:context/min:procedure;")
+     (then
+      (expand-nested-defs -
+       (("spec__min__min.pre__" 1 (("sit__ini__" 1))) ("sit__loop" 3)
+        ("spec__min__min.post__" 3 (("sit__fin__post__" 3)))))
+      (flatten-disjunct -) (check-report (skip))))
+    nil)
+   nil nil))
+ (cc__loop_TCC2 0
+  (cc__loop_TCC2-1 nil 3549283273
+   (""
+    (then (skosimp-2) (uid "min:context/min:procedure;")
+     (then
+      (expand-nested-defs -
+       (("spec__min__min.pre__" 1 (("sit__ini__" 1))) ("sit__loop" 3)
+        ("spec__min__min.post__" 3 (("sit__fin__post__" 3)))))
+      (flatten-disjunct -) (check-report (skip))))
+    nil)
+   nil nil))
+ (cc__loop 0
+  (cc__loop-1 nil 3549283273
+   (""
+    (uid "min:context/min:procedure/loop:situation/trs1:transition;")
+    (("" (flatten-disjunct 1 :depth 1)
+      ((""
+        (spread (split 1 :depth 1)
+         ((then (beta 1)
+           (uid
+            "min:context/min:procedure/loop:situation/trs1:transition/loop__stmt1:transition;")
+           (then
+            (expand-nested-defs -
+             (("spec__min__min.pre__" 1 (("sit__ini__" 1)))
+              ("sit__loop" 3)
+              ("spec__min__min.post__" 3 (("sit__fin__post__" 3)))))
+            (flatten-disjunct -) (check-report (skip))))
+          (then
+           (spread (split-n 2)
+            ((then
+              (uid
+               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;")
+              (flatten-disjunct 1 :depth 1)
+              (spread (split 1 :depth 1)
+               ((then (beta 1)
+                 (uid
+                  "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__stmt2:transition;")
+                 (then
+                  (expand-nested-defs -
+                   (("spec__min__min.pre__" 1 (("sit__ini__" 1)))
+                    ("sit__loop" 3)
+                    ("spec__min__min.post__" 3
+                     (("sit__fin__post__" 3)))))
+                  (flatten-disjunct -) (check-report (skip))))
+                (then
+                 (spread (split-n 2)
+                  ((then
+                    (uid
+                     "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition;")
+                    (flatten-disjunct 1 :depth 1)
+                    (flatten-disjunct 1 :depth 1)
+                    (spread (split 1 :depth 1)
+                     ((then (beta 1)
+                       (uid
+                        "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__stmt4:transition;")
+                       (then
+                        (expand-nested-defs -
+                         (("spec__min__min.pre__" 1 (("sit__ini__" 1)))
+                          ("sit__loop" 3)
+                          ("spec__min__min.post__" 3
+                           (("sit__fin__post__" 3)))))
+                        (flatten-disjunct -) (check-report (skip))))
+                      (then
+                       (spread (split 1 :depth 1)
+                        ((then (beta 1)
+                          (uid
+                           "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__stmt5:transition;")
+                          (then
+                           (expand-nested-defs -
+                            (("spec__min__min.pre__" 1
+                              (("sit__ini__" 1)))
+                             ("sit__loop" 3)
+                             ("spec__min__min.post__" 3
+                              (("sit__fin__post__" 3)))))
+                           (flatten-disjunct -) (check-report (skip))))
+                         (then
+                          (then
+                           (uid
+                            "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition;")
+                           (expand-defs
+                            (("spec__min__min.pre__" 1
+                              (("sit__ini__" 1)))
+                             ("sit__loop" 3)
+                             ("spec__min__min.post__" 3
+                              (("sit__fin__post__" 3)))))
+                           (spread (split-n 3)
+                            ((then
+                              (uid
+                               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition/trs1__branch__trs1__branch__trs1__goto_check_loop_1:transition;")
+                              (check-report (skip)))
+                             (then
+                              (uid
+                               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition/trs1__branch__trs1__branch__trs1__goto_check_loop_2:transition;")
+                              (check-report (skip)))
+                             (then
+                              (uid
+                               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition/trs1__branch__trs1__branch__trs1__goto_check_loop_3:transition;")
+                              (check-report (skip)))))))))))))
+                   (then
+                    (uid
+                     "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition;")
+                    (flatten-disjunct 1 :depth 1)
+                    (flatten-disjunct 1 :depth 1)
+                    (flatten-disjunct 1 :depth 1)
+                    (spread (split 1 :depth 1)
+                     ((then (beta 1)
+                       (uid
+                        "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt6:transition;")
+                       (then
+                        (expand-nested-defs -
+                         (("spec__min__min.pre__" 1 (("sit__ini__" 1)))
+                          ("sit__loop" 3)
+                          ("spec__min__min.post__" 3
+                           (("sit__fin__post__" 3)))))
+                        (flatten-disjunct -) (check-report (skip))))
+                      (then
+                       (spread (split 1 :depth 1)
+                        ((then (beta 1)
+                          (uid
+                           "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt7:transition;")
+                          (then
+                           (expand-nested-defs -
+                            (("spec__min__min.pre__" 1
+                              (("sit__ini__" 1)))
+                             ("sit__loop" 3)
+                             ("spec__min__min.post__" 3
+                              (("sit__fin__post__" 3)))))
+                           (flatten-disjunct -) (check-report (skip))))
+                         (then
+                          (then
+                           (uid
+                            "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition;")
+                           (expand-defs
+                            (("spec__min__min.pre__" 1
+                              (("sit__ini__" 1)))
+                             ("sit__loop" 3)
+                             ("spec__min__min.post__" 3
+                              (("sit__fin__post__" 3)))))
+                           (spread (split-n 3)
+                            ((then
+                              (uid
+                               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition/trs1__branch__trs1__branch__trs2__goto_check_loop_1:transition;")
+                              (check-report (skip)))
+                             (then
+                              (uid
+                               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition/trs1__branch__trs1__branch__trs2__goto_check_loop_2:transition;")
+                              (check-report (skip)))
+                             (then
+                              (uid
+                               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition/trs1__branch__trs1__branch__trs2__goto_check_loop_3:transition;")
+                              (check-report (skip)))))))))))))))))))
+             (then
+              (uid
+               "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition;")
+              (flatten-disjunct 1 :depth 1)
+              (then
+               (uid
+                "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition;")
+               (expand-defs
+                (("spec__min__min.pre__" 1 (("sit__ini__" 1)))
+                 ("sit__loop" 3)
+                 ("spec__min__min.post__" 3 (("sit__fin__post__" 3)))))
+               (spread (split-n 3)
+                ((then
+                  (uid
+                   "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition/trs1__branch__trs2__goto_check_post___1:transition;")
+                  (check-report (skip)))
+                 (then
+                  (uid
+                   "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition/trs1__branch__trs2__goto_check_post___2:transition;")
+                  (check-report (skip)))
+                 (then
+                  (uid
+                   "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition/trs1__branch__trs2__goto_check_post___3:transition;")
+                  (check-report (skip))))))))))))
+        nil)))))
+   nil shostak)))
+

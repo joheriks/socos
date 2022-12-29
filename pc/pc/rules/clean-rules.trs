@@ -1,0 +1,182 @@
+# Turn progvars into regular vars
+
+progvar_to_var
+::
+        module > KEY_PROGVAR
+        ->
+        KEY_PROGVAR := 'KEY_VAR'(@children(KEY_PROGVAR))
+::
+
+# Turn procedure arguments into vars
+
+pparg_to_arg
+::
+        module
+        > proc:'p?procedure'(args(arg:'p?parg'(orig(oid:ID+,
+                                                    flags:'KEY_(RESULT|VALRES)'?,
+                                                    typ:'.*'*),
+                                               new(nid:ID)),
+                                  &rest),
+                             &rest)
+        ->
+        arg := 'arg'(oid, nid, typ)
+::
+
+args_to_var
+::
+        module
+        > proc:'p?procedure'(ID,
+                             vars:'KEY_(VAR|PROGVAR)'*,
+                             args(arg(argid:ID+,
+                                      flags:'KEY_(RESULT|VALRES)'?,
+                                      typ:'.*'*),
+                                  &rest),
+                             &rest)
+        ->
+        args := args(args.rest)
+        proc := 'procedure'(proc.ID, vars, 'KEY_VAR'(argid, typ), args, proc.rest)
+::
+
+del_empty_args
+::
+        module
+        > proc:'p?procedure'(ID, args(:'.*'!), &rest)
+        ->
+        proc := 'procedure'(ID, rest)
+::
+
+# Move situations up
+
+move_sit_up
+::
+        module
+        > parent:'.*'(situation:'p?situation'(ID, &rest), &rest)
+        ->
+        situation := situation.rest
+::
+
+# Delete procedure body node
+
+del_proc_body
+::
+        module
+        > proc:'p?procedure'(procedure_body, &rest)
+        ->
+        procedure_body := @children(procedure_body)
+::
+
+# Delete junk
+
+del_junk
+::
+	module
+	> proc:'p?procedure'(pKEY_PROGVAR+, &rest)
+	->
+	proc := 'procedure'(proc.rest)
+::
+
+# Delete more junk
+
+del_modifies
+::
+	module
+	> proc:'p?procedure'(modifies+, &rest)
+	->
+	proc := 'procedure'(proc.rest)
+::
+
+# Rename pprocedure to procedure
+rename_pprocedure
+::
+        module(pprocedure, &rest)
+        ->
+        pprocedure := 'procedure'(@children(pprocedure))
+::
+
+# Module invariants ...
+
+move_var
+::
+	module(init_progvar(var:'(orig|new)_var'+(vars:'KEY_(VAR|PROGVAR)'+)),&rest)
+	->
+	init_progvar:= vars
+::
+
+# Nested let expressions
+
+let_merge
+::
+        module > parent:let(a:letbinding+, pgroup(let(b:letbinding, expr:'.*')))
+        ->
+        parent := 'let'(a, b, expr)
+::
+
+
+# Simple tree fixes (turn op(a,b,c,...) into op(a, op(b, op(c, ...))))
+
+fix_and
+::
+        module > KEY_AND(e1:'.*', e2:'.*', e3:'.*', &rest)
+        ->
+        KEY_AND := KEY_AND(e1, 'KEY_AND'(e2, e3, rest))
+::
+
+fix_or
+::
+        module > KEY_OR(e1:'.*', e2:'.*', e3:'.*', &rest)
+        ->
+        KEY_OR := KEY_OR(e1, 'KEY_OR'(e2, e3, rest))
+::
+
+fix_or_and_2
+::
+        module > expr:'KEY_(OR|AND)'(&any)
+        ->
+        expr := any
+::
+
+# Extra parens
+
+fix_pgroup
+::
+        module > pgroup(simple:'name|NUMBER|pgroup')
+        ->
+        pgroup := simple
+::
+
+# Turn using into imports
+
+fix_using_1
+::
+	module > using(module_name(lib:ID,mod:ID),&rest)
+	->
+	module_name := 'theory_name'('ID'=$concat($$lib,'@',$$mod,'_Spec'))
+::
+
+fix_using_2
+::
+	module > using(module_name(mod:ID),&rest)
+	->
+	module_name := 'theory_name'('ID'=$concat($$mod,'_Spec'))
+::
+
+# Turn slice operator into setbinding
+
+fix_slice
+::
+        module > slice(left:'.*', right:'.*')
+        ->
+        slice := 'pslice'('ID' = $gensym('xx'), left, right)
+::
+
+fix_slice_2
+::
+        module > pslice(ID, left:'.*', right:'.*')
+        ->
+        pslice := 'setbind_or_expr'('setbindings'('setbinding'('idop'(ID),
+                                                               'ID'='nat')),
+                                    'KEY_AND'('LT_EQUAL'('pgroup'(left),
+                                                         ID),
+                                              'LT'('pgroup'(right),
+                                                   ID)))
+::

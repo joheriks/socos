@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="ibpe.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="RCP Perspective"
+            class="ibpe.Perspective"
+            id="ibpe.perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="ibpe.IBPEditor"
+            contributorClass="ibpe.IBPEditorActionBarContributor"
+            extensions="ibp"
+            icon="icons/editor_icon.png"
+            id="ibpe.IBPEditor"
+            name="IBPEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category 
+            id="ibpe.wizards" 
+            name="Socos">
+      </category> 
+      <wizard
+            name="Context"
+            class="ibpe.wizards.NewIBPFileWizard"
+            id="ibpe.wizards.NewIBPFileWizard"
+            category="ibpe.wizards"
+            icon="icons/editor_icon.png">
+      </wizard>
+         
+   </extension>
+   <extension
+     point="org.eclipse.ui.navigator.navigatorContent">
+       <commonWizard type="new" wizardId="ibpe.wizards.NewIBPFileWizard">
+           <enablement>
+           </enablement>
+       </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="ibpe.IBPPreferences"
+            id="ibpe.preferences.IBPPreferences"
+            name="Socos">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="ibpe.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         id="ibpmarker"
+         name="Socos message"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="fi.imped.socos.IBPE.category1"
+            class="ibpe.DebuggerView"
+            id="fi.imped.socos.IBPE.DebuggerView"
+            name="Debugger"
+            restorable="true">
+      </view>
+      <category
+            id="fi.imped.socos.IBPE.category1"
+            name="Socos">
+      </category>
+   </extension>
+</plugin>

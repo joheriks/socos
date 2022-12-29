@@ -1,0 +1,133 @@
+Summary: Verifying compiler for invariant based programs
+Name: socos-pc
+Version: @socosversion@
+Release: 1
+License: Socos license
+Group: Development/Tools
+URL: http://valhalla.cs.abo.fi
+Source0: %{name}-%{version}.src.tar.gz
+BuildArch: noarch
+BuildRoot: /var/tmp/%{name}-%{version}.%{release}-buildroot
+Requires: python >= 2.4
+#Requires: pvs >= 4.1
+
+# Launch script
+%define binfile %{_bindir}/socos
+
+# Location of Python modules
+%define pypackagepath %{_datadir}/socos
+
+# Location of data files
+%define datapath %{_datadir}/socos
+
+# Location of examples and documents
+%define docpath %{_docdir}/%{name}-%{version}
+
+%description
+
+Socos is a prototype tool for constructing programs and reasoning
+about their correctness.  This package contains the compiler and
+verifier backend, and does not feature a graphical interface.  Socos
+requires PVS version 4.1 or later: 
+
+http://pvs.csl.sri.com/
+
+Socos also requires the ProofLite addon:
+
+http://shemesh.larc.nasa.gov/people/cam/ProofLite/
+
+%prep
+%setup -q -n pc
+
+%build
+
+PYTHONPATH=%{_builddir} make distconfig build
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p /var/tmp/%{name}-buildroot
+mkdir -p $RPM_BUILD_ROOT/%{name}-root
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/parsing
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/parsing/ply
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/parsetabs
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/pp
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/rewrite
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/semantic
+mkdir -p $RPM_BUILD_ROOT%{pypackagepath}/pc/util
+mkdir -p $RPM_BUILD_ROOT%{datapath}
+mkdir -p $RPM_BUILD_ROOT%{docpath}
+
+echo '#!/bin/sh' > $RPM_BUILD_ROOT%{binfile}
+echo python %{pypackagepath}'/socos $@' >> $RPM_BUILD_ROOT%{binfile}
+chmod 755 $RPM_BUILD_ROOT%{_bindir}/socos
+
+cp socos $RPM_BUILD_ROOT%{pypackagepath}
+
+cat run_acceptance_tests.sh | sed 's|^TESTDIR1=.*|TESTDIR1='%{datapath}'/acceptancetests|g' |sed 's|^TESTDIR2=.*|TESTDIR2='%{datapath}'/rejectancetests|g' | sed 's|^SOCOS=.*|SOCOS=socos|g' > $RPM_BUILD_ROOT%{datapath}/run_acceptance_tests.sh
+chmod 755 $RPM_BUILD_ROOT%{datapath}/run_acceptance_tests.sh
+
+cp __init__.py config.py $RPM_BUILD_ROOT%{pypackagepath}/pc
+cp parsing/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/parsing
+cp parsing/ply/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/parsing/ply
+cp parsetabs/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/parsetabs
+cp pp/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/pp
+cp rewrite/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/rewrite
+cp semantic/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/semantic
+cp util/*.py $RPM_BUILD_ROOT%{pypackagepath}/pc/util
+
+cp -r lib $RPM_BUILD_ROOT%{datapath}/lib
+cp -r examples $RPM_BUILD_ROOT%{datapath}
+cp -r acceptancetests $RPM_BUILD_ROOT%{datapath}
+cp -r rejectancetests $RPM_BUILD_ROOT%{datapath}
+
+cp tools/ibp-mode.el $RPM_BUILD_ROOT%{docpath}
+cp doc/* $RPM_BUILD_ROOT%{docpath}
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+
+%{_bindir}/socos
+%{datapath}
+%{docpath}
+
+%changelog
+
+* Thu May 12 2010 Johannes Eriksson <joheriks@abo.fi>
+- Update
+
+* Mon May 10 2010 Johannes Eriksson <joheriks@abo.fi>
+- Update
+
+* Tue Apr 6 2010 Johannes Eriksson <joheriks@abo.fi>
+- Repackage
+- Removed PVS dependency (so it can be installed without the PVS rpm, which 
+  we cannot distribute) 
+- Package should build on Fedora 10 and Fedora 12, build requires PVS to 
+  be installed
+
+* Fri Dec 12 2008 Johannes Eriksson <joheriks@abo.fi>
+- Repackage
+
+* Tue Nov 13 2007 Johannes Eriksson <joheriks@abo.fi>
+- Updated the build system
+- Added lib dir to the manifest
+
+* Mon Aug 20 2007 Daniel Sjöblom <dsjoblom@abo.fi>
+- Added more elisp to installation
+
+* Fri Aug 17 2007 Daniel Sjöblom <dsjoblom@abo.fi>
+- Added rule installation
+
+* Tue Aug 14 2007 Johannes Eriksson <joheriks@abo.fi>
+- Some updates
+  - Added dependency on python-inotify for the prover daemon
+
+* Thu Jun 7 2007 Daniel Sjöblom <dsjoblom@abo.fi>
+- First version
+

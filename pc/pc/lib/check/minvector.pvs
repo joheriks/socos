@@ -1,0 +1,395 @@
+ctx__minvector: theory
+begin
+    importing ds@vector;
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "minvector:context;") 
+%|-            (then 
+%|-                (expand-nested-defs -  nil) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) QED
+end ctx__minvector 
+
+spec__minvector__minvector: theory
+begin
+    importing ctx__minvector;
+    a: var vector[int];
+    m: var int;
+    
+    pre__(a): bool =
+        (id(len(a) > 0));
+    
+    post__(a, m): bool =
+        (id(len(a) > 0)) and (id(0 <= m and m < len(a))) and (id((forall (i : below[len(a)]) : 
+                                                                       a(m) <= a(i))));
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "minvector:context/minvector:procedure;") 
+%|-            (then 
+%|-                (expand-nested-defs 
+%|-                    - 
+%|-                    (("pre__" 1) 
+%|-                ("post__" 3))) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) QED
+end spec__minvector__minvector 
+
+spec__minvector__minvectortest: theory
+begin
+    importing ctx__minvector;
+    
+    pre__: bool =
+        true;
+    
+    post__: bool =
+        true;
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "minvector:context/minvectortest:procedure;") 
+%|-            (then 
+%|-                (expand-nested-defs 
+%|-                    - 
+%|-                    (("pre__" 0) 
+%|-                ("post__" 0))) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) QED
+end spec__minvector__minvectortest 
+
+impl__minvector__minvector: theory
+begin
+    importing spec__minvector__minvector;
+    m: var int;
+    
+    a: vector[int];
+    k: var int;
+    
+    m_0: int;
+    
+    k_0: int;
+    
+    k_1: int;
+    
+    m_1: int;
+    
+    sit__ini__(m, k): bool = True;
+       % ((true)) and (spec__minvector__minvector.pre__(a));
+    
+    sit__loop(m, k): bool = True;
+     %   (id(0 < k and k <= len(a))) and (id(0 <= m and m < k)) and (id((forall (i : below[len(a)]) : 
+       %                                                                      i < k => a(m) <= a(i))));
+    
+    sit__fin__post__(m, k): bool = True;
+     %   (spec__minvector__minvector.post__(a, m));
+    
+        cc__ini__: LEMMA sit__ini__(m_0, k_0) => (k_1 = (((lambda (m, k) : 
+                                               1))(m_0, k_0))::int => m_1 = (((lambda (m, k) : 
+                                                                            0))(m_0, k_1))::int => sit__loop(m_1, k_1))
+    
+%|-    cc__ini__:proof
+%|-        (uid "minvector:context/minvector:procedure/ini__:situation/trs1:transition;") (flatten-disjunct 1  :depth  1) (expand sit__ini__) (flatten-disjunct -1  :depth  1) (spread 
+%|-            (split-n 1) 
+%|-            ((then 
+%|-                (uid "minvector:context/minvector:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;") 
+%|-                (flatten-disjunct 1  :depth  1) 
+%|-                (flatten-disjunct 1  :depth  1) 
+%|-                (then 
+%|-                    (uid "minvector:context/minvector:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__ini____goto:transition;") 
+%|-                    (expand-defs 
+%|-                        (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                            ("sit__loop" 3) 
+%|-                    ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                    (spread 
+%|-                        (split-n 3) 
+%|-                        ((then 
+%|-                            (uid "minvector:context/minvector:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__ini____goto:transition/trs1__branch__trs1__ini____goto_check_loop_1:transition;") 
+%|-                        (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                            (then 
+%|-                                (uid "minvector:context/minvector:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__ini____goto:transition/trs1__branch__trs1__ini____goto_check_loop_2:transition;") 
+%|-                            (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                            (then 
+%|-                                (uid "minvector:context/minvector:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__ini____goto:transition/trs1__branch__trs1__ini____goto_check_loop_3:transition;") 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))))))))) QED
+    
+        cc__loop: LEMMA sit__loop(m_0, k_0) => (id(((lambda (m, k) : 
+                                          k < len(a) or k = len(a)))(m_0, k_0))) and (((((lambda (m, k) : 
+                                                                                           k < len(a)))(m_0, k_0)) => (id(((lambda (m, k) : 
+                                                                                                                             a(m) < a(k) or a(m) >= a(k)))(m_0, k_0))) and (((((lambda (m, k) : 
+                                                                                                                                                                                 a(m) < a(k)))(m_0, k_0)) => k_1 = (((lambda (m, k) : 
+                                                                                                                                                                                                                       k + 1))(m_0, k_0))::int => (id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                         0 <= len(a) - k))(m_0, k_1))) and ((id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                   len(a) - k < ((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                   len(a) - k))(m_0, k_0)))(m_0, k_1))) and (sit__loop(m_0, k_1)))) and ((((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                             a(m) >= a(k)))(m_0, k_0)) => m_1 = (((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                    k))(m_0, k_0))::int => k_1 = (((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     k + 1))(m_1, k_0))::int => (id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       0 <= len(a) - k))(m_1, k_1))) and ((id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 len(a) - k < ((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 len(a) - k))(m_0, k_0)))(m_1, k_1))) and (sit__loop(m_1, k_1)))))) and ((((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         k = len(a)))(m_0, k_0)) => sit__fin__post__(m_0, k_0)))
+    
+%|-    cc__loop:proof
+%|-        (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition;") (flatten-disjunct 1  :depth  1) (spread 
+%|-            (split 1  :depth  1) 
+%|-            ((then 
+%|-                (beta 1) 
+%|-                (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/loop__stmt1:transition;") 
+%|-                (then 
+%|-                    (expand-nested-defs 
+%|-                        - 
+%|-                        (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                            ("sit__loop" 3) 
+%|-                    ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                    (flatten-disjunct -) 
+%|-            (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                (then 
+%|-                    (spread 
+%|-                        (split-n 2) 
+%|-                        ((then 
+%|-                            (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;") 
+%|-                            (flatten-disjunct 1  :depth  1) 
+%|-                            (spread 
+%|-                                (split 1  :depth  1) 
+%|-                                ((then 
+%|-                                    (beta 1) 
+%|-                                    (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__stmt2:transition;") 
+%|-                                    (then 
+%|-                                        (expand-nested-defs 
+%|-                                            - 
+%|-                                            (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                ("sit__loop" 3) 
+%|-                                        ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                        (flatten-disjunct -) 
+%|-                                (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                                    (then 
+%|-                                        (spread 
+%|-                                            (split-n 2) 
+%|-                                            ((then 
+%|-                                                (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition;") 
+%|-                                                (flatten-disjunct 1  :depth  1) 
+%|-                                                (flatten-disjunct 1  :depth  1) 
+%|-                                                (spread 
+%|-                                                    (split 1  :depth  1) 
+%|-                                                    ((then 
+%|-                                                        (beta 1) 
+%|-                                                        (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__stmt4:transition;") 
+%|-                                                        (then 
+%|-                                                            (expand-nested-defs 
+%|-                                                                - 
+%|-                                                                (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                    ("sit__loop" 3) 
+%|-                                                            ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                            (flatten-disjunct -) 
+%|-                                                    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                                                        (then 
+%|-                                                            (spread 
+%|-                                                                (split 1  :depth  1) 
+%|-                                                                ((then 
+%|-                                                                    (beta 1) 
+%|-                                                                    (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__stmt5:transition;") 
+%|-                                                                    (then 
+%|-                                                                        (expand-nested-defs 
+%|-                                                                            - 
+%|-                                                                            (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                ("sit__loop" 3) 
+%|-                                                                        ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                        (flatten-disjunct -) 
+%|-                                                                (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                                                                    (then 
+%|-                                                                        (then 
+%|-                                                                            (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__loop__goto:transition;") 
+%|-                                                                            (expand-defs 
+%|-                                                                                (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                    ("sit__loop" 3) 
+%|-                                                                            ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                            (spread 
+%|-                                                                                (split-n 3) 
+%|-                                                                                ((then 
+%|-                                                                                    (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__loop__goto:transition/trs1__branch__trs1__branch__trs1__loop__goto_check_loop_1:transition;") 
+%|-                                                                                (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                                                                                    (then 
+%|-                                                                                        (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__loop__goto:transition/trs1__branch__trs1__branch__trs1__loop__goto_check_loop_2:transition;") 
+%|-                                                                                    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                                                                                    (then 
+%|-                                                                                        (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__loop__goto:transition/trs1__branch__trs1__branch__trs1__loop__goto_check_loop_3:transition;") 
+%|-                                            (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))))))))))))) 
+%|-                                                (then 
+%|-                                                    (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition;") 
+%|-                                                    (flatten-disjunct 1  :depth  1) 
+%|-                                                    (flatten-disjunct 1  :depth  1) 
+%|-                                                    (flatten-disjunct 1  :depth  1) 
+%|-                                                    (spread 
+%|-                                                        (split 1  :depth  1) 
+%|-                                                        ((then 
+%|-                                                            (beta 1) 
+%|-                                                            (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt6:transition;") 
+%|-                                                            (then 
+%|-                                                                (expand-nested-defs 
+%|-                                                                    - 
+%|-                                                                    (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                        ("sit__loop" 3) 
+%|-                                                                ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                (flatten-disjunct -) 
+%|-                                                        (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                                                            (then 
+%|-                                                                (spread 
+%|-                                                                    (split 1  :depth  1) 
+%|-                                                                    ((then 
+%|-                                                                        (beta 1) 
+%|-                                                                        (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt7:transition;") 
+%|-                                                                        (then 
+%|-                                                                            (expand-nested-defs 
+%|-                                                                                - 
+%|-                                                                                (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                    ("sit__loop" 3) 
+%|-                                                                            ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                            (flatten-disjunct -) 
+%|-                                                                    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                                                                        (then 
+%|-                                                                            (then 
+%|-                                                                                (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__loop__goto:transition;") 
+%|-                                                                                (expand-defs 
+%|-                                                                                    (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                        ("sit__loop" 3) 
+%|-                                                                                ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                                (spread 
+%|-                                                                                    (split-n 3) 
+%|-                                                                                    ((then 
+%|-                                                                                        (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__loop__goto:transition/trs1__branch__trs1__branch__trs2__loop__goto_check_loop_1:transition;") 
+%|-                                                                                    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                                                                                        (then 
+%|-                                                                                            (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__loop__goto:transition/trs1__branch__trs1__branch__trs2__loop__goto_check_loop_2:transition;") 
+%|-                                                                                        (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                                                                                        (then 
+%|-                                                                                            (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__loop__goto:transition/trs1__branch__trs1__branch__trs2__loop__goto_check_loop_3:transition;") 
+%|-                        (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))))))))))))))))))) 
+%|-                            (then 
+%|-                                (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition;") 
+%|-                                (flatten-disjunct 1  :depth  1) 
+%|-                                (then 
+%|-                                    (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__loop__goto:transition;") 
+%|-                                    (expand-defs 
+%|-                                        (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                                            ("sit__loop" 3) 
+%|-                                    ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                    (spread 
+%|-                                        (split-n 3) 
+%|-                                        ((then 
+%|-                                            (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__loop__goto:transition/trs1__branch__trs2__loop__goto_check_post___1:transition;") 
+%|-                                        (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                                            (then 
+%|-                                                (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__loop__goto:transition/trs1__branch__trs2__loop__goto_check_post___2:transition;") 
+%|-                                            (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind)))) 
+%|-                                            (then 
+%|-                                                (uid "minvector:context/minvector:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__loop__goto:transition/trs1__branch__trs2__loop__goto_check_post___3:transition;") 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))))))))))) QED
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "minvector:context/minvector:procedure;") 
+%|-            (then 
+%|-                (expand-nested-defs 
+%|-                    - 
+%|-                    (("spec__minvector__minvector.pre__" 1  (("sit__ini__" 1))) 
+%|-                        ("sit__loop" 3) 
+%|-                ("spec__minvector__minvector.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) QED
+end impl__minvector__minvector 
+
+impl__minvector__minvectortest: theory
+begin
+    importing spec__minvector__minvectortest;
+    importing spec__minvector__minvector;
+    m: var int;
+    
+    m_0: int;
+    
+    minvector_call_m_1: int;
+    
+    m_1: int;
+    
+    sit__ini__(m): bool =
+        ((true)) and (spec__minvector__minvectortest.pre__);
+    
+    sit__fin__post__(m): bool =
+        (spec__minvector__minvectortest.post__);
+    
+        cc__ini__: LEMMA sit__ini__(m_0) => ((spec__minvector__minvector.pre__(((lambda (m) : 
+                                                                     vector_val[int]((:1, 2, 3:))))(m_0)))) and ((spec__minvector__minvector.post__(((lambda (m) : 
+                                                                                                                                                       vector_val[int]((:1, 2, 3:))))(m_0), ((lambda (m) : 
+                                                                                                                                                                                               minvector_call_m_1))(m_0))) => m_1 = (((lambda (m) : 
+                                                                                                                                                                                                                                        minvector_call_m_1))(m_0))::int => (id(((lambda (m) : 
+                                                                                                                                                                                                                                                                                  0 <= m and m < 3))(m_1))) and ((((lambda (m) : 
+                                                                                                                                                                                                                                                                                                                 0 <= m and m < 3))(m_1)) => sit__fin__post__(m_1)))
+    
+%|-    cc__ini__:proof
+%|-        (uid "minvector:context/minvectortest:procedure/ini__:situation/trs1:transition;") (flatten-disjunct 1  :depth  1) (expand sit__ini__) (flatten-disjunct -1  :depth  1) (spread 
+%|-            (split-n 1) 
+%|-            ((then 
+%|-                (uid "minvector:context/minvectortest:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;") 
+%|-                (spread 
+%|-                    (split 1  :depth  1) 
+%|-                    ((then 
+%|-                        (uid "minvector:context/minvectortest:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__stmt3:transition;") 
+%|-                        (expand-defs 
+%|-                            (("spec__minvector__minvectortest.pre__" 0  (("sit__ini__" 0))) 
+%|-                                ("spec__minvector__minvectortest.post__" 0  (("sit__fin__post__" 0))) 
+%|-                                ("spec__minvector__minvector.pre__" 1) 
+%|-                        ("spec__minvector__minvector.post__" 3))) 
+%|-                        (spread 
+%|-                            (split 1) 
+%|-                            ((then 
+%|-                                (uid "minvector:context/minvectortest:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__stmt3:transition/trs1__branch__stmt3_check_pre___1:transition;") 
+%|-                    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))))) 
+%|-                        (then 
+%|-                            (flatten-disjunct 1  :depth  1) 
+%|-                            (flatten-disjunct 1  :depth  1) 
+%|-                            (spread 
+%|-                                (split 1  :depth  1) 
+%|-                                ((then 
+%|-                                    (beta 1) 
+%|-                                    (uid "minvector:context/minvectortest:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__stmt2:transition;") 
+%|-                                    (then 
+%|-                                        (expand-nested-defs 
+%|-                                            - 
+%|-                                            (("spec__minvector__minvectortest.pre__" 0  (("sit__ini__" 0))) 
+%|-                                                ("spec__minvector__minvectortest.post__" 0  (("sit__fin__post__" 0))) 
+%|-                                                ("spec__minvector__minvector.pre__" 1) 
+%|-                                        ("spec__minvector__minvector.post__" 3))) 
+%|-                                        (flatten-disjunct -) 
+%|-                                (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) 
+%|-                                    (then 
+%|-                                        (flatten-disjunct 1  :depth  1) 
+%|-                                        (then 
+%|-                                            (uid "minvector:context/minvectortest:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__ini____goto:transition;") 
+%|-                                            (expand-defs 
+%|-                                                (("spec__minvector__minvectortest.pre__" 0  (("sit__ini__" 0))) 
+%|-                                                    ("spec__minvector__minvectortest.post__" 0  (("sit__fin__post__" 0))) 
+%|-                                                    ("spec__minvector__minvector.pre__" 1) 
+%|-                                            ("spec__minvector__minvector.post__" 3))) 
+%|-                                            (spread 
+%|-                                                (split-n 0) 
+%|-    ()))))))))))) QED
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "minvector:context/minvectortest:procedure;") 
+%|-            (then 
+%|-                (expand-nested-defs 
+%|-                    - 
+%|-                    (("spec__minvector__minvectortest.pre__" 0  (("sit__ini__" 0))) 
+%|-                        ("spec__minvector__minvectortest.post__" 0  (("sit__fin__post__" 0))) 
+%|-                        ("spec__minvector__minvector.pre__" 1) 
+%|-                ("spec__minvector__minvector.post__" 3))) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (then (endgame) (lemma "vector[int].val_access_prop_1") (lemma "vector[int].val_access_prop_2") (grind))))) QED
+end impl__minvector__minvectortest 
+

@@ -1,0 +1,39 @@
+proof4: context begin
+
+   by "(grind)";
+
+   p1[x: int]: procedure
+
+   begin
+
+      a: pvar int;
+
+      if [x>=0];
+            a:=1;
+            if [x=0];
+                  a:=a+1;
+                  exit;
+                  proof
+                     * lemma x=0; [];
+                     * lemma a_1=1; [];
+                     * lemma a_2=2; [];
+                  endproof
+               [x/=0];
+                  a:=a+2;
+                  exit;
+                  proof
+                     * lemma x>=1; [];
+                     * lemma a_1=1; [];
+                     * lemma a_2=3; [];
+                  endproof
+            endif
+         [x<0];
+            exit;
+            proof
+               * lemma x<0; [];
+            endproof
+      endif
+
+   end p1
+
+end proof4

@@ -1,0 +1,32 @@
+assign: context
+begin
+
+    by "(endgame)";
+
+    p0[ x:VALRES int ]: PROCEDURE 
+    POST x > x__0;
+    BEGIN 
+        x:=x+1; EXIT
+    END p0 
+
+
+    p1[ x,y: result int ]: procedure
+    post x=1 and y=2;
+    begin
+        x,y := 1,2; exit
+    end p1
+
+
+    multiple: procedure
+    begin
+        x,y: pvar int;
+
+        choice
+          x,y,y,x := 1,2,3,4; { x=4 and y=3 }; exit;
+          p1[x,x]; {x=2}; exit;
+        endchoice
+
+    end multiple
+
+
+end assign

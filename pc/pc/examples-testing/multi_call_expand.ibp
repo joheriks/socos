@@ -1,0 +1,113 @@
+multi: MODULE BEGIN
+
+    USING icip@core;
+
+    % search for the first occurrence of x in array a beginning at j and return its index
+    search[ a:dynarray[int].dynarray, x:int, j:nat, result i:nat ]: PROCEDURE
+    BEGIN
+        PRE j<=len(a);
+        POST i>=j and i<len(a) and a(i)=x and forall (k:below(i)): k>=j IMPLIES a(k)/=x;
+        not_found: POST forall (k:index(a)): a(k)/=x;
+
+		V_1: PROGVAR int;
+						
+        SELECT
+			j<len(a) THEN 
+            	SELECT 
+                	a(j)=x THEN i:=j; EXIT
+                    a(j)/=x THEN 
+						
+                    	%CALL search(a, x, j+1, i) DECREASING [len(a)-j]
+						%	EXCEPT 
+						%		not_found THEN EXIT AT not_found
+						%	ELSE
+						%		EXIT							
+
+						[V_1 = len(a)-j];
+
+						% PRE
+						{j+1<=len(a)};
+						CHOICE
+                    		% POST - not_found
+                    		[forall (k:index(a)): a(k)/=x];
+
+                    		{len(a)-(j+1) < V_1};
+
+							EXIT AT not_found
+
+							% POST - default
+							[i>=j+1 and i<len(a) and a(i)=x and forall (k:below(i)): k>=j+1 IMPLIES a(k)/=x];
+
+                    		{len(a)-(j+1) < V_1};
+
+							EXIT
+						END
+					
+				END
+            j=len(a) THEN exit at not_found
+  		END
+
+    END search
+
+    % replace all occurrences of value x with value y in a
+    replace[ valres a:dynarray[int].dynarray, x:int, y:int]: PROCEDURE
+    BEGIN
+        PRE x/=y;
+        POST a = mupdate(OLD(a),occurrences(OLD(a),x),lambda (i:index(a)):y);
+
+        GOTO loop
+
+        loop: SITUATION
+        BEGIN
+		    i: PROGVAR nat;
+            invariant exists (p:setof[occurrences(OLD(a),x)]): a=mupdate(OLD(a),p,lambda (i:index):y) ;
+    
+
+            % CALL search(a,x,0,i)
+            %	EXCEPT 
+	        %       not_found THEN EXIT
+    	    %   ELSE
+	        %       a := update(a,i,y);
+		    %       GOTO loop DECREASING [card(occurrences(a,x))]
+
+			% PRE
+			{0<=len(a)};
+
+			CHOICE
+        		% POST - not_found
+        		[forall (k:index(a)): a(k)/=x];
+				EXIT
+
+				% POST - default
+				[i>=0 and i<len(a) and a(i)=x and forall (k:below(i)): k>=0 IMPLIES a(k)/=x];
+	            a := update(a,i,y);
+	            GOTO loop DECREASING [card(occurrences(a,x))]
+			END
+            
+        END loop
+        
+    END replace
+
+    % doubles all occurrences of value x in a
+    double[ valres a:dynarray[int].dynarray, x:int]: PROCEDURE
+    BEGIN
+    	POST a = mupdate(OLD(a),occurrences(OLD(a),x),lambda (i:index(a)):2*x);
+
+		% CALL replace(a,x,2*x);
+
+		a_1: PROGVAR dynarray[int].dynarray;
+		a_1 := a;
+		
+        % PRE 
+		{x/=2*x};
+        
+        % POST
+        [a_1 = mupdate(a,occurrences(a,x),lambda (i:index(a_1)):2*x)];
+		
+		a := a_1;
+		
+		EXIT
+
+	END double
+
+END multi

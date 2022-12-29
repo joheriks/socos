@@ -1,0 +1,16 @@
+liveness: context
+begin
+
+    by "(endgame)";
+
+    p1: procedure
+    begin
+        x: pvar nat;
+
+        x:=x+1; 
+        if [x=1]; exit
+           [x>1]; exit
+        endif
+    end p1
+
+end liveness

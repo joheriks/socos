@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PC
+Bundle-SymbolicName: fi.imped.socos.PC
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: fi.imped.socos.IBPE;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: IMPEd.fi

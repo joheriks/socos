@@ -1,0 +1,284 @@
+ctx__min: theory
+begin
+    importing ds@parray;
+    
+    n: nat;
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "min:context;") 
+%|-            (then 
+%|-                (expand-nested-defs -  nil) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (skip)))) QED
+end ctx__min 
+
+spec__min__min: theory
+begin
+    importing ctx__min;
+    a: var parray[n, int];
+    m: var int;
+    
+    pre__(a): bool =
+        (id(n > 0));
+    
+    post__(a, m): bool =
+        (id(n > 0)) and (id(0 <= m and m < n)) and (id((forall (i : int) : 
+                                                             0 <= i and i < n => a(m) <= a(i))));
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "min:context/min:procedure;") 
+%|-            (then 
+%|-                (expand-nested-defs 
+%|-                    - 
+%|-                    (("pre__" 1) 
+%|-                ("post__" 3))) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (skip)))) QED
+end spec__min__min 
+
+impl__min__min: theory
+begin
+    importing spec__min__min;
+    m: var int;
+    
+    a: parray[n, int];
+    k: var int;
+    
+    m_0: int;
+    
+    k_0: int;
+    
+    k_1: int;
+    
+    m_1: int;
+    
+    sit__ini__(m, k): bool =
+        ((true)) and (spec__min__min.pre__(a));
+    
+    sit__loop(m, k): bool =
+        (id(0 < k and k <= n)) and (id(0 <= m and m < k)) and (id((forall (i : int) : 
+                                                                        0 <= i and i < k => a(m) <= a(i))));
+    
+    sit__fin__post__(m, k): bool =
+        (spec__min__min.post__(a, m));
+    
+        cc__ini__: LEMMA sit__ini__(m_0, k_0) => (k_1 = (((lambda (m, k) : 
+                                               1))(m_0, k_0))::int => m_1 = (((lambda (m, k) : 
+                                                                            0))(m_0, k_1))::int => sit__loop(m_1, k_1))
+    
+%|-    cc__ini__:proof
+%|-        (uid "min:context/min:procedure/ini__:situation/trs1:transition;") (flatten-disjunct 1  :depth  1) (expand sit__ini__) (flatten-disjunct -1  :depth  1) (spread 
+%|-            (split-n 1) 
+%|-            ((then 
+%|-                (uid "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;") 
+%|-                (flatten-disjunct 1  :depth  1) 
+%|-                (flatten-disjunct 1  :depth  1) 
+%|-                (then 
+%|-                    (uid "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition;") 
+%|-                    (expand-defs 
+%|-                        (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                            ("sit__loop" 3) 
+%|-                    ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                    (spread 
+%|-                        (split-n 3) 
+%|-                        ((then 
+%|-                            (uid "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition/trs1__branch__trs1__goto_check_loop_1:transition;") 
+%|-                        (check-report (skip))) 
+%|-                            (then 
+%|-                                (uid "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition/trs1__branch__trs1__goto_check_loop_2:transition;") 
+%|-                            (check-report (skip))) 
+%|-                            (then 
+%|-                                (uid "min:context/min:procedure/ini__:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__goto:transition/trs1__branch__trs1__goto_check_loop_3:transition;") 
+%|-    (check-report (skip))))))))) QED
+    
+        cc__loop: LEMMA sit__loop(m_0, k_0) => (id(((lambda (m, k) : 
+                                          k < n or k = n))(m_0, k_0))) and (((((lambda (m, k) : 
+                                                                                 k < n))(m_0, k_0)) => (id(((lambda (m, k) : 
+                                                                                                              a(m) < a(k) or a(m) >= a(k)))(m_0, k_0))) and (((((lambda (m, k) : 
+                                                                                                                                                                  a(m) < a(k)))(m_0, k_0)) => k_1 = (((lambda (m, k) : 
+                                                                                                                                                                                                        k + 1))(m_0, k_0))::int => (id(((lambda (m, k) : 
+                                                                                                                                                                                                                                          0 <= n - k))(m_0, k_1))) and ((id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                                               n - k < ((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                          n - k))(m_0, k_0)))(m_0, k_1))) and (sit__loop(m_0, k_1)))) and ((((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                               a(m) >= a(k)))(m_0, k_0)) => m_1 = (((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                      k))(m_0, k_0))::int => k_1 = (((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                       k + 1))(m_1, k_0))::int => (id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                         0 <= n - k))(m_1, k_1))) and ((id(((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              n - k < ((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         n - k))(m_0, k_0)))(m_1, k_1))) and (sit__loop(m_1, k_1)))))) and ((((lambda (m, k) : 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            k = n))(m_0, k_0)) => sit__fin__post__(m_0, k_0)))
+    
+%|-    cc__loop:proof
+%|-        (uid "min:context/min:procedure/loop:situation/trs1:transition;") (flatten-disjunct 1  :depth  1) (spread 
+%|-            (split 1  :depth  1) 
+%|-            ((then 
+%|-                (beta 1) 
+%|-                (uid "min:context/min:procedure/loop:situation/trs1:transition/loop__stmt1:transition;") 
+%|-                (then 
+%|-                    (expand-nested-defs 
+%|-                        - 
+%|-                        (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                            ("sit__loop" 3) 
+%|-                    ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                    (flatten-disjunct -) 
+%|-            (check-report (skip)))) 
+%|-                (then 
+%|-                    (spread 
+%|-                        (split-n 2) 
+%|-                        ((then 
+%|-                            (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition;") 
+%|-                            (flatten-disjunct 1  :depth  1) 
+%|-                            (spread 
+%|-                                (split 1  :depth  1) 
+%|-                                ((then 
+%|-                                    (beta 1) 
+%|-                                    (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__stmt2:transition;") 
+%|-                                    (then 
+%|-                                        (expand-nested-defs 
+%|-                                            - 
+%|-                                            (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                ("sit__loop" 3) 
+%|-                                        ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                        (flatten-disjunct -) 
+%|-                                (check-report (skip)))) 
+%|-                                    (then 
+%|-                                        (spread 
+%|-                                            (split-n 2) 
+%|-                                            ((then 
+%|-                                                (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition;") 
+%|-                                                (flatten-disjunct 1  :depth  1) 
+%|-                                                (flatten-disjunct 1  :depth  1) 
+%|-                                                (spread 
+%|-                                                    (split 1  :depth  1) 
+%|-                                                    ((then 
+%|-                                                        (beta 1) 
+%|-                                                        (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__stmt4:transition;") 
+%|-                                                        (then 
+%|-                                                            (expand-nested-defs 
+%|-                                                                - 
+%|-                                                                (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                    ("sit__loop" 3) 
+%|-                                                            ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                            (flatten-disjunct -) 
+%|-                                                    (check-report (skip)))) 
+%|-                                                        (then 
+%|-                                                            (spread 
+%|-                                                                (split 1  :depth  1) 
+%|-                                                                ((then 
+%|-                                                                    (beta 1) 
+%|-                                                                    (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__stmt5:transition;") 
+%|-                                                                    (then 
+%|-                                                                        (expand-nested-defs 
+%|-                                                                            - 
+%|-                                                                            (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                ("sit__loop" 3) 
+%|-                                                                        ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                        (flatten-disjunct -) 
+%|-                                                                (check-report (skip)))) 
+%|-                                                                    (then 
+%|-                                                                        (then 
+%|-                                                                            (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition;") 
+%|-                                                                            (expand-defs 
+%|-                                                                                (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                    ("sit__loop" 3) 
+%|-                                                                            ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                            (spread 
+%|-                                                                                (split-n 3) 
+%|-                                                                                ((then 
+%|-                                                                                    (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition/trs1__branch__trs1__branch__trs1__goto_check_loop_1:transition;") 
+%|-                                                                                (check-report (skip))) 
+%|-                                                                                    (then 
+%|-                                                                                        (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition/trs1__branch__trs1__branch__trs1__goto_check_loop_2:transition;") 
+%|-                                                                                    (check-report (skip))) 
+%|-                                                                                    (then 
+%|-                                                                                        (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs1:transition/trs1__branch__trs1__branch__trs1__goto:transition/trs1__branch__trs1__branch__trs1__goto_check_loop_3:transition;") 
+%|-                                            (check-report (skip))))))))))))) 
+%|-                                                (then 
+%|-                                                    (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition;") 
+%|-                                                    (flatten-disjunct 1  :depth  1) 
+%|-                                                    (flatten-disjunct 1  :depth  1) 
+%|-                                                    (flatten-disjunct 1  :depth  1) 
+%|-                                                    (spread 
+%|-                                                        (split 1  :depth  1) 
+%|-                                                        ((then 
+%|-                                                            (beta 1) 
+%|-                                                            (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt6:transition;") 
+%|-                                                            (then 
+%|-                                                                (expand-nested-defs 
+%|-                                                                    - 
+%|-                                                                    (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                        ("sit__loop" 3) 
+%|-                                                                ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                (flatten-disjunct -) 
+%|-                                                        (check-report (skip)))) 
+%|-                                                            (then 
+%|-                                                                (spread 
+%|-                                                                    (split 1  :depth  1) 
+%|-                                                                    ((then 
+%|-                                                                        (beta 1) 
+%|-                                                                        (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__stmt7:transition;") 
+%|-                                                                        (then 
+%|-                                                                            (expand-nested-defs 
+%|-                                                                                - 
+%|-                                                                                (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                    ("sit__loop" 3) 
+%|-                                                                            ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                            (flatten-disjunct -) 
+%|-                                                                    (check-report (skip)))) 
+%|-                                                                        (then 
+%|-                                                                            (then 
+%|-                                                                                (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition;") 
+%|-                                                                                (expand-defs 
+%|-                                                                                    (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                                                                        ("sit__loop" 3) 
+%|-                                                                                ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                                                                (spread 
+%|-                                                                                    (split-n 3) 
+%|-                                                                                    ((then 
+%|-                                                                                        (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition/trs1__branch__trs1__branch__trs2__goto_check_loop_1:transition;") 
+%|-                                                                                    (check-report (skip))) 
+%|-                                                                                        (then 
+%|-                                                                                            (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition/trs1__branch__trs1__branch__trs2__goto_check_loop_2:transition;") 
+%|-                                                                                        (check-report (skip))) 
+%|-                                                                                        (then 
+%|-                                                                                            (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs1:transition/trs1__branch__trs1__branch:transition/trs1__branch__trs1__branch__trs2:transition/trs1__branch__trs1__branch__trs2__goto:transition/trs1__branch__trs1__branch__trs2__goto_check_loop_3:transition;") 
+%|-                        (check-report (skip))))))))))))))))))) 
+%|-                            (then 
+%|-                                (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition;") 
+%|-                                (flatten-disjunct 1  :depth  1) 
+%|-                                (then 
+%|-                                    (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition;") 
+%|-                                    (expand-defs 
+%|-                                        (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                                            ("sit__loop" 3) 
+%|-                                    ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                                    (spread 
+%|-                                        (split-n 3) 
+%|-                                        ((then 
+%|-                                            (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition/trs1__branch__trs2__goto_check_post___1:transition;") 
+%|-                                        (check-report (skip))) 
+%|-                                            (then 
+%|-                                                (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition/trs1__branch__trs2__goto_check_post___2:transition;") 
+%|-                                            (check-report (skip))) 
+%|-                                            (then 
+%|-                                                (uid "min:context/min:procedure/loop:situation/trs1:transition/trs1__branch:transition/trs1__branch__trs2:transition/trs1__branch__trs2__goto:transition/trs1__branch__trs2__goto_check_post___3:transition;") 
+%|-    (check-report (skip)))))))))))) QED
+    
+%|-    *_TCC*:proof
+%|-        (then 
+%|-            (skosimp-2) 
+%|-            (uid "min:context/min:procedure;") 
+%|-            (then 
+%|-                (expand-nested-defs 
+%|-                    - 
+%|-                    (("spec__min__min.pre__" 1  (("sit__ini__" 1))) 
+%|-                        ("sit__loop" 3) 
+%|-                ("spec__min__min.post__" 3  (("sit__fin__post__" 3))))) 
+%|-                (flatten-disjunct -) 
+%|-    (check-report (skip)))) QED
+end impl__min__min 
+

@@ -1,0 +1,53 @@
+vector2update : CONTEXT BEGIN
+    importing ds@vector;
+    strategy "(endgame :lemmas (\"vector[int].update_prop_1\" \"vector[int].update_prop_2\"))";
+    vectorupdate[
+        a:valres vector[int];
+    ] : PROCEDURE
+    PRE BEGIN %: [140 10 100 50]
+    END
+    POST BEGIN %: [260 320 765 83]
+        * len(a)=len(a__0);
+        * forall(i:below[len(a)]): (a__0(i)>=0 => a(i)=a__0(i) and a__0(i)<0 => a(i)=0);
+    END
+    BEGIN
+        k: pvar int;
+        loop : SITUATION BEGIN %: [63 110 811 111]
+            * 0<=k and k<=len(a);
+            * len(a)=len(a__0);
+            * forall(i:below[k]): (a__0(i)>=0 => a(i)=a__0(i) and a__0(i)<0 => a(i)=0);
+            * forall(i:nat): k<=i and i<len(a) => a(i)=a__0(i);
+            ** len(a)-k;
+            IF 
+                %: [4 51] [ [10 160] [10 320] [70 320] [100 320] ] 
+                %: [4 320]
+                [k<len(a)];
+                IF %: [140 320]
+                    %: [7 2] [ ] [72 98] 
+                    %: [55 241]
+                    [a(k)>=0];
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                    %: [3 1] [ [200 320] ] [77 99] 
+                    %: [203 238]
+                    [a(k)<0];
+                    a:=update(a,k,0::int);
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                ENDIF
+                %: [265 99] [ ] [70 9] 
+                %: [653 257]
+                [k>=len(a)];
+                EXIT post__
+            ENDIF
+        END loop
+        CHOICE 
+            %: [45 42] [ ] [164 5] 
+            %: [199 73]
+            k:=0;
+            GOTO loop
+        ENDCHOICE
+    END vectorupdate
+END vector2update

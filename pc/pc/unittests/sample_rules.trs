@@ -1,0 +1,33 @@
+
+r1
+::
+node
+->
+node := 'foo'()
+::
+
+r2
+::
+node(node)
+->
+node := 'foo'()
+::
+
+r3
+::
+node(:node*, node(), node+, node!, node, node='v', p:'.*', :'.*'*)
+->
+node := 'foo'()
+::
+
+r4
+::
+node(node)
+->
+node := 'foo'='bar'
+node := node
+node := node('c1'())
+node := node('c1'(), 'c2'())
+node := node.node
+node := 'foo'=$concat('x', $$node.node)
+::

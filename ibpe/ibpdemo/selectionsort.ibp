@@ -1,0 +1,80 @@
+sorting : CONTEXT BEGIN
+    importing ds@parray;
+    n:nat;
+    sorted(a:parray[n,int],k:upto[n],m:upto[n]): bool = forall (i,j:int): k<=i and i<=j and j<m => a(i)<=a(j);
+    sorted(a:parray[n,int]):bool = sorted(a,0,n);
+    partitioned(a:parray[n,int],k:upto[n]):bool = forall (i,j:int): 0<=i and i<k and k<=j and j<n => a(i)<=a(j);
+    by "(endgame :lemmas (\"parray[n,int].permutation_rfl\" \"parray[n,int].permutation_trs\" \"parray[n,int].swap_acc\" \"parray[n,int].permutation_swap\"))";
+    selectionsort[
+        a: valres parray[n,int];
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 100 50]
+    END
+    POST BEGIN %: [520 0 191 65]
+        * sorted(a);
+        * permutation(a,a__0);
+    END
+    BEGIN
+        k: pvar int;
+        m,j: pvar int;
+        sort : SITUATION BEGIN %: [10 108 702 365]
+            * 0<=k and k<=n;
+            * sorted(a,0,k);
+            * partitioned(a,k);
+            * permutation(a,a__0);
+            ** n-k;
+            findmin : SITUATION BEGIN %: [230 20 368 128]
+                * k<=j and j<=n;
+                * k<=m and m<n;
+                * forall (i:int): k<=i and i<j => a(m)<=a(i);
+                ** n-j;
+                IF 
+                    %: [159 39] [ [580 400] ] [331 149] 
+                    %: [589 382]
+                    [j=n];
+                    a:=swap(a,k,m);
+                    k:=k+1;
+                    decreasing;
+                    GOTO sort
+                    %: [157 59] [ [480 460] ] 
+                    %: [501 402]
+                    [j<n];
+                    IF %: [290 460]
+                        %: [6 2] [ [150 460] [150 330] ] [70 98] 
+                        %: [154 370]
+                        [a(j)>=a(m)];
+                        j:=j+1;
+                        decreasing;
+                        GOTO findmin
+                        %: [5 5] [ ] 
+                        %: [299 374]
+                        [a(j)<a(m)];
+                        m:=j;
+                        j:=j+1;
+                        decreasing;
+                        GOTO findmin
+                    ENDIF
+                ENDIF
+            END findmin
+            IF 
+                %: [224 1] [ ] [54 48] 
+                %: [573 87]
+                [k=n];
+                EXIT post__
+                %: [ [20 298] [50 298] ] [1 38] 
+                %: [102 263]
+                [k<n];
+                m:=k;
+                j:=k+1;
+                GOTO findmin
+            ENDIF
+        END sort
+        IF 
+            %: [34 47] [ [50 90] ] [38 0] 
+            %: [63 65]
+            k:=0;
+            m,j:=0,0;
+            GOTO sort
+        ENDIF
+    END selectionsort
+END sorting

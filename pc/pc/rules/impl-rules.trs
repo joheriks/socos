@@ -1,0 +1,91 @@
+##
+# Generates impl parts of a theory
+##
+
+partition
+::
+        module(mid:ID,
+               using*,
+               importing*,
+               extern*,
+               def:definition*,
+               recdefinition*,
+               mvars:KEY_VAR*,
+               situation_invariant*,
+               procedure(pid:ID,
+                         pvars:KEY_VAR*,
+                         pinv:situation_invariant+,
+                         &rest),
+               rest:'procedure|pmodule'*)
+        ->
+        procedure :=
+        'pmodule'('ID' = $join('_', $$mid, $$pid, 'Impl'),
+                  'importing'('theory_name'('ID' = $join('_', $$mid, $$pid, 'Spec'))),
+                  mvars,
+                  procedure)
+::
+
+partition_2
+::
+        module(mid:ID,
+               using*,
+               importing*,
+               extern*,
+               def:definition*,
+               recdefinition*,
+               mvars:KEY_VAR*,
+               situation_invariant*,
+               pmodule(pid:ID,
+                       pimports:importing,
+                       pvars:KEY_VAR*,
+                       procedure(pid2:ID,
+                                 KEY_VAR*,
+                                 situation_invariant+(source(ID = 'PRE|POST|modinv',
+                                                             &rest),
+                                                      &rest),
+                                 &rest)),
+               rest:'procedure|pmodule'*)
+        ->
+        procedure := procedure(pid, KEY_VAR, procedure.rest)
+::
+
+partition_3
+::
+        module(mid:ID,
+               using*,
+               importing*,
+               extern*,
+               def:definition*,
+               recdefinition*,
+               mvars:KEY_VAR*,
+               situation_invariant*,
+               pmodule+(pid:ID,
+                       pimports:importing,
+                       pvars:KEY_VAR*,
+                       procedure(pid2:ID,
+                                 KEY_VAR*,
+                                 situation_invariant!(source(ID = 'PRE|POST|modinv',
+                                                             &rest),
+                                                      &rest),
+                                 &rest)))
+        ->
+        module := 'TOP'('mmodule'('ID' = $join('_', $$mid, 'Impl'),
+                        @foreach(pid,
+                                 'importing'('theory_name'('ID' = $$pid)))),
+                        pmodule)
+::
+
+
+partition_4
+::
+        module(mid:ID,
+               using*,
+               importing*,
+               extern*,
+               def:definition*,
+               recdefinition*,
+               mvars:KEY_VAR*,
+               situation_invariant*)
+        ->
+        module := 'TOP'('mmodule'('ID' = $join('_', $$mid, 'Impl')))
+::

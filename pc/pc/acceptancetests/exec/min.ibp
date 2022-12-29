@@ -1,0 +1,73 @@
+minvector : CONTEXT BEGIN
+    importing ds@vector;
+    strategy "(then (endgame) (lemma \"vector[int].val_access_prop_1\") (lemma \"vector[int].val_access_prop_2\") (grind))";
+    minvector[
+        a:vector[int];
+        m: result int;
+    ] : PROCEDURE
+    PRE BEGIN %: [10 10 112 50]
+        * len(a)>0;
+    END
+    POST BEGIN %: [320 2 243 73]
+        * len(a)>0;
+        * 0<=m and m<len(a);
+        * forall (i:int): 0<=i and i<len(a) => a(m) <= a(i);
+    END
+    BEGIN
+        k: pvar int;
+        loop : SITUATION BEGIN %: [140 160 370 120]
+            * 0<k and k<=len(a);
+            * 0<=m and m<k;
+            * forall (i:int): 0<=i and i<k => a(m) <= a(i);
+            ** len(a)-k;
+            IF 
+                %: [9 194] [ [140 370] ] 
+                %: [87 330]
+                [k<len(a)];
+                IF %: [290 370]
+                    %: [3 7] [ ] 
+                    %: [206 293]
+                    [a(m)<a(k)];
+                    k:=k+1;
+                    decreasing;
+                    GOTO loop
+                    %: [5 4] [ [400 370] ] 
+                    %: [400 317]
+                    [a(m)>=a(k)];
+                    k:=k+1;
+                    m:=k;
+                    decreasing;
+                    GOTO loop
+                ENDIF
+                %: [198 0] [ [480 270] ] [32 49] 
+                %: [440 178]
+                [k=len(a)];
+                EXIT post__
+            ENDIF
+        END loop
+        CHOICE 
+            %: [32 48] [ [70 210] ] 
+            %: [73 106]
+            k:=1;
+            m:=0;
+            GOTO loop
+        ENDCHOICE
+    END minvector
+    main : PROCEDURE
+    PRE BEGIN %: [10 10 100 50]
+    END
+    POST BEGIN %: [390 10 100 50]
+    END
+    BEGIN
+        k: pvar int;
+        b: pvar vector[int];
+        CHOICE 
+            %: [97 22] [ ] [6 19] 
+            %: [117 47]
+            k,b:=0,vector_val[int]((:1,2,3:));
+            minvector[b,k];
+            k:=k+1;
+            EXIT post__
+        ENDCHOICE
+    END main
+END minvector

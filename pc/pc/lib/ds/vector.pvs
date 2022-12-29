@@ -1,0 +1,50 @@
+vector[T:type]: theory
+begin
+    vector:type+ = [# len:nat, elem:[below(len)->T] #]
+
+    index(a:vector):type = below(len(a))
+
+    access(v:vector,i:below(len(v))):T = v`elem(i)
+
+    acc(v:vector)(i:below(len(v))):macro T = access(v,i)
+    conversion+ acc
+
+    update(v:vector,j:index(v),x:T):{w:vector|len(w)=len(v)}=
+      (# len:=len(v),
+         elem:=elem(v) with [ j:=x ] #)
+
+    update_prop_1: lemma
+      forall (v:vector,i:index(v),x:T): 
+        access(update(v,i,x),i) = x
+
+    update_prop_2: lemma
+      forall (v:vector,i:index(v),j:index(v),x:T): 
+        i=j or access(update(v,i,x),j) = access(v,j)
+
+    auto_rewrite- access,update
+
+    eql(a:vector,b:vector,l,r:nat): bool = 
+      forall (i:nat): l<=i and i<r and i<len(a) and i<len(b) => access(a,i)=access(b,i)
+
+    vector_val( a: list[T] ): {w:vector|len(w)=length(a)} = 
+     (# len := length(a),
+        elem := lambda (i:below(length(a))): nth(a,i) #)
+    conversion+ vector_val
+
+    vector_n_val( n:nat, x:T ): {w:vector|len(w)=n} =
+      (# len := n,
+         elem := lambda (i:below[n]): x #)
+
+    auto_rewrite- vector_val
+
+    val_access_prop_1: lemma
+        forall (a:list[T]): len(vector_val(a)) = length(a)
+               
+
+    val_access_prop_2: lemma
+        forall (v:vector, a:list[T], i:index(v)):
+               v = vector_val(a) => access(v,i) = nth(a,i)
+
+
+end vector
+

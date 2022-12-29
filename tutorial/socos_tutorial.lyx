@@ -1,0 +1,4226 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass scrartcl
+\begin_preamble
+\usepackage{microtype}
+\usepackage{tikz}
+\usepackage{hyperref}
+
+\usetikzlibrary{matrix}
+\usetikzlibrary{decorations.pathmorphing}
+
+\setlength{\emergencystretch}{5em}
+
+\setlength{\marginparwidth}{22mm}
+\let\oldmarginpar\marginpar
+\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft\footnotesize #1]%
+{\raggedright\footnotesize #1}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman times
+\font_sans lmss
+\font_typewriter cmtt
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 2.5cm
+\rightmargin 3cm
+\bottommargin 2.75cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+A Tutorial Introduction to Socos
+\end_layout
+
+\begin_layout Author
+Johannes Eriksson 
+\family typewriter
+<joheriks@abo.fi>
+\family default
+
+\begin_inset Newline newline
+\end_inset
+
+Åbo Akademi University, Department of IT
+\begin_inset Newline newline
+\end_inset
+
+Turku, FI-20520, Finland
+\end_layout
+
+\begin_layout Abstract
+Socos (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{www.imped.fi/socos}
+\end_layout
+
+\end_inset
+
+) is a free, open-source tool for constructing and verifying invariant-based
+ programs.
+ It consists of an Eclipse-based graphical diagram editor connected to the
+ theorem provers PVS and Yices for discharging verification conditions automatic
+ally.
+ This document is a short tutorial introduction to Socos.
+ It guides the reader through the installation of Socos, and shows how to
+ use Socos to verify a simple invariant-based program.
+ It assumes no knowledge of automatic theorem proving, but the reader should
+ be familiar with the basics of invariant-based programming.
+\end_layout
+
+\begin_layout Section
+Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Introduction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Invariant-based programming (IBP)
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+For more information on IBP, see: R.-J.
+ Back.
+ Invariant Based Programming: Basic Approach and Teaching Experience.
+ 
+\emph on
+Formal Aspects of Computing, 21(3)
+\emph default
+, 227--244
+\end_layout
+
+\end_inset
+
+ is a diagrammatic method for developing programs that are correct by constructi
+on.
+ The programmer writes the pre- and postconditions and loop invariants as
+ state predicates called 
+\emph on
+situations
+\emph default
+ before the actual code.
+ After the situations have been defined, the programmer adds the actual
+ program code---the 
+\emph on
+transitions
+\emph default
+---and proves that each added transition is 
+\emph on
+consistent
+\emph default
+ with the invariants.
+ When all transitions have been verified consistent, the programmer checks
+ that the program has no infinite loops---i.e., that it
+\emph on
+ terminates
+\emph default
+---and also that the program reaches the desired postcondition---i.e., that
+ it is 
+\emph on
+live
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+Socos is a program construction and verification tool supporting IBP.
+ Invariant diagrams are drawn in a graphical editor in the Eclipse (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{www.eclipse.org}
+\end_layout
+
+\end_inset
+
+) environment.
+ By the click of a button, Socos sends the verification conditions of the
+ diagram to the automatic theorem prover PVS (
+\family typewriter
+pvs.csl.sri.com
+\family default
+).
+ The verification conditions are attacked with powerful proof strategies
+ to automatically discharge as many conditions as possible.
+ The default strategy uses the automatic theorem prover Yices (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{yices.csl.sri.com}
+\end_layout
+
+\end_inset
+
+), which is integrated into PVS, as a catch-all strategy.
+ Only the conditions that were not proved automatically are shown to the
+ user.
+ Specifications and invariants are expressed in the language of PVS.
+ The user can add auxiliary functions, predicates and even entire PVS theories.
+ Socos also includes a small number of domain theories for reasoning about
+ data structures such as arrays.
+\end_layout
+
+\begin_layout Standard
+The tutorial is organized as follows.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Installation"
+
+\end_inset
+
+ describes how to install Socos.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Using-Socos"
+
+\end_inset
+
+ describes how to use Socos in the context of a simple example program.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Updates-and-bug-reports"
+
+\end_inset
+
+ contains contact information for updates and bug reports.
+ Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Language-quick-reference"
+
+\end_inset
+
+ is a quick-reference to the Socos and PVS language.
+\end_layout
+
+\begin_layout Section
+Installation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Installation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Socos is comprised of two components, the 
+\emph on
+editor
+\emph default
+ and the
+\emph on
+ checker
+\emph default
+.
+ The editor acts as the front-end to the checker and is distributed as a
+ plug-in to Eclipse.
+ The checker can be set up to run either locally on the same host as the
+ editor, or remotely on another host connected over the network.
+ In the first case the editor communicates with the checker over Unix IPC
+ (pipes), in the second case over HTTP:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="40col%">
+<column alignment="center" valignment="top" width="40col%">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename fig/local-checking.pdf
+	scale 110
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename fig/remote-checking.pdf
+	scale 110
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Local checking
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Remote checking
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Remote checking allows use of Socos without installing PVS and Yices, only
+ the editor is needed.
+ The remainder of this section describes how to install the diagram editor,
+ as well as setting up remote and local checking.
+ Note that this tutorial does not describe how to set up a checking server.
+\end_layout
+
+\begin_layout Subsection
+Installing the diagram editor
+\end_layout
+
+\begin_layout Paragraph
+Prerequisites.
+\end_layout
+
+\begin_layout Standard
+The diagram editor works on any platform for which Eclipse is available.
+ Eclipse can be downloaded at 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{www.eclipse.org/downloads}
+\end_layout
+
+\end_inset
+
+.
+ Version 3.5 (Galileo) or newer is required, though we recommend installing
+ the latest stable version.
+ Various package configurations differing in the set of included plug-ins
+ are available for each Eclipse version.
+ For running Socos, the Eclipse Classic configuration is sufficient.
+\end_layout
+
+\begin_layout Paragraph
+Installation.
+ 
+\end_layout
+
+\begin_layout Standard
+Eclipse plug-ins are installed using Eclipse's update manager.
+ To install the Socos editor plug-in, follow the steps below:
+\end_layout
+
+\begin_layout Enumerate
+Launch Eclipse.
+\end_layout
+
+\begin_layout Enumerate
+Select 
+\begin_inset Formula $\textsf{Help}$
+\end_inset
+
+ 
+\family sans
+\SpecialChar \menuseparator
+ 
+\family default
+
+\begin_inset Formula $\textsf{Install new software}$
+\end_inset
+
+.
+ A list of the known update sites appears.
+\end_layout
+
+\begin_layout Enumerate
+Add 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{http://www.imped.fi/update}
+\end_layout
+
+\end_inset
+
+ to the list of update sites, then select Socos from the list of available
+ plug-ins (see figure below).
+ Click next.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename fig/eclipse-select-site.png
+	scale 46
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Click next again, accepting the license agreement.
+ Socos requires the Graphical Editing Framework (GEF) plug-in, which depending
+ on your configuration of Eclipse may not be pre-installed; the update manager
+ should automatically find and install any missing dependencies.
+\end_layout
+
+\begin_layout Enumerate
+Wait for the installation to complete.
+ This process may take several minutes.
+ Restart Eclipse when prompted.
+\end_layout
+
+\begin_layout Standard
+The last step before using Socos is to configure either remote or local
+ checking.
+ This is described in the following sections.
+\end_layout
+
+\begin_layout Subsection
+Configuring remote checking
+\end_layout
+
+\begin_layout Standard
+To configure Socos to use an existing remote checker, open the Eclipse preferenc
+es
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+Windows and Linux: 
+\begin_inset Formula $\textsf{Window}$
+\end_inset
+
+
+\family sans
+\SpecialChar \menuseparator
+
+\family default
+
+\begin_inset Formula $\textsf{Preferences}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Mac OS X: 
+\begin_inset Formula $\textsf{Eclipse}$
+\end_inset
+
+
+\family sans
+\SpecialChar \menuseparator
+
+\family default
+
+\begin_inset Formula $\textsf{Preferences}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ and select the 
+\begin_inset Formula $\textsf{Socos}$
+\end_inset
+
+ page.
+ Enable 
+\begin_inset Formula $\textsf{Use remote checker}$
+\end_inset
+
+ and enter the address to a known checking server in the field 
+\begin_inset Formula $\textsf{Checker URL}$
+\end_inset
+
+.
+ The field must contain a URL of the form 
+\family typewriter
+http://
+\family default
+\emph on
+hostname
+\family typewriter
+\emph default
+:
+\family default
+\emph on
+port
+\family typewriter
+\emph default
+/check
+\family default
+ .
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename fig/set-remote-checker.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Configuring local checking
+\end_layout
+
+\begin_layout Standard
+To set up a local checker, you must first download and install the following
+ packages (unless already installed):
+\end_layout
+
+\begin_layout Itemize
+Python 2, version 2.4 or newer: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{www.python.org}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+PVS 5.0, older versions 
+\emph on
+do not
+\emph default
+ work: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{pvs.csl.sri.com}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Yices 1.0.X: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{yices.csl.sri.com}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Follow the installation instructions in the documentation for package.
+\end_layout
+
+\begin_layout Standard
+Next, download the Socos checker from 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{www.imped.fi/socos}
+\end_layout
+
+\end_inset
+
+ .
+ Unpack the Socos package in any location 
+\emph on
+targetdir
+\emph default
+.
+ The checker executable is 
+\emph on
+targetdir
+\family typewriter
+\emph default
+/pc/socos
+\family default
+ .
+ Socos looks for programs 
+\family typewriter
+pvs
+\family default
+ and 
+\family typewriter
+yices
+\family default
+ on the search path (environment variable 
+\begin_inset Formula $\texttt{PATH}$
+\end_inset
+
+) when executed, so you may need to extend the search path depending on
+ where you installed PVS and Yices.
+ If 
+\family typewriter
+pvs
+\family default
+ is not found, Socos will not work at all.
+ If 
+\family typewriter
+yices
+\family default
+ is not found, you will notice it by the default strategy not being able
+ to prove anything.
+ For PVS to run on 64-bit Linux systems it may be necessary to install 32-bit
+ versions of the standard libraries (libc, etc).
+ Once the checker has been installed locally, configure the diagram editor
+ to use it by disabling 
+\begin_inset Formula $\textsf{Use remote checker}$
+\end_inset
+
+ and ensuring that the 
+\begin_inset Formula $\textsf{Socos executable}$
+\end_inset
+
+ field contains 
+\emph on
+targetdir
+\family typewriter
+\emph default
+/pc/socos
+\family default
+ in preferences.
+\end_layout
+
+\begin_layout Section
+Using Socos
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Using-Socos"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this section, we will construct and verify a simple program in Socos
+ step by step.
+ Before starting this section make sure you have installed the editor and
+ configured either local or remote checking as described in the previous
+ section.
+ If an error occurs, check that recent versions of all the above mentioned
+ packages are installed, and if using remote checking, that the remote host
+ is accessible.
+ If everything seems correctly set up, but the error persists, please file
+ a bug report (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Updates-and-bug-reports"
+
+\end_inset
+
+ for more information).
+\end_layout
+
+\begin_layout Standard
+Start Eclipse and pick a suitable 
+\emph on
+workspace
+\emph default
+ location.
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+The 
+\size normal
+\emph on
+workspace
+\emph default
+ is the directory in which Eclipse keeps all your projects.
+ Any directory can be used, but concurrently running Eclipse instances must
+ use separate workspaces.
+\end_layout
+
+\end_inset
+
+ Once Eclipse is up and running, create a fresh project: 
+\begin_inset Formula $\textsf{New}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Project}$
+\end_inset
+
+.
+ In the project wizard, select 
+\begin_inset Formula $\textsf{General}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Project}$
+\end_inset
+
+, then click 
+\begin_inset Formula $\textsf{Next}$
+\end_inset
+
+.
+ Type a name for the project, then click 
+\begin_inset Formula $\textsf{Finish}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename fig/new-project-type.png
+	width 48col%
+
+\end_inset
+
+ 
+\begin_inset space \quad{}
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename fig/new-project-name.png
+	width 48col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Next, we add a Socos file---called a 
+\emph on
+context
+\emph default
+---to the newly created project.
+ Right-click on the project in the
+\emph on
+ project explorer
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+The 
+\emph on
+project explorer
+\emph default
+ is the hierarchy browser on the left hand side of the Eclipse workbench.
+ It provides access to all projects in the current Eclipse workspace.
+ If the project explorer is not visible, enable it with 
+\begin_inset Formula $\textsf{Window}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Show View}$
+\end_inset
+
+ 
+\family sans
+\SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Project Explorer}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\emph default
+ and select 
+\begin_inset Formula $\textsf{New}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Context}$
+\end_inset
+
+ in the pop-up menu (if the 
+\begin_inset Formula $\textsf{Context}$
+\end_inset
+
+ item is not visible in the submenu, select instead 
+\begin_inset Formula $\textsf{Other...}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Socos}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Context}$
+\end_inset
+
+).
+ Give the context any name, then click 
+\begin_inset Formula $\textsf{Finish}$
+\end_inset
+
+.
+ The new context will appear as a new tab in the Eclipse workspace.
+\end_layout
+
+\begin_layout Standard
+A context can contain 
+\emph on
+declarations 
+\emph default
+and 
+\emph on
+procedures
+\emph default
+ (programs).
+ In this tutorial, we will create a routine that determines if an array
+ of integers is a palindrome---i.e., whether reading the array from the start
+ or from the end results in the same sequence of values.
+ Socos includes a theory for reasoning about arrays, which we must first
+ import into the context.
+ To add a new declaration to the context, activate the 
+\begin_inset Formula $\textsf{New declaration}$
+\end_inset
+
+ (
+\begin_inset Graphics
+	filename fig/new_declaration.png
+	height 10pt
+
+\end_inset
+
+) tool in the tool palette on the right and click on the context area (or
+ right-click on the context area and select 
+\begin_inset Formula $\textsf{Add declaration}$
+\end_inset
+
+ from the pop-up menu).
+ Click once on the declaration to select it, then click once again to edit
+ it.
+ To move a declaration, drag it to the desired position.
+\end_layout
+
+\begin_layout Standard
+Now add the following to the context (as two separate declarations):
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+importing ds@parray
+\begin_inset Newline newline
+\end_inset
+
+n:nat
+\end_layout
+
+\begin_layout Standard
+The first declaration imports the 
+\begin_inset Formula $\mathtt{\texttt{ds@parray}}$
+\end_inset
+
+ theory, which defines a type of arrays with fixed size (
+\begin_inset Formula $\mathtt{\texttt{parray}}$
+\end_inset
+
+).
+ The second declaration adds a global constant 
+\begin_inset Formula $\texttt{n}$
+\end_inset
+
+ of type 
+\begin_inset Formula $\texttt{nat}$
+\end_inset
+
+ (natural number) to the context.
+ Next, we create a new empty program Activate the 
+\begin_inset Formula $\textsf{New procedure}$
+\end_inset
+
+ (
+\begin_inset Graphics
+	filename fig/new_procedure.png
+	height 10pt
+
+\end_inset
+
+) tool, then click below the added declarations.
+ An empty procedure appears in the document.
+ To change the procedure name, select the procedure and click on the name
+ in the upper left corner of the box.
+ The default name 
+\begin_inset Formula $\texttt{p1}$
+\end_inset
+
+ is not very informative, so change it to something more interesting such
+ as 
+\begin_inset Formula $\texttt{palindrome}$
+\end_inset
+
+.
+ Your workbench should now be in the following state:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/palindrome-empty.png
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To the right of the procedure name is the (currently empty) parameter list.
+ Below the name follows two compartments holding respectively the local
+ declarations and situations of the procedure.
+ The parameter list and local variable compartments are initially empty,
+ and two empty situations---the pre- and postconditions of the procedure---are
+ added by default to the situation compartment.
+ The precondition (the leftmost situation) is identified by a thick outline,
+ whereas the postcondition (the rightmost situation) has a double outline.
+\end_layout
+
+\begin_layout Standard
+For our procedure to be useful, it must define some input and/or output
+ parameters.
+ Since the procedure is to determine whether an array is a palindrome, it
+ needs an array as input, and an output parameter of Boolean type.
+ Parameters are added similarly to global declarations---by activating the
+ 
+\begin_inset Formula $\textsf{New declaration}$
+\end_inset
+
+ (
+\begin_inset Graphics
+	filename fig/new_declaration.png
+	height 10pt
+
+\end_inset
+
+) tool in the tool palette and clicking on the parameter list (the empty
+ area between the 
+\begin_inset Formula $[$
+\end_inset
+
+ and 
+\begin_inset Formula $]$
+\end_inset
+
+ brackets).
+ Next, add the following to the parameter list of 
+\begin_inset Formula $\texttt{palindrome}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+a:parray[n,int]
+\begin_inset Newline newline
+\end_inset
+
+b:result bool
+\end_layout
+
+\begin_layout Standard
+The first line declares a constant parameter called 
+\begin_inset Formula $\texttt{a}$
+\end_inset
+
+ of size 
+\begin_inset Formula $\texttt{n}$
+\end_inset
+
+ and type integer.
+ That 
+\begin_inset Formula $\texttt{a}$
+\end_inset
+
+ is constant means that the program is not allowed to assign to 
+\begin_inset Formula $\texttt{a}$
+\end_inset
+
+.
+ The second line defines 
+\begin_inset Formula $\texttt{b}$
+\end_inset
+
+ as a 
+\emph on
+result
+\emph default
+ 
+\emph on
+parameter
+\emph default
+ of type 
+\begin_inset Formula $\texttt{bool}$
+\end_inset
+
+, meaning that the program will assign a return value to 
+\begin_inset Formula $\texttt{b}$
+\end_inset
+
+.
+ However, the program may not make assumptions about the initial value of
+ 
+\begin_inset Formula $\texttt{b}$
+\end_inset
+
+ (if we want to use a parameter for both input and output data, then we
+ should declare it as a 
+\begin_inset Formula $\texttt{valres}$
+\end_inset
+
+ (
+\emph on
+value-result
+\emph default
+) parameter instead).
+\end_layout
+
+\begin_layout Standard
+The next step is to write the specification of the procedure---namely the
+ pre- and postconditions.
+ Our program does not need additional preconditions---it should accept all
+ arrays, also empty ones.
+ As an empty situation corresponds to 
+\begin_inset Formula $\texttt{true}$
+\end_inset
+
+, we do not modify the precondition situation.
+ The postcondition, however, should state that 
+\begin_inset Formula $\texttt{b}$
+\end_inset
+
+ is true if and only if 
+\begin_inset Formula $\texttt{a}$
+\end_inset
+
+ is a palindrome.
+ We can consider empty arrays also as palindromes.
+ We state the postcondition in Socos as follows:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+b = (forall (i:nat):i<n => a(i)=a(n-1-i))
+\end_layout
+
+\begin_layout Standard
+The predicate expresses that 
+\begin_inset Formula $\texttt{b}$
+\end_inset
+
+ has the truth value of the universal quantification on the right hand side.
+ Note that arrays are indexed from 
+\begin_inset Formula $0$
+\end_inset
+
+ to 
+\begin_inset Formula $\texttt{n}-1$
+\end_inset
+
+, and that array access is written as 
+\begin_inset Formula $\texttt{a(i)}$
+\end_inset
+
+ for index 
+\begin_inset Formula $\mathtt{i}$
+\end_inset
+
+.
+ This is because 
+\begin_inset Formula $\texttt{parray}$
+\end_inset
+
+:s are just functions, and array access is function application.
+ PVS is a logic of total functions, meaning that arrays can only be accessed
+ within their domains.
+ PVS checks that array indexes (and function arguments in general) are within
+ the domain of the function (if this check fails, an unsolved TCC (type
+ correctness condition) error will be issued).
+\end_layout
+
+\begin_layout Standard
+Add the above declaration to the postcondition (using the Declaration tool,
+ 
+\begin_inset Graphics
+	filename fig/new_declaration.png
+	height 10pt
+
+\end_inset
+
+).
+ Your workbench should now look as follows:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/palindrome-spec.png
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Before we start writing the actual program, at this point it is a good idea
+ to ask Socos to check the specification in order to identify potential
+ syntax and type errors.
+ Ensure that the diagram editor is focused, then click the check (
+\begin_inset Graphics
+	filename fig/verify.png
+	height 10pt
+
+\end_inset
+
+) toolbar button.
+ The effect of this action is to save the current diagram, then call the
+ Socos checker, and finally display the result of the check.
+ For our specification, Socos reports:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/complete-with-warnings.png
+	width 50col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The exit status 
+\begin_inset Formula $\textsf{COMPLETE WITH WARNINGS}$
+\end_inset
+
+ means that the checked program had no errors or unproved verification condition
+s, but that there were some warnings.
+ Other exit statuses are 
+\begin_inset Formula $\textsf{COMPLETE}$
+\end_inset
+
+, meaning that there were no errors or warnings, and 
+\begin_inset Formula $\textsf{INCOMPLETE}$
+\end_inset
+
+, meaning that the program had errors.
+ The warnings and errors issued by Socos are displayed in the 
+\begin_inset Formula $\textsf{Problems}$
+\end_inset
+
+ tab
+\begin_inset Marginal
+status collapsed
+
+\begin_layout Plain Layout
+If the 
+\begin_inset Formula $\textsf{Problems}$
+\end_inset
+
+ tab is not visible, activate it with the command 
+\begin_inset Formula $\textsf{Window}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Show View}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Problems}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\end_inset
+
+, located in the lower part of the workbench.
+ Additionally, elements which have warnings or errors associated with them
+ are marked with squiggly underbars---
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+tikz[baseline=(X.base)]{
+\backslash
+node(X)[inner sep=0]{orange for warnings}; 
+\backslash
+draw[orange,decorate,decoration={zigzag,amplitude=1pt,segment length=3pt}]
+ (X.south east)--(X.south west);}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+tikz[baseline=(X.base)]{
+\backslash
+node(X)[inner sep=0]{red for errors
+\backslash
+vphantom{g}}; 
+\backslash
+draw[red,decorate,decoration={zigzag,amplitude=1pt,segment length=3pt}]
+ (X.south east)--(X.south west);}
+\end_layout
+
+\end_inset
+
+.
+ To quickly view a warning or error in the editor, hover the mouse cursor
+ over the marked element.
+ In this case, Socos warns that the postcondition is unreachable, which
+ is expected since we have not yet added any transitions.
+ Unfinished, but consistent, programs are not considered erroneous by Socos,
+ since it is often useful to check absence of errors (consistency) before
+ all transitions have been added.
+ In the sequel, we will ignore the warnings about liveness and termination
+ until we have added and verified all transitions, after which we will eliminate
+ the warnings by proving liveness and termination.
+\end_layout
+
+\begin_layout Standard
+Now that we are satisfied with the specification, we continue with the implement
+ation.
+ We choose here the most straightforward program for determining whether
+ an array is palindromic: by comparing element by element the first half
+ of the array (in left to right order) to the second half of the array (in
+ right to left order).
+ We start a loop counter 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ from zero and in each iteration compare the element at index 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ with its counterpart in the second half of the array, i.e., the element at
+ index 
+\begin_inset Formula $\mathtt{n-1-k}$
+\end_inset
+
+.
+ If we find a pair of elements that are different, the array cannot be palindrom
+ic and we can immediately return 
+\begin_inset Formula $\texttt{false}$
+\end_inset
+
+.
+ If the current pair of elements are equal, we advance to the next pair
+ of elements, incrementing 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ by one.
+ When 
+\begin_inset Formula $\mathtt{k\ge n-1-k}$
+\end_inset
+
+ we have compared all element pairs with positive result, and we should
+ hence return 
+\begin_inset Formula $\texttt{true}$
+\end_inset
+
+.
+ These situations and transitions are depicted in the following figure:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{tikzpicture}[
+\end_layout
+
+\begin_layout Plain Layout
+
+  unknown/.style={draw=black,fill=white,minimum width=7mm,minimum height=7mm,anch
+or=north},
+\end_layout
+
+\begin_layout Plain Layout
+
+  known/.style={draw=black,fill=yellow!30,minimum width=7mm,minimum height=7mm,an
+chor=north},
+\end_layout
+
+\begin_layout Plain Layout
+
+  label/.style={minimum width=7mm,minimum height=5mm,anchor=north,inner sep=0},
+\end_layout
+
+\begin_layout Plain Layout
+
+  stmt/.style={font=
+\backslash
+small}
+\end_layout
+
+\begin_layout Plain Layout
+
+]
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+matrix (pre) [ampersand replacement=
+\backslash
+&,matrix of nodes] at (0ex,0ex)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+ |[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+ |[label]| $
+\backslash
+texttt{0}$ 
+\backslash
+& 
+\backslash
+& 
+\backslash
+& 
+\backslash
+& 
+\backslash
+& 
+\backslash
+& 
+\backslash
+& 
+\backslash
+&  |[label]| $
+\backslash
+texttt{n-1}$ 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+matrix (inv) [ampersand replacement=
+\backslash
+&,matrix of nodes] at (0ex,-10ex)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+ |[known]| 2 
+\backslash
+&|[known]| 0 
+\backslash
+&|[known]| 5 
+\backslash
+&|[unknown]| ? 
+\backslash
+&|[unknown]| 
+\backslash
+&|[unknown]| ? 
+\backslash
+&|[known]| 5 
+\backslash
+&|[known]| 0 
+\backslash
+&|[known]| 2 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+ 
+\backslash
+& 
+\backslash
+& 
+\backslash
+& |[label]| $
+\backslash
+texttt{k}$ 
+\backslash
+& 
+\backslash
+& |[label]| 
+\backslash
+& 
+\backslash
+& 
+\backslash
+&  
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+node[label]  at (inv-2-6.north) {$
+\backslash
+texttt{n-k-1}$};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+matrix (pal) [ampersand replacement=
+\backslash
+&,matrix of nodes] at (-25ex,-22ex)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+|[known]| 2 
+\backslash
+&|[known]| 0 
+\backslash
+&|[known]| 5 
+\backslash
+&|[known]| 1 
+\backslash
+&|[known]| 2 
+\backslash
+&|[known]| 1 
+\backslash
+&|[known]| 5 
+\backslash
+&|[known]| 0 
+\backslash
+&|[known]| 2 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+matrix (nopal) [ampersand replacement=
+\backslash
+&,matrix of nodes] at (25ex,-22ex)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+|[known]| 2 
+\backslash
+&|[known]| 0 
+\backslash
+&|[known]| 5 
+\backslash
+&|[known]| 
+\backslash
+textcolor{red}{1} 
+\backslash
+&|[unknown]| 
+\backslash
+&|[known]| 
+\backslash
+textcolor{red}{2} 
+\backslash
+&|[known]| 5 
+\backslash
+&|[known]| 0 
+\backslash
+&|[known]| 2 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw[thick,->] (pre.south) +(0,3ex) -- node[stmt,right]{$
+\backslash
+texttt{k:=0}$} (inv.north);
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw[thick,->] (inv.175) -| node[stmt,left]{
+\backslash
+parbox{16ex}{$
+\backslash
+mathtt{[k 
+\backslash
+ge n-1-k]};$ 
+\backslash
+
+\backslash
+ $ 
+\backslash
+texttt{b:=true}$}} (pal);
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw[thick,->] (inv.280) -- ++(0,-1ex) -- node[stmt,below]{$
+\backslash
+mathtt{[k<n-1-k]}$} ++(26ex,0)  node[inner sep=0] (i) {} |- node[stmt,below
+ right]{
+\backslash
+parbox{16ex}{$
+\backslash
+mathtt{[a(k)=a(n-1-k)];}$ 
+\backslash
+
+\backslash
+ $
+\backslash
+mathtt{k:=k+1}$}} (inv.5);
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+draw[thick,->] (i) -- node[stmt,right]{
+\backslash
+parbox{16ex}{$
+\backslash
+mathtt{[a(k) 
+\backslash
+ne a(n-1-k)];}$
+\backslash
+
+\backslash
+$
+\backslash
+mathtt{b:=false}$}} (nopal.north-|i);
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{tikzpicture}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Add the declaration 
+\begin_inset Formula $\texttt{k:pvar int}$
+\end_inset
+
+ to the local declaration compartment of 
+\begin_inset Formula $\texttt{palindrome}$
+\end_inset
+
+.
+ This introduces 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ as a local variable.
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+Note: Socos does not support adding variable declarations to situations.
+\end_layout
+
+\end_inset
+
+ From the above figure we read that the invariant maintained by this program
+ is that 
+\begin_inset Formula $\mathtt{k}$
+\end_inset
+
+ is in the range 
+\begin_inset Formula $\mathtt{0\dots n-1-k}$
+\end_inset
+
+, and that all elements to the left of 
+\begin_inset Formula $\mathtt{k}$
+\end_inset
+
+ are equal to their counterparts.
+ We can state these predicates as follows in Socos:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+0<=k and k<=n-1-k
+\begin_inset Newline newline
+\end_inset
+
+forall (i:nat):0<=i and i<k => a(i)=a(n-1-i)
+\end_layout
+
+\begin_layout Standard
+To add the loop invariants to the diagram, create a new situation (
+\begin_inset Graphics
+	filename fig/new_situation.png
+	height 10pt
+
+\end_inset
+
+) in the procedure, give it a suitable name (e.g., 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+), and add the above predicates to it.
+ Then check the program again to ensure that the invariants are well defined.
+\end_layout
+
+\begin_layout Standard
+An important aspect of the loop invariant is that it should be sufficiently
+ strong to prove that the exit transition establishes the postcondition.
+ It is therefore usually a good idea to add and check the exit transition
+ first.
+ Activate the transition tool (
+\begin_inset Graphics
+	filename fig/new_transition.png
+	height 10pt
+
+\end_inset
+
+) in the tool palette, then click on the 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ situation, and finally on the postcondition.
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+Hint: To add bendpoints to a transition while creating it, hold down shift
+ while clicking.
+ Bendpoints can be added to a selected transition by clicking and dragging
+ the small handles on the center of segments.
+\end_layout
+
+\end_inset
+
+ This action adds a transition arrow to the diagram.
+ To add a statement to the transition, select the arrow, press Enter, type
+ the statement, and press Enter again.
+ Add the guard 
+\begin_inset Formula $\texttt{[k>=n-1-k]}$
+\end_inset
+
+ followed by the assignment 
+\begin_inset Formula $\texttt{b:=true}$
+\end_inset
+
+.
+ Add each statement on a separate line (do not separate statements with
+ a semicolon).
+ Your program should now look approximately as follows:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename fig/first-transition.png
+	width 85col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Click the check button.
+ No error is issued, meaning that Socos managed to prove the exit transition
+ consistent.
+ However, Socos issues a warning related to our use of a guard.
+ This is because we have not asked Socos to check liveness yet---the default
+ behavior is to warn that a guard is used, not to try to prove that the
+ situations are live.
+ To turn liveness checking on, right-click on the 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ situation and select 
+\begin_inset Formula $\textsf{Enable liveness check}$
+\end_inset
+
+.
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+Liveness checking is set separately for each situation.
+ The current state is indicated by the connection points for outgoing transition
+s: hollow squares mean that liveness is not checked, whereas solid squares
+ mean that liveness is checked.
+\end_layout
+
+\end_inset
+
+ Then click the check button again.
+ Now Socos no longer complains about the guard, but instead issues an error
+ for 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+.
+ Hover the mouse cursor over the red squiggly in the diagram to see the
+ unproved condition:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/error-popup-loop-post.png
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The assumptions of the unproved condition are listed before the turnstile
+ (
+\begin_inset Formula $\vdash$
+\end_inset
+
+).
+ In this case, the loop invariants are the assumptions.
+ Following the turnstile is the proposition that should be proved---in this
+ case the guard of the exit transition.
+ 
+\begin_inset Formula $\texttt{k\_0}$
+\end_inset
+
+ stands for the value of 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ before the transition has started to execute.
+ Each assignment in a transition introduces an incrementally indexed variable:
+ i.e., 
+\begin_inset Formula $\texttt{k\_}n$
+\end_inset
+
+ represents the value of 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ after the 
+\begin_inset Formula $n$
+\end_inset
+
+:th assignment.
+ As there is only one outgoing transition, Socos has tried to prove that
+ the guard is true assuming the loop invariant.
+ Since the liveness condition clearly will be false until all transitions
+ originating from 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ have been added, we postpone liveness checking until the end by right-clicking
+ again on 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ and selecting 
+\begin_inset Formula $\textsf{Disable liveness check}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Next, we add the initial transition.
+ Draw a transition from the precondition to 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ with the statement 
+\begin_inset Formula $\texttt{k:=0}$
+\end_inset
+
+.
+ When we ask Socos to check the program again, it now tells us that the
+ new transition is inconsistent:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/error-popup-pre-loop.png
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It seems Socos was not able to prove that the first loop invariant is establishe
+d.
+ We note from the above that after substitution we should prove that 
+\begin_inset Formula $\texttt{0\le n-1-0}$
+\end_inset
+
+ (the second conjunct), which is clearly not true for the case 
+\begin_inset Formula $\texttt{n=0}$
+\end_inset
+
+ (but true for 
+\begin_inset Formula $\texttt{n}>0$
+\end_inset
+
+).
+ This lets us conclude that our loop invariant is too strong---it cannot
+ be established by the initial transition in all cases! We could make the
+ transition consistent by prefixing it with the guard 
+\begin_inset Formula $\texttt{[n>0]}$
+\end_inset
+
+, but then we would need to handle the case 
+\begin_inset Formula $\texttt{n}=0$
+\end_inset
+
+ in a separate transition (since our program should work also for empty
+ arrays).
+ Alternatively, we can relax the first loop invariant by extending the upper
+ limit by one element.
+ Taking the latter approach, the new loop invariant becomes:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+0<=k and k<=n-k
+\end_layout
+
+\begin_layout Standard
+After this change, both transitions are proved automatically.
+\end_layout
+
+\begin_layout Standard
+For the case 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mathtt{k<n-1-k}$
+\end_inset
+
+ we have two branches: one transition back to 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ incrementing 
+\begin_inset Formula $\texttt{k}$
+\end_inset
+
+ when 
+\begin_inset Formula $\mathtt{a(k)=a(n-1-k)}$
+\end_inset
+
+, and one transition to the postcondition returning 
+\begin_inset Formula $\texttt{false}$
+\end_inset
+
+ when 
+\begin_inset Formula $\mathtt{a(k)\ne a(n-1-k)}$
+\end_inset
+
+.
+ To create multiple transitions with a shared guard, 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+activate the transition tool (
+\begin_inset Graphics
+	filename fig/new_transition.png
+	height 10pt
+
+\end_inset
+
+) and click first on the border of 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ to set the source situation, and then click outside of 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ but inside the procedure box.
+ This creates a transition ending in a 
+\emph on
+choice point 
+\emph default
+(rendered as a white square with a blue outline), which can serve as a starting
+ point for further transitions.
+ While both situations and choice points can serve as transition origins,
+ choice points differ from situations in the two important respects.
+ Firstly, a choice point must have exactly one incoming transition.
+ Consequently, choice points can add new branches to a transition, but not
+ join existing transitions.
+ Secondly, choice points retain all assumptions from the start situation
+ and guards and assignments on the transition path up to the choice point.
+\end_layout
+
+\begin_layout Standard
+Add the 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+guard 
+\begin_inset Formula $[\mathtt{k<n-1-k}]$
+\end_inset
+
+ to the new transition.
+ Since the guards from 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ are now complete, we enable liveness checking for 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ (right-click on 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ and select 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $\textsf{Enable liveness check}$
+\end_inset
+
+).
+ The program should now look as follows (notice the solid squares at the
+ transitions originating from 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+, indicating that liveness is now checked for 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/fork-transition.png
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Check the program.
+ Socos reports that all transitions are consistent and that the 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ situation is live.
+ As expected, a warning is issued about the choice point, since there are
+ no outgoing branches from it yet.
+ To resolve this issue, we first add the exit transition, starting from
+ the choice point and ending at the postcondition.
+ We then add the following statements to the exit transition:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+[a(k)/=a(n-1-k)]
+\begin_inset Newline newline
+\end_inset
+
+b:=false
+\end_layout
+
+\begin_layout Standard
+Next, add the loop transition, starting from the choice point and ending
+ at the 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ situation.
+ Add the following statements to the loop transition:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+[a(k)=a(n-1-k)]
+\begin_inset Newline newline
+\end_inset
+
+k:=k+1
+\end_layout
+
+\begin_layout Standard
+We should also enable liveness checking at the choice point (right-click,
+ 
+\begin_inset Formula $\textsf{Enable liveness check}$
+\end_inset
+
+).
+ The program should now look as follows:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/all-transitions.png
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When we ask Socos to check the program, it now proves the added transitions
+ consistent and the choice point live.
+ It also issues a warning for termination.
+ This is because we have added a loop but not yet given the termination
+ function for 
+\begin_inset Formula $\mathtt{loop}$
+\end_inset
+
+.
+ A termination function is a function from the program variables to the
+ natural numbers that is decreased by the loop transition.
+ The termination function must be declared in the upper right-hand corner
+ of the 
+\begin_inset Formula $\texttt{loop}$
+\end_inset
+
+ situation: right-click on the corner and select 
+\begin_inset Formula $\textsf{Add declaration}$
+\end_inset
+
+ or, alternatively, activate the Declaration tool (
+\begin_inset Graphics
+	filename fig/new_declaration.png
+	height 10pt
+
+\end_inset
+
+) in the tool palette and then click on the corner.
+ Type the following termination function: 
+\begin_inset Formula $\mathtt{n-k}$
+\end_inset
+
+ (the lower bound 
+\begin_inset Formula $0$
+\end_inset
+
+ is implicit).
+ 
+\end_layout
+
+\begin_layout Standard
+Finally, Socos also needs to know which transition we intend to decrease
+ the termination function.
+\begin_inset Marginal
+status open
+
+\begin_layout Plain Layout
+Invariant diagrams are not restricted to single-entry constructs, but can
+ be arbitrary graphs.
+ The programmer must specify which transitions decrease the termination
+ function.
+ Socos issues an error if there are not enough transitions annotated with
+ 
+\begin_inset Formula $\texttt{decreasing}$
+\end_inset
+
+ to cut all cycles in the diagram.
+\end_layout
+
+\end_inset
+
+ Add the statement 
+\begin_inset Formula $\texttt{decreasing}$
+\end_inset
+
+ to the end of the loop transition.
+ Socos now generates an additional verification condition that the annotated
+ transition decreases the termination function.
+ The final program is shown below:
+\end_layout
+
+\begin_layout Quote
+\align center
+\begin_inset Graphics
+	filename fig/palindrome-final.png
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When checking the program, Socos now reports the status 
+\begin_inset Formula $\textsf{COMPLETE}$
+\end_inset
+
+.
+ Hence we can conclude the 
+\begin_inset Formula $\texttt{palindrome}$
+\end_inset
+
+ procedure is consistent, live and terminating.
+\end_layout
+
+\begin_layout Section
+Updates and bug reports
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Updates-and-bug-reports"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Socos editor.
+\end_layout
+
+\begin_layout Standard
+Updates to the Socos editor are issued through the Socos update site:
+\end_layout
+
+\begin_layout Quote
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{http://www.imped.fi/update}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To check for updates in Eclipse, first ensure that this site occurs in the
+ list of update sites (
+\begin_inset Formula $\textsf{Preferences}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Install/Update}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Available Software Sites}$
+\end_inset
+
+).
+ Then run 
+\begin_inset Formula $\textsf{Help}$
+\end_inset
+
+
+\family sans
+ \SpecialChar \menuseparator
+
+\family default
+ 
+\begin_inset Formula $\textsf{Check for Updates}$
+\end_inset
+
+.
+ When a new version of Socos becomes available, Eclipse will notice it and
+ ask to install it, replacing the previously installed version.
+\end_layout
+
+\begin_layout Paragraph
+Socos checker.
+\end_layout
+
+\begin_layout Standard
+Updates to the Socos checker will be made announced on the main Socos page
+ when available:
+\end_layout
+
+\begin_layout Quote
+
+\family typewriter
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{http://www.imped.fi/socos}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+New versions must be downloaded and installed manually.
+ Older versions are currently available on request (contact 
+\family typewriter
+joheriks@abo.fi
+\family default
+).
+\end_layout
+
+\begin_layout Paragraph
+Bug reports.
+\end_layout
+
+\begin_layout Standard
+Socos is a research prototype currently under development, and is likely
+ to contain bugs.
+ Discovered errors should be reported by email to 
+\family typewriter
+joheriks@abo.fi
+\family default
+.
+ Please be as specific as possible in your bug report, include a description
+ of how to reproduce the error.
+ Your report should mention whether you are using local or remote checker,
+ and if possible attach an 
+\family typewriter
+.ibp
+\family default
+ file that demonstrates the bug.
+ We also greatly appreciate any feedback on the tool to the above email
+ address.
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Language quick reference
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Language-quick-reference"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This tutorial covers only a small subset of the PVS language.
+ The full language reference is available at 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+url{pvs.csl.sri.com/doc/pvs-language-reference.pdf}
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="16" columns="3">
+<features islongtable="true" longtabularalignment="center">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Logic
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+PVS 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+existential quantification
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $(\exists x\in X\bullet P)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+exists (x:
+\begin_inset Formula $X$
+\end_inset
+
+):
+\begin_inset Formula $P$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+universal quantification
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $(\forall x\in X\bullet P)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+forall (x:
+\begin_inset Formula $X$
+\end_inset
+
+):
+\begin_inset Formula $P$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lambda abstraction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $(\lambda x\in X\bullet E)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+lambda (x:
+\begin_inset Formula $X$
+\end_inset
+
+):
+\begin_inset Formula $E$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+implication
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $P\Rightarrow Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $P$
+\end_inset
+
+ => 
+\begin_inset Formula $Q$
+\end_inset
+
+ 
+\begin_inset space \quad{}
+\end_inset
+
+ 
+\begin_inset Formula $P$
+\end_inset
+
+ implies 
+\begin_inset Formula $Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+equivalence
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $P\Leftrightarrow Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $P$
+\end_inset
+
+ <=> 
+\begin_inset Formula $Q$
+\end_inset
+
+ 
+\begin_inset space \quad{}
+\end_inset
+
+ 
+\begin_inset Formula $P$
+\end_inset
+
+ iff 
+\begin_inset Formula $Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+conjunction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $P\land Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $P$
+\end_inset
+
+ and 
+\begin_inset Formula $Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+disjunction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $P\lor Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $P$
+\end_inset
+
+ or 
+\begin_inset Formula $Q$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+negation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\neg P$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+not 
+\begin_inset Formula $P$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+equal to
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X=Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X$
+\end_inset
+
+ = 
+\begin_inset Formula $Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+not equal to
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X\ne Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X$
+\end_inset
+
+ /= 
+\begin_inset Formula $Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+less than or equal to
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X\le Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $X$
+\end_inset
+
+ <= 
+\begin_inset Formula $Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+greater than or equal to
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $X\ge Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $X$
+\end_inset
+
+ >= 
+\begin_inset Formula $Y$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+function application
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $F(E_{1},\dots,E_{n})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $F$
+\end_inset
+
+(
+\begin_inset Formula $E_{1}$
+\end_inset
+
+,...,
+\begin_inset Formula $E_{n}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+array access
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A[E]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $A$
+\end_inset
+
+(
+\begin_inset Formula $E$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+array update
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A[I\leftarrow E]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\begin_inset Formula $A$
+\end_inset
+
+ with [
+\begin_inset Formula $I$
+\end_inset
+
+:=
+\begin_inset Formula $E$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Expressions
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features islongtable="true" longtabularalignment="center">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Logic
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+PVS 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+natural numbers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{N}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{nat}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+integers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{Z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{int}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+positive integers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{N}_{+}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{posnat}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rational numbers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{Q}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{rational}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+real numbers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{R}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{real}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+truth values
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathbb{B}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{bool}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+array (size 
+\begin_inset Formula $n\in\mathbb{N}$
+\end_inset
+
+, type 
+\begin_inset Formula $T$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mathsf{array[0..n-1]}\;\mathsf{of}\; T$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{parray}[n,T]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Types
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features islongtable="true" longtabularalignment="center">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Syntax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Example
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+assignment
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Id_{1},\dots,Id_{n}:=E_{1},\dots,E_{n}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{x,y,z:=1,2,3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+assumption (guard)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $[E]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{[x<y]}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+procedure call
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Id\;\texttt{(}\;\langle E_{1},\dots,E_{n}\rangle\;\texttt{)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{p(a,b,x+y)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+decreasing annotation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{decreasing}\;\langle Situation\rangle$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{decreasing S}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Statements
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="4">
+<features islongtable="true" longtabularalignment="center">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Syntax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Context
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Example
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PVS strategy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{strategy}\;\mathtt{"}\mathit{S-expr}\mathtt{"}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Global
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{strategy "(grind)"}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+theory import
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{importing}\; Id@Id[Params]$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Global
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{importing ds@parray[n,int]}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+constant
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Id_{1},\dots,Id_{n}:X$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 1
+use_makebox 0
+width "16mm"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+Global,
+\begin_inset Newline newline
+\end_inset
+
+ signature,
+\begin_inset Newline newline
+\end_inset
+
+body
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{n:int}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+result parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Id_{1},\dots,Id_{n}:\texttt{result}\;\mathit{X}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Signature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{y:result bool}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value-result parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Id_{1},\dots,Id_{n}:\texttt{valres}\;\mathit{X}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Signature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{n,m:valres nat}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+local variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Id_{1},\dots,Id_{n}:\texttt{pvar}\;\mathit{X}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Body
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{a,b,c:pvar int}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Declarations
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

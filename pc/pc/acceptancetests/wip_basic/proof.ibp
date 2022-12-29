@@ -1,0 +1,23 @@
+prooftest: context begin
+
+   by "(skip)";
+
+   p1: procedure
+
+      post begin
+         * 1<2;
+         * 2<3;
+      end
+
+   begin
+
+      exit;
+      by
+         * lemma 1<2;
+         |- {by "(assert)"}; [];
+         * lemma 2<3;
+         |- {by "(assert)"}; [];
+         
+   end p1
+
+end prooftest

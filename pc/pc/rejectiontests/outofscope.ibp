@@ -1,0 +1,20 @@
+% Scope of situation-local variables in transitions:
+% - A variable not defined in the source situation cannot be read
+
+outofscope: context
+begin
+    
+    by "(assert)";
+
+    outofscope: procedure
+    begin
+       s1: situation
+       begin
+           x: pvar int;
+       end s1
+
+       x:=0; exit
+
+    end outofscope
+
+end outofscope

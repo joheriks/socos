@@ -1,0 +1,37 @@
+reccall2: context
+begin
+    by "(endgame)";
+
+    p1[ x:int ]: procedure
+    ** abs(x);
+    begin
+        if
+            [x>0]; p1[x-1]; exit
+            [x=0]; exit
+            [x<0]; p1[x+1]; exit
+        endif
+    end p1
+
+    p2[ x: valres int ]: procedure
+    ** x;
+    pre x>=0;
+    post x=0;
+    begin
+        if
+            [x>0]; x:=x-1; p2[x]; exit
+            [x=0]; exit
+        endif
+    end p2
+
+    p3[ x: valres int ]: procedure
+    ** abs(x);
+    post x=0;
+    begin
+        if
+            [x>0]; x:=x-1; p3[x]; exit
+            [x=0]; exit
+            [x<0]; x:=x+1; p3[x]; exit
+        endif
+    end p3
+
+end reccall2

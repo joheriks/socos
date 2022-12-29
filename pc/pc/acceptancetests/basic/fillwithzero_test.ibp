@@ -1,0 +1,37 @@
+fillwith_test: context
+begin
+fillwithzeroes[ a: valres vector[int] ]: procedure
+  post len(a)=len(a__0);
+  post forall (i:index(a)): a(i)=0;
+  begin
+      k: pvar int;
+      Loop: situation
+      begin
+          * len(a)=len(a__0);
+          * 0<=k and k<=len(a);
+          * forall (i:index(a)): i<k => a(i)=0;
+          ** len(a)-k;
+          if
+            [k=len(a)]; exit
+            [k<len(a)]; a := update(a,k,0); k:=k+1; decreasing goto Loop
+          endif
+      end Loop
+      k:=0; goto Loop
+  end fillwithzeroes
+
+fillwithzeroes_test: procedure
+  begin
+    a: pvar vector[int];
+    a:=vector_val((:1,2,3,4,5:));
+    fillwithzeroes[a];
+    { a=vector_val((:0,0,0,0,0:)) };
+    exit
+  end fillwithzeroes_test
+   
+  main: procedure
+  begin
+    fillwithzeroes_test[];
+  exit
+  end main
+  
+  end fillwith_test

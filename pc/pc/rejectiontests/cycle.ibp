@@ -1,0 +1,4 @@
+cycle: context
+begin
+    extending cycle;
+end cycle

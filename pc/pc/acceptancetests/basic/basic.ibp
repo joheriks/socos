@@ -1,0 +1,65 @@
+basic: context
+begin
+    
+    by "(assert)";
+
+    % empty procedure
+    p0:procedure
+    begin
+    end p0
+
+    % check correct expansion of situations without constraints
+    p1: procedure
+    begin 
+        s1: situation
+        begin
+            exit
+       end s1
+       goto s1
+    end p1
+
+    % check correct expansion of nested situations without constraints
+    p2: procedure
+    begin 
+        s1: situation
+        begin
+          s2: situation
+          begin
+            exit
+          end s2
+          goto s2
+        end s1
+        goto s1
+    end p2
+
+    % check handling of nested situations with and without constraints
+    p3: procedure
+    begin 
+        x: nat;
+        s1: situation
+        begin
+          s2: situation
+          begin
+              * x>0; 
+              exit
+          end s2
+        end s1
+        [x=1]; goto s2
+    end p3
+
+
+    % check handling of trivial conditions (which may be discharged before the
+    % leaves are even expanded)
+    p4[x:nat]: procedure
+    post false;
+    begin
+        [false]; exit
+    end p4
+
+    % program vars, but not diagram
+    p5: procedure
+    begin
+        x: pvar int;
+    end p5
+
+end basic

@@ -1,0 +1,26 @@
+nested: context
+begin
+
+    by "(grind)";
+
+    p[x: valres int]: procedure
+    post x>=2;
+    begin
+        f(x:int):int = -1;
+        
+        s1: situation
+        begin
+            * x>=0;
+            * f(x)<x;
+            s2: situation
+            begin
+                * x>=1;
+                x:=x+1; exit;
+            end s2
+            x:=x+1; goto s2
+        end s1
+
+        x:=0; goto s1
+    end p
+
+end nested

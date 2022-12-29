@@ -1,0 +1,35 @@
+##
+# Tree rewrites that are done before wp rewriting.
+# This is in a separate pass (mostly to keep things simpler)
+##
+
+# Insert dummy invariants if not defined (for pvs_rules)
+
+fix_module_inv
+::
+        module(invariant!, &rest)
+        ->
+        module := module(rest, 'invariant'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+fix_proc_pre
+::
+        module > procedure_body(KEY_PRE!, &rest)
+        ->
+        procedure_body := procedure_body(rest, 'KEY_PRE'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+fix_proc_post
+::
+        module > procedure_body(KEY_POST!(&any, id!), &rest)
+        ->
+        procedure_body := procedure_body(rest, 'KEY_POST'('name'('idop'('KEY_TRUE'='true'))))
+::
+
+fix_situation_inv
+::
+        module > situation(invariant!, &rest)
+        ->
+        situation := situation(rest, 'invariant'('name'('idop'('KEY_TRUE'='true'))))
+::
+

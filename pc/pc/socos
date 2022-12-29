@@ -1,0 +1,180 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
+# Command line interface for Socos checker
+
+import codecs
+import getopt
+import sys
+import os.path
+import atexit
+import signal
+import shutil
+import tempfile
+
+def copyright():
+    s = open(os.path.join(socos_dir,"doc","LICENSE")).read().decode("latin-1")
+    print s
+
+def credits():
+    print u"""Contributing developers:     Fredrik Holmberg   Juuso Jokiniemi
+                             Otto Järvinen      Viorel Preoteasa    
+                             Daniel Sjöblom     Sebastian Strand"""
+    
+
+def short_usage():
+    print "Usage: 'socos [OPTION]... [FILE]...'"
+    
+    
+def help():
+    short_usage()
+    print "--help\n    Display this message."
+    print "--copyright\n    Display copyright information"
+    print "--output-dir=ARG\n    Put auxiliary files and generated files in directory ARG; if empty, fresh temporary dir"
+    print
+    
+    print "Checker options:"
+    for a in IBPEnvironment.OPTIONS:
+        print "--%s\n    %s"%(a,IBPEnvironment.DESCRIPTION[a])
+    print
+    print "Attributes:"
+    for a in IBPEnvironment.ATTRIBUTES:
+        print "--%s=ARG\n    %s"%(a,IBPEnvironment.DESCRIPTION[a])
+    print
+    print "Display options:"
+    for a in Message.OPTIONS:
+        print "--%s\n    %s"%(a,Message.DESCRIPTION[a])
+    print 
+    sys.exit(0)
+    
+
+def error( msg ):
+    print >> sys.stderr, "socos: %s"%msg
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    # make standard output unbuffered
+    sys.stdout = codecs.getwriter("utf-8")(os.fdopen(sys.stdout.fileno(), 'w', 0))
+    from init_socos import *
+
+    from pc.semantic import Message
+    from pc.semantic.IBPEnvironment import IBPEnvironment
+
+    options = set()
+    attributes = {}
+    output_directory = None
+
+    # read options and attributes from environment 
+
+    asenv = lambda x: "SOCOS_%s"%(x.upper().replace("-","_"))
+    for x in IBPEnvironment.OPTIONS:
+        if os.environ.get(asenv(x)): options.add(x)
+    for x in IBPEnvironment.ATTRIBUTES:
+        if asenv(x) in os.environ: attributes[x] = os.environ[asenv(x)]
+    for x in Message.OPTIONS:
+        if os.environ.get(asenv(x)): Message.opts.add(x)
+    output_directory =  os.environ.get(asenv("output-dir"))
+
+
+    # read options from command line arguments
+    try:
+        opts,files = getopt.getopt(sys.argv[1:],"",
+                                   IBPEnvironment.OPTIONS +
+                                   ["%s="%a for a in IBPEnvironment.ATTRIBUTES] +
+                                   Message.OPTIONS +
+                                   ["copyright","help","output-dir="])
+        for o,a in opts:
+            if o == "--copyright": copyright(); credits(); exit(0)
+            elif o == "--help": help()
+            elif o == "--output-dir": output_directory = a
+            elif o[2:] in IBPEnvironment.OPTIONS: options.add(o[2:])
+            elif o[2:] in IBPEnvironment.ATTRIBUTES: attributes[o[2:]] = a
+            elif o[2:] in Message.OPTIONS: Message.opts.add(o[2:])
+    except getopt.GetoptError,e:
+        error(str(e) + " (try --help for a list of options)")
+
+    # print the pid, this is useful for the frontend to kill this process
+    if "process-info" in options:
+        pid = os.getpid()
+        print >> sys.stdout, Message.SuccessMessage("pid:%d"%pid,{"pid":pid}).get_message()
+
+    if not files:
+        short_usage()
+        sys.exit(0)
+
+    # basic sanity check---all input files exist and are in the same
+    # directory
+    file_directory = None
+
+    basenames = []
+    
+    for filename in files:
+        filepath = os.path.abspath(filename)
+        dir,fname = os.path.split(filepath)
+        if file_directory==None:
+            file_directory = dir
+        if not os.path.exists(filepath):
+           error("%s: no such file or directory"%filename)
+        if dir!=file_directory:
+           error("files must be in the same directory")
+        if fname not in basenames:
+            basenames.append(fname)
+
+    assert file_directory!=None
+    
+    if output_directory is None:
+        output_directory = file_directory
+    else:
+        if output_directory.strip()=="":
+            output_directory = tempfile.mkdtemp(prefix="socos")
+        else:
+            output_directory = os.path.abspath(output_directory)
+        if output_directory==file_directory:
+            error("output directory, if specified, should be different from file directory")
+        try:
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+            if not os.path.exists(output_directory) or not os.path.isdir(output_directory):
+                error("%s: not a directory"%output_directory)
+
+            # copy all readable files from the file_directory to the output directory
+            for filename in os.listdir(file_directory):
+                src = os.path.join(file_directory,filename)
+                if os.access(src,os.R_OK) and not os.path.isdir(src):
+                    shutil.copy(src,output_directory)
+        except IOError,e:
+            error("%s: %s"%(e.strerror,filename))
+        
+    # do we have write access to the directory?
+    if not os.access(output_directory,os.W_OK):
+        error("write access to %s required"%output_directory)
+
+    try:
+        # Create environment, do semantic checking
+        env = IBPEnvironment(socos_dir,
+                             file_directory,
+                             output_directory,
+                             basenames,
+                             [],
+                             options = options,
+                             attributes = attributes)
+        atcr = True
+        for w in env.check():
+            if w.type=="PROGRESS":
+                sys.stdout.write("\r")
+                atcr = False
+            elif not atcr:
+                sys.stdout.write("\n")
+            sys.stdout.write(w.get_message())
+            if w.type!="PROGRESS":
+                sys.stdout.write("\n")
+                atcr = True
+                
+        sys.exit(1 if env.incomplete else 0)
+            
+
+    except Message.ProgramException,e:
+        # This is the exit point for any kind of failure
+        print >> sys.stderr, e.get_message()
+        sys.exit(1)
+

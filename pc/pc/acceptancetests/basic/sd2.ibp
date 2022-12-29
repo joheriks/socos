@@ -1,0 +1,46 @@
+sd2: context
+begin
+    by "(endgame)";
+    
+    importing ds@parray;
+
+    n,k:nat;
+
+    partitioned(a:parray[n,int],k:nat): bool = forall (i,j:nat): i<k and k<=j and j<n => a(i)<=a(j);
+    sorted(a:parray[n,int],k:nat,m:nat): bool = forall (i,j:nat): k<=i and i<=j and j<m and m<=n => a(i)<=a(j);
+    sorted(a:parray[n,int]):bool = sorted(a,0,n);
+
+    a: var parray[n,int];
+
+    *   ro4u1: theorem partitioned(a,1) => sorted(a);
+    -   [add]:: n=2;
+    |-  partitioned(a,1) => sorted(a);
+    <=> { "definition of partitioned" };
+        (forall (i,j:nat): i<1 and 1<=j and j<2 => a(i)<=a(j)) => sorted(a) ;
+    <=> { "one-point rule" };
+        a(0)<=a(1) => sorted(a) ;
+    <=> { "definition of sorted" };
+        a(0)<=a(1) => forall (i,j:nat): 1<=i and i<=j and j<2 => a(i)<=a(j);
+    <=> { "rewrite finite, limited integer interval as disjunction" };
+        a(0)<=a(1) => forall (i,j:nat): (i=0 and j=0) or (i=0 and j=1) or (i=1 and j=1) => a(i)<=a(j);
+    <=> { "interval split, one-point rule" };
+        a(0)<=a(1) => a(0)<=a(0) and a(0)<=a(1) and a(1)<=a(1);
+    <=> { "basic logic" };
+        true;
+    [];
+
+
+    *   ro4u2: theorem sorted(a) => partitioned(a,k);
+    -   [add]:: 0<=k and k<n;
+    |-  sorted(a);
+    <=> { "definition of sorted" };
+        forall (i,j:nat): i<=j and j<n => a(i)<=a(j);
+     => { "strengthen interval" };
+        forall (i,j:nat): i<j and j<n => a(i)<=a(j);
+     => { "strengthen interval" };
+        forall (i,j:nat): i<k and k<=j and j<n => a(i)<=a(j);
+    <=> { "definition of partitioned" };
+        partitioned(a,k);
+    [];
+
+end sd2

@@ -1,0 +1,17 @@
+array_vals: context
+begin                  
+    n: nat;
+    importing ds@parray;
+    by "(endgame)";
+
+    p: procedure
+    begin
+        a: pvar parray[n,int];
+        a := (: 1::int, 2::int, 3::int :);
+        { n>0 => a(0)=1 };
+        { n>1 => a(1)=2 };
+        { n>2 => a(2)=3 };
+        exit
+    end p
+
+end array_vals

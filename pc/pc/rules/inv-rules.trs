@@ -1,0 +1,188 @@
+# many rules change the order of declarations FIXME
+
+combine_pre_conds
+::
+	module > pb:procedure_body( cond1:KEY_PRE(&any), cond2:KEY_PRE(&any) ,&rest)
+	->
+	pb:= pb( cond1('KEY_AND'('pgroup'(cond1.any), 'pgroup'(cond2.any))), pb.rest)
+
+::
+
+# only default, nameless, postconditions are combined
+combine_post_conds
+::
+	module > pb:procedure_body( cond1:KEY_POST(&any, id!), cond2:KEY_POST(&any,id!) ,&rest)
+	->
+	pb:= pb( cond1('KEY_AND'('pgroup'(cond1.any), 'pgroup'(cond2.any))), pb.rest)
+::
+
+# labeled postconditions must be unique in name
+# combine_labeled_post_conds
+# ::
+# 	module > pb:procedure_body(cond1:KEY_POST(pl:id, &any), cond2:KEY_POST(id=pb.cond1.pl, &any) ,&rest)
+# 	->
+# 	pb:= pb( cond1('KEY_AND'('pgroup'(cond1.any), 'pgroup'(cond2.any)), cond1.pl), pb.rest)
+# ::
+
+rewrite_PRE_Condition
+::
+	module(init_progvar*(var:'(orig|new)_var'*(KEY_PROGVAR*(ID+,&rest))),
+               p:'p?procedure'(ID,
+                               procedure_body(KEY_PRE(&rest), rest:'(?!KEY_PRE).*'*),
+                               args?(pparg:'p?parg'*(proc_var:'(orig|new)'*(ID+,&rest)),
+                                     arg*(ID+,&rest)),
+                               &rest),
+               &rest)
+	->
+	KEY_PRE:='situation_invariant'('source'('ID' = 'inv',
+                                                'ID' =  $$p.ID,
+                                                'ID' = 'PRE'),
+				        'name'('idop'('ID'= 'bool')),
+                                        'args'(KEY_PROGVAR.ID),
+					'args'(proc_var.ID),
+					'args'(arg.ID),
+				         KEY_PRE.rest)
+::
+
+rewrite_POST_Condition
+::
+	module(init_progvar*(var:'(orig|new)_var'*(KEY_PROGVAR*(ID+, &rest))),
+               p:'p?procedure'(ID,
+                               procedure_body(KEY_POST(ID!, &rest), KEY_POST!(ID,&rest), &rest),
+                               args?(pparg:'p?parg'*(proc_var:'(orig|new)'*(ID+,&rest)),
+                                     arg*(ID+, &rest)),
+                               &rest),
+               &rest)
+	->
+	KEY_POST:='situation_invariant'('source'('ID' = 'inv',
+                                                'ID' =  $$p.ID,
+                                                'ID' = 'POST'),
+				        'name'('idop'('ID'= 'bool')),
+                                        'args'(KEY_PROGVAR.ID),
+					'args'(proc_var.ID),
+					'args'(arg.ID),
+				         KEY_POST.rest)
+::
+
+rewrite_labeled_POST_Condition
+::
+	module(init_progvar*(var:'(orig|new)_var'*(KEY_PROGVAR*(ID+, &rest))),
+               p:'p?procedure'(ID,
+                               procedure_body(KEY_POST(pl:ID, &rest), &rest),
+                               args?(pparg:'p?parg'*(proc_var:'(orig|new)'*(ID+,&rest)),
+                                     arg*(ID+, &rest)),
+                               &rest),
+               &rest)
+	->
+	KEY_POST:='situation_invariant'('source'('ID' = 'inv',
+                                                'ID' =  $$p.ID,
+                                                'ID' = $concat('POST_',$$pl)),
+				        'name'('idop'('ID'= 'bool')),
+                                        'args'(KEY_PROGVAR.ID),
+					'args'(proc_var.ID),
+					'args'(arg.ID),
+				         KEY_POST.rest)
+::
+
+#changes the order of declarations in situations FIXME
+
+move_situation_up
+::
+        module > sit1:situation(ID,
+                                sit2:situation(ID, &rest),
+                                var2:pKEY_PROGVAR*,
+                                var:KEY_PROGVAR*,
+                                invariant*(&any),
+                                &rest)
+	->
+	sit1:= sit1(sit1.ID, var,var2, invariant, sit1.rest),
+	      'situation'(sit2.ID, var2, 'pKEY_PROGVAR'(var), invariant, sit2.rest)
+::
+
+copy_progvars_to_situation
+::
+        module > pb:procedure_body(vars:KEY_PROGVAR*,
+                                   sit:situation(ID,
+                                                 vars:'p?KEY_PROGVAR'*,
+                                                 situation!,
+                                                 &rest),
+                                   &rest)
+	->
+	sit:='psituation'(sit.ID, 'pKEY_PROGVAR'(pb.vars), sit.vars, sit.rest)
+::
+
+
+combine_invariants
+::
+	module > parent:'.*'(inv1:invariant(&any) , inv2:invariant(&any),  &rest)
+	->
+	parent := parent(parent.rest, 'invariant'('KEY_AND'('pgroup'(inv1.any) , 'pgroup'(inv2.any))))
+::
+
+combine_module_invariant
+::
+	module(inv1:invariant, inv2:invariant, &rest)
+	->
+	module := module(rest, 'invariant'('KEY_AND'(@children(inv1), @children(inv2))))
+
+::
+
+# This rule depends on previous rules (FIXME)
+
+rewrite_situation_invariants
+::
+
+	module(init_progvar*(var:'(orig|new)_var'*(KEY_PROGVAR*(ID+,&rest))),
+               p:'p?procedure'(ID,
+                               procedure_body(
+                                 sit:'p?situation'(ID,
+                                                   situation!,
+                                                   invariant,
+                                                   var1:KEY_PROGVAR*(ID+, &rest),
+                                                   pKEY_PROGVAR*(var2:KEY_PROGVAR*(ID+,&rest)),
+                                                   &rest),
+                                 &rest),
+                               args?(pparg:'p?parg'*(proc_var:'(orig|new)'*(ID+,&rest)),
+                                     arg*(ID+,&rest)),
+                               &rest),
+               &rest)
+	->
+	invariant :='situation_invariant'('source'('ID' = 'inv',
+                                                   'ID' = $$p.ID,
+                                                   'ID' = $$sit.ID),
+                                          'name'('idop'('ID'= 'bool')),
+                                          'args'(KEY_PROGVAR.ID),
+                                          'args'(proc_var.ID),
+                                          'args'(arg.ID),
+                                          'args'(var2.ID),
+                                          'args'(var1.ID),
+                                          @children(invariant))
+::
+
+rewrite_module_invariant
+::
+        module(ID,
+               invariant,
+               init_progvar*(var:'(orig|new)_var'*(KEY_PROGVAR*(ID+, &rest))),
+               rest:'(?!invariant).*'*)
+	->
+	invariant := 'situation_invariant'('source'('ID' = 'modinv',
+                                                    'ID' = $$module.ID),
+                                           'name'('idop'('ID' = 'bool')),
+                                           'args'(KEY_PROGVAR.ID),
+                                           @children(invariant))
+::
+
+combine_args
+::
+	module > sit_inv:situation_invariant(source, name,arg:args(ID+), args+(ID+) , &rest)
+	->
+	sit_inv := sit_inv(source, name, 'args'(arg.ID, args.ID), rest)
+::
+
+delete_empty_args
+::
+        module > sit_inv:situation_invariant(source, name, args+() , &rest)
+	->
+	sit_inv := sit_inv(source, name, rest)
+::

@@ -1,0 +1,39 @@
+c: context begin
+
+   by "(skip)";
+
+   p1: procedure
+   begin
+
+      l1: situation begin
+
+         {true};
+         proof
+            * theorem true; [];
+         endproof
+
+         p2[];
+         proof
+            * theorem true; [];
+         endproof
+
+         exit;
+         proof
+            * theorem true; [];
+         endproof
+
+      end l1
+
+      goto l1;
+      proof
+         * theorem true; [];
+      endproof
+
+   end p1
+
+   p2: procedure
+   begin
+      exit
+   end p2
+
+end c

@@ -1,0 +1,437 @@
+(ctx__BuildTree)
+(spec__BuildTree__BuildTree)
+(spec__BuildTree__main)
+(impl__BuildTree__BuildTree
+ (BuildTree__BuildTree__ini___TCC1 0
+  (BuildTree__BuildTree__ini___TCC1-1 nil 3571464443
+   (""
+    (then (skosimp-2) (uid "BuildTree:context/BuildTree:procedure")
+     (then
+      (expand-nested-defs -
+       (("spec__BuildTree__BuildTree.pre__" 0 (("sit__ini__" 0)))
+        ("spec__BuildTree__BuildTree.final" 2 (("sit__fin__final" 2)))
+        ("spec__BuildTree__BuildTree.fail" 1 (("sit__fin__fail" 1)))
+        ("spec__BuildTree__BuildTree.pre__" 0)
+        ("spec__BuildTree__BuildTree.final" 2)
+        ("spec__BuildTree__BuildTree.fail" 1)))
+      (flatten-disjunct -)
+      (check-report (then (skosimp*) (use tr1) (assert)))))
+    nil)
+   ((tr1 formula-decl nil List2Tree nil)
+    (s const-decl "list[nat]" impl__BuildTree__BuildTree nil)
+    (AND const-decl "[bool, bool -> bool]" booleans nil)
+    (every adt-def-decl "boolean" list_adt nil)
+    (PRED type-eq-decl nil defined_types nil)
+    (list type-decl nil list_adt nil)
+    (d const-decl "nat" impl__BuildTree__BuildTree nil)
+    (nat nonempty-type-eq-decl nil naturalnumbers nil)
+    (>= const-decl "bool" reals nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (boolean nonempty-type-decl nil booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (id const-decl "(bijective?[T, T])" identity nil)
+    (fail const-decl "bool" spec__BuildTree__BuildTree nil)
+    (sit__fin__fail const-decl "bool" impl__BuildTree__BuildTree nil)
+    (pre__ const-decl "bool" spec__BuildTree__BuildTree nil)
+    (sit__ini__ const-decl "bool" impl__BuildTree__BuildTree nil))
+   nil))
+ (BuildTree__BuildTree__ini__ 0
+  (BuildTree__BuildTree__ini__-1 nil 3571462830
+   (""
+    (uid
+     "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition")
+    (("" (skolem-2)
+      (("" (flatten-disjunct 1 :depth 1)
+        (("" (expand sit__ini__)
+          (("" (flatten-disjunct -1 :depth 1)
+            ((""
+              (spread (split 1 :depth 1)
+               ((then (skip)
+                 (uid
+                  "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/stmt1:transition")
+                 (expand-defs
+                  (("spec__BuildTree__BuildTree.pre__" 0
+                    (("sit__ini__" 0)))
+                   ("spec__BuildTree__BuildTree.final" 2
+                    (("sit__fin__final" 2)))
+                   ("spec__BuildTree__BuildTree.fail" 1
+                    (("sit__fin__fail" 1)))
+                   ("spec__BuildTree__BuildTree.pre__" 0)
+                   ("spec__BuildTree__BuildTree.final" 2)
+                   ("spec__BuildTree__BuildTree.fail" 1)))
+                 (spread (split-n 1)
+                  ((then
+                    (uid
+                     "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/stmt1:transition")
+                    (check-report
+                     (then (skosimp*) (use tr1) (assert)))))))
+                (then
+                 (spread (split-n 2)
+                  ((then
+                    (uid
+                     "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs1:transition")
+                    (flatten-disjunct 1 :depth 1) (skolem-2)
+                    (flatten-disjunct 1 :depth 1) (skolem-2)
+                    (flatten-disjunct 1 :depth 1)
+                    (then (skip)
+                     (uid
+                      "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs1:transition/goto:transition")
+                     (expand-defs
+                      (("spec__BuildTree__BuildTree.pre__" 0
+                        (("sit__ini__" 0)))
+                       ("spec__BuildTree__BuildTree.final" 2
+                        (("sit__fin__final" 2)))
+                       ("spec__BuildTree__BuildTree.fail" 1
+                        (("sit__fin__fail" 1)))
+                       ("spec__BuildTree__BuildTree.pre__" 0)
+                       ("spec__BuildTree__BuildTree.final" 2)
+                       ("spec__BuildTree__BuildTree.fail" 1)))
+                     (spread (split-n 1)
+                      ((then
+                        (uid
+                         "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs1:transition/goto:transition/check:transition")
+                        (check-report
+                         (then (skosimp*) (use tr1) (assert))))))))
+                   (then
+                    (uid
+                     "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition")
+                    (flatten-disjunct 1 :depth 1)
+                    (spread (split 1 :depth 1)
+                     ((then (skip)
+                       (uid
+                        "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/stmt2:transition")
+                       (expand-defs
+                        (("spec__BuildTree__BuildTree.pre__" 0
+                          (("sit__ini__" 0)))
+                         ("spec__BuildTree__BuildTree.final" 2
+                          (("sit__fin__final" 2)))
+                         ("spec__BuildTree__BuildTree.fail" 1
+                          (("sit__fin__fail" 1)))
+                         ("spec__BuildTree__BuildTree.pre__" 0)
+                         ("spec__BuildTree__BuildTree.final" 2)
+                         ("spec__BuildTree__BuildTree.fail" 1)))
+                       (spread (split-n 1)
+                        ((then
+                          (uid
+                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/stmt2:transition")
+                          (check-report
+                           (then (skosimp*) (use tr1) (assert)))))))
+                      (then
+                       (spread (split-n 3)
+                        ((then
+                          (uid
+                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs1:transition")
+                          (flatten-disjunct 1 :depth 1) (skolem-2)
+                          (flatten-disjunct 1 :depth 1) (skolem-2)
+                          (flatten-disjunct 1 :depth 1)
+                          (then (skip)
+                           (uid
+                            "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs1:transition/goto:transition")
+                           (expand-defs
+                            (("spec__BuildTree__BuildTree.pre__" 0
+                              (("sit__ini__" 0)))
+                             ("spec__BuildTree__BuildTree.final" 2
+                              (("sit__fin__final" 2)))
+                             ("spec__BuildTree__BuildTree.fail" 1
+                              (("sit__fin__fail" 1)))
+                             ("spec__BuildTree__BuildTree.pre__" 0)
+                             ("spec__BuildTree__BuildTree.final" 2)
+                             ("spec__BuildTree__BuildTree.fail" 1)))
+                           (spread (split-n 1)
+                            ((then
+                              (uid
+                               "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs1:transition/goto:transition/check:transition")
+                              (check-report
+                               (then
+                                (skosimp*)
+                                (use tr1)
+                                (assert))))))))
+                         (then
+                          (uid
+                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs2:transition")
+                          (flatten-disjunct 1 :depth 1) (skolem-2)
+                          (flatten-disjunct 1 :depth 1) (skolem-2)
+                          (flatten-disjunct 1 :depth 1)
+                          (then (skip)
+                           (uid
+                            "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs2:transition/goto:transition")
+                           (expand-defs
+                            (("spec__BuildTree__BuildTree.pre__" 0
+                              (("sit__ini__" 0)))
+                             ("spec__BuildTree__BuildTree.final" 2
+                              (("sit__fin__final" 2)))
+                             ("spec__BuildTree__BuildTree.fail" 1
+                              (("sit__fin__fail" 1)))
+                             ("spec__BuildTree__BuildTree.pre__" 0)
+                             ("spec__BuildTree__BuildTree.final" 2)
+                             ("spec__BuildTree__BuildTree.fail" 1)))
+                           (spread (split-n 2)
+                            ((then
+                              (uid
+                               "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs2:transition/goto:transition/check:transition")
+                              (check-report
+                               (then (skosimp*) (use tr1) (assert))))
+                             (then
+                              (uid
+                               "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs2:transition/goto:transition/check:transition")
+                              (check-report
+                               (then
+                                (skosimp*)
+                                (use tr1)
+                                (assert))))))))
+                         (then
+                          (uid
+                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition")
+                          (flatten-disjunct 1 :depth 1)
+                          (spread (split 1 :depth 1)
+                           ((then (skip)
+                             (uid
+                              "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/stmt2:transition")
+                             (expand-defs
+                              (("spec__BuildTree__BuildTree.pre__"
+                                0
+                                (("sit__ini__" 0)))
+                               ("spec__BuildTree__BuildTree.final"
+                                2
+                                (("sit__fin__final" 2)))
+                               ("spec__BuildTree__BuildTree.fail"
+                                1
+                                (("sit__fin__fail" 1)))
+                               ("spec__BuildTree__BuildTree.pre__" 0)
+                               ("spec__BuildTree__BuildTree.final" 2)
+                               ("spec__BuildTree__BuildTree.fail" 1)))
+                             (spread (split-n 0) nil))
+                            (then (skolem-2)
+                             (spread (split-n 2)
+                              ((then
+                                (uid
+                                 "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs1:transition")
+                                (flatten-disjunct 1 :depth 1)
+                                (skolem-2)
+                                (flatten-disjunct 1 :depth 1)
+                                (skolem-2)
+                                (flatten-disjunct 1 :depth 1)
+                                (then
+                                 (skip)
+                                 (uid
+                                  "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs1:transition/goto:transition")
+                                 (expand-defs
+                                  (("spec__BuildTree__BuildTree.pre__"
+                                    0
+                                    (("sit__ini__" 0)))
+                                   ("spec__BuildTree__BuildTree.final"
+                                    2
+                                    (("sit__fin__final" 2)))
+                                   ("spec__BuildTree__BuildTree.fail"
+                                    1
+                                    (("sit__fin__fail" 1)))
+                                   ("spec__BuildTree__BuildTree.pre__"
+                                    0)
+                                   ("spec__BuildTree__BuildTree.final"
+                                    2)
+                                   ("spec__BuildTree__BuildTree.fail"
+                                    1)))
+                                 (spread
+                                  (split-n 1)
+                                  ((then
+                                    (uid
+                                     "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs1:transition/goto:transition/check:transition")
+                                    (check-report
+                                     (then
+                                      (skosimp*)
+                                      (use tr1)
+                                      (assert))))))))
+                               (then
+                                (uid
+                                 "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition")
+                                (flatten-disjunct 1 :depth 1)
+                                (skolem-2)
+                                (flatten-disjunct 1 :depth 1)
+                                (spread
+                                 (split 1 :depth 1)
+                                 ((then
+                                   (skip)
+                                   (uid
+                                    "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/stmt1:transition")
+                                   (expand-defs
+                                    (("spec__BuildTree__BuildTree.pre__"
+                                      0
+                                      (("sit__ini__" 0)))
+                                     ("spec__BuildTree__BuildTree.final"
+                                      2
+                                      (("sit__fin__final" 2)))
+                                     ("spec__BuildTree__BuildTree.fail"
+                                      1
+                                      (("sit__fin__fail" 1)))
+                                     ("spec__BuildTree__BuildTree.pre__"
+                                      0)
+                                     ("spec__BuildTree__BuildTree.final"
+                                      2)
+                                     ("spec__BuildTree__BuildTree.fail"
+                                      1)))
+                                   (spread (split-n 0) nil))
+                                  (then
+                                   (skolem-2)
+                                   (spread
+                                    (split-n 2)
+                                    ((then
+                                      (uid
+                                       "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs1:transition")
+                                      (flatten-disjunct 1 :depth 1)
+                                      (skolem-2)
+                                      (flatten-disjunct 1 :depth 1)
+                                      (skolem-2)
+                                      (flatten-disjunct 1 :depth 1)
+                                      (then
+                                       (skip)
+                                       (uid
+                                        "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs1:transition/goto:transition")
+                                       (expand-defs
+                                        (("spec__BuildTree__BuildTree.pre__"
+                                          0
+                                          (("sit__ini__" 0)))
+                                         ("spec__BuildTree__BuildTree.final"
+                                          2
+                                          (("sit__fin__final" 2)))
+                                         ("spec__BuildTree__BuildTree.fail"
+                                          1
+                                          (("sit__fin__fail" 1)))
+                                         ("spec__BuildTree__BuildTree.pre__"
+                                          0)
+                                         ("spec__BuildTree__BuildTree.final"
+                                          2)
+                                         ("spec__BuildTree__BuildTree.fail"
+                                          1)))
+                                       (spread
+                                        (split-n 1)
+                                        ((then
+                                          (uid
+                                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs1:transition/goto:transition/check:transition")
+                                          (check-report
+                                           (then
+                                            (skosimp*)
+                                            (use tr1)
+                                            (assert))))))))
+                                     (then
+                                      (uid
+                                       "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs2:transition")
+                                      (flatten-disjunct 1 :depth 1)
+                                      (skolem-2)
+                                      (flatten-disjunct 1 :depth 1)
+                                      (skolem-2)
+                                      (flatten-disjunct 1 :depth 1)
+                                      (then
+                                       (skip)
+                                       (uid
+                                        "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs2:transition/goto:transition")
+                                       (expand-defs
+                                        (("spec__BuildTree__BuildTree.pre__"
+                                          0
+                                          (("sit__ini__" 0)))
+                                         ("spec__BuildTree__BuildTree.final"
+                                          2
+                                          (("sit__fin__final" 2)))
+                                         ("spec__BuildTree__BuildTree.fail"
+                                          1
+                                          (("sit__fin__fail" 1)))
+                                         ("spec__BuildTree__BuildTree.pre__"
+                                          0)
+                                         ("spec__BuildTree__BuildTree.final"
+                                          2)
+                                         ("spec__BuildTree__BuildTree.fail"
+                                          1)))
+                                       (spread
+                                        (split-n 2)
+                                        ((then
+                                          (uid
+                                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs2:transition/goto:transition/check:transition")
+                                          (check-report
+                                           (then
+                                            (skosimp*)
+                                            (use tr1)
+                                            (assert))))
+                                         (then
+                                          (uid
+                                           "BuildTree:context/BuildTree:procedure/ini__:situation/trs1:transition/if:transition/trs2:transition/if:transition/trs3:transition/choice:transition/trs2:transition/choice:transition/trs2:transition/goto:transition/check:transition")
+                                          (check-report
+                                           (then
+                                            (skosimp*)
+                                            (use tr1)
+                                            (assert)))))))))))))))))))))))))))))))
+              nil)))))))))))
+   ((fail const-decl "bool" spec__BuildTree__BuildTree nil)
+    (list_of_tree_not_null3 formula-decl nil List2Tree nil)
+    (add2list_null formula-decl nil List2Tree nil)
+    (null_append formula-decl nil List2Tree nil)
+    (d const-decl "nat" impl__BuildTree__BuildTree nil)
+    (number nonempty-type-decl nil numbers nil)
+    (list type-decl nil list_adt nil)
+    (boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (PRED type-eq-decl nil defined_types nil)
+    (AND const-decl "[bool, bool -> bool]" booleans nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (>= const-decl "bool" reals nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (nat nonempty-type-eq-decl nil naturalnumbers nil)
+    (s const-decl "list[nat]" impl__BuildTree__BuildTree nil)
+    (tr1 formula-decl nil List2Tree nil)
+    (sit__fin__fail const-decl "bool" impl__BuildTree__BuildTree nil)
+    (cons? adt-recognizer-decl "[list -> boolean]" list_adt nil)
+    (car adt-accessor-decl "[(cons?) -> T]" list_adt nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (real_gt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (list_of_tree_inj formula-decl nil List2Tree nil)
+    (append_assoc formula-decl nil list_props nil)
+    (+ const-decl "[numfield, numfield -> numfield]" number_fields nil)
+    (numfield nonempty-type-eq-decl nil number_fields nil)
+    (add2list_append formula-decl nil List2Tree nil)
+    (final const-decl "bool" spec__BuildTree__BuildTree nil)
+    (cdr adt-accessor-decl "[(cons?) -> list]" list_adt nil)
+    (cons adt-constructor-decl "[[T, list] -> (cons?)]" list_adt nil)
+    (= const-decl "[T, T -> boolean]" equalities nil)
+    (real_le_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (length def-decl "nat" list_props nil)
+    (list_cons_eta formula-decl nil list_adt nil)
+    (sit__fin__final const-decl "bool" impl__BuildTree__BuildTree nil)
+    (add2list_add2list formula-decl nil List2Tree nil)
+    (Node? adt-recognizer-decl "[Tree -> boolean]" Tree_adt nil)
+    (l adt-accessor-decl "[(Node?) -> Tree]" Tree_adt nil)
+    (r adt-accessor-decl "[(Node?) -> Tree]" Tree_adt nil)
+    (nnint_plus_posint_is_posint application-judgement "posint"
+     integers nil)
+    (posint_plus_nnint_is_posint application-judgement "posint"
+     integers nil)
+    (list_of_tree_not_null2 formula-decl nil List2Tree nil)
+    (append def-decl "list[T]" list_props nil)
+    (add2list const-decl "list[nat]" List2Tree nil)
+    (list_of_tree def-decl "list[nat]" List2Tree nil)
+    (nnint_plus_nnint_is_nnint application-judgement "nonneg_int"
+     integers nil)
+    (Leaf? adt-recognizer-decl "[Tree -> boolean]" Tree_adt nil)
+    (Tree type-decl nil Tree_adt nil)
+    (pre__ const-decl "bool" spec__BuildTree__BuildTree nil)
+    (id const-decl "(bijective?[T, T])" identity nil)
+    (sit__ini__ const-decl "bool" impl__BuildTree__BuildTree nil))
+   shostak)))
+(impl__BuildTree__main)
+

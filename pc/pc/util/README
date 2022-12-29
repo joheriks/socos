@@ -1,0 +1,2 @@
+This directory contains utility modules. Note: no modules in this 
+directory should depend on other modules in icip.

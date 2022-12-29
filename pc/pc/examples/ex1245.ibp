@@ -1,0 +1,197 @@
+ex1245: context
+begin
+    importing ds@parray;
+    N,M: nat;
+
+    by "(endgame)";
+
+    %
+    % A set of toy programs used as assignments in the special course
+    % on invariant based programming given in spring 2010.
+    %
+
+    % ASSIGNMENT 1 - Palindrome
+
+    palindrome [ a:parray[N,int]; b: result bool ] : procedure
+    post b = forall (i:below[N]) : a(i) = a(N-1-i);
+    begin
+        k : pvar int;
+        loop: situation
+        begin
+
+            %  __________________________________________
+            % |######|   |                    |   |######|
+            % |######|___|____________________|___|######|
+            %         k                       N-1-k
+            %
+            % The elements in the region A[0,k) mirror
+            % the elements in the region A[N-k,N).
+            %
+            * 0 <= k and k <= N-k;
+            * forall (i:below(k)) : a(i) = a(N-1-i);
+            ** N - k;
+            if
+                [k<N-1-k] ;
+                if
+                   [a(k) /= a(N-1-k)] ; b:=false ; exit
+                   [a(k) = a(N-1-k)] ; k := k+1 ; decreasing goto loop 
+                endif
+                [k>=N-1-k] ; b:=true; exit
+            endif
+        end loop
+        k := 0;
+        goto loop
+    end palindrome
+
+
+
+    % ASSIGNMENT 2 - Integer square root
+    %
+    % Simple linear search starting from 0.
+    isqrt [ p: nat; s: result nat ]: procedure
+    post s*s <= p and p < (s+1)*(s+1);
+    begin
+        k:pvar nat;
+
+        loop: situation
+        begin
+            % In this situation, the square of s is 
+            % less than or equal to p. Exit when
+            % the square of the successor of s 
+            % exceeds p.
+
+            * s*s<=p;
+            ** p-s;
+
+            if
+                [p<(s+1)*(s+1)]; exit
+                [(s+1)*(s+1)<=p]; s:=s+1; decreasing goto loop
+            endif
+        end loop
+
+        s:=0; goto loop
+    end isqrt
+
+
+    % ASSIGNMENT 4 - Find and replace
+
+    findandreplace [ m: parray[M,int];
+                     r: parray[M,int];
+                     a: valres parray[N,int] ]: procedure
+    pre forall (i,j:below[M]): m(i)=m(j) => i=j;
+    post forall (i:below[N],j:below[M]): a__0(i)=m(j) => a(i)=r(j);
+    post forall (i:below[N]): 
+           (forall (j:below[M]): a__0(i)/=m(j)) => a(i)=a__0(i);
+    begin
+        k,l: pvar int;
+
+        oloop: situation
+        begin
+            % The outer loop maintains:
+            %     _______________________________
+            % a: |#########|  |                  |
+            %    |#########|__|__________________|
+            %                k                     N
+            %
+            % Elements in the region a[0,k) have been replaced.
+
+            * 0<=k and k<=N;
+            * forall (i,j:below[M]): m(i)=m(j) => i=j;
+            * forall (i:below[k],j:below[M]): a__0(i)=m(j) => a(i)=r(j);
+            * forall (i:below[k]): 
+                (forall (j:below[M]): a__0(i)/=m(j)) => a(i)=a__0(i);
+            * forall (i:nat): k<=i and i<N => a(i)=a__0(i);
+            ** N-k;
+
+            iloop: situation
+            begin
+                % The inner loop additionally maintains:
+                %     _______________________________
+                % m: |#########|  |                  |
+                %    |#########|__|__________________|
+                %                l                     N
+                %
+                % All elements in the region m[0,l) do not match
+                % a(k) (it is also known that k<N)
+
+                * k<N;
+                * 0<=l and l<=M;
+                * forall (i:below[l]): a(k)/=m(i);
+                ** M-l;
+
+                if 
+                    [l=M]; k:=k+1; decreasing goto oloop
+                    [l<M]; 
+                    if
+                        [a(k)=m(l)]; a:=a with [k:=r(l)]; k:=k+1; decreasing goto oloop
+                        [a(k)/=m(l)]; l:=l+1; decreasing goto iloop
+                    endif
+                endif
+            end iloop
+
+            if
+                [k=N]; exit
+                [k<N]; l:=0; goto iloop
+            endif
+        end oloop
+
+        k := 0; goto oloop
+    end findandreplace
+
+
+
+    % ASSIGNMENT 5
+    %
+    % This is a straightforward translation of the program
+    % given in the assignment, using integer arrays instead
+    % of sets and Max and Min in place of Union and Intersection. 
+    % We assume that there is at least one element in the array,
+    % i.e., that N>0
+
+    IsMax(X:parray[N,int],k:upto[N],x:int):bool = 
+        (exists (j:below[k]): X(j)=x) and
+        (forall (j:below[k]): X(j)<=x);
+
+    IsMin(X:parray[N,int],k:upto[N],x:int):bool = 
+        (exists (j:below[k]): X(j)=x) and
+        (forall (j:below[k]): x<=X(j));
+
+
+    misra[ X:parray[N,int]; 
+           Y:parray[N,int];
+           s: result bool ]: procedure
+    pre N>0;
+    post s = forall (i,j:below[N]): i/=j => X(i)<=Y(j);
+    begin
+        k: pvar int;
+        cin,cout: pvar int;
+        
+        loop: situation
+        begin
+            % In this situation, cin is the maximal value in the
+            % subarray X[0,k), and cout is the minimal value in the
+            % subarray Y[0,k)
+
+            * N>0;
+            * 0<=k and k<=N;
+            * s = forall (i,j:below[k]): i/=j => X(i)<=Y(j);
+            * IsMax(X,k,cin);
+            * IsMin(Y,k,cout);
+            ** N-k;
+
+            if
+                [k=N]; exit
+                [k/=N]; s := s and (X(k)<=cout) and (cin<=Y(k));
+                        cin := max(X(k),cin);
+                        cout := min(Y(k),cout);
+                        k:=k+1;
+                        decreasing goto loop
+                        
+            endif
+        end loop
+
+        k:=1; cin:=X(0); cout:=Y(0); s:=true; goto loop
+    end misra
+
+
+end ex1245

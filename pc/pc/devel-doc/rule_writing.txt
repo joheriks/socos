@@ -1,0 +1,387 @@
+
+==============================================================================
+= The ins and outs of TRS rule writing                                       =
+==============================================================================
+
+
+This is a practical guide to the joys of TRS rule writing.
+
+
+----------
+Rule files
+==========
+
+A TRS rule file contains one or more rules. Lines beginning with # are ignored.
+
+
+-----
+Rules
+=====
+
+A TRS rule consists of three parts:
+  1: Name
+  2: Match specification
+  3: Replacement specification
+
+
+This is the basic syntax:
+
+ rule name
+ ::
+ match spec
+ ->
+ replacement spec
+ ::
+
+
+-----
+Names
+=====
+
+The rule name can contain alphanumeric characters and underscores. Rule names
+are not required to be unique, but it is recommended that they are in order to
+guard against future changes to this policy.
+
+
+--------------------
+Match specifications
+====================
+
+A match specification consists of five parts:
+[[binding]:]type[repeat][value or child match] [ descend match ]
+
+Only the type part is required.
+
+
+Type and binding:
+-----------------
+
+The most basic match:
+foo
+
+This would match one node of type foo. The match can be referred to in the
+replacement spec as binding 'foo'.
+
+
+Changing bindings:
+name:foo
+
+This also matches one node of type foo, but assigns it to binding 'name'
+instead. The name part can be left empty in which case the match cannot be
+referred to later.
+
+
+Matching patterns:
+name:'some.*pattern'
+
+This would match one node with a type that matches the regular expression inside
+the single quotes and assign the match to binding 'name'. Leaving out the name
+part (but including the : character) is also ok.
+
+
+Repeat:
+-------
+
+A match can be allowed to repeat several times or be made optional or inverted
+by the use of a repeat character.
+
+Repeat characters:
+(none): The match must occur exactly one time.
+    ! : If a match is found, this match and the surrounding match is considered
+        a failure (inverted match).
+    + : One or more matches.
+    ? : Zero or one match.
+    * : Zero or more matches.
+
+
+Value or child match:
+---------------------
+
+Matching leaf nodes:
+='some.*pattern'
+
+This can be appended to a type match to restrict the match to leaf nodes whose
+value matches the given pattern. Example:
+ID='x'
+This matches ID leaf nodes with a value 'x'.
+
+
+Matching parent nodes:
+(foo)
+
+This can be appended to the type match just like the leaf node match, but of
+course not at the same time. Inside the parenthesis any number of match
+specifications can be added, and only parent nodes whose children match these 
+specifications are matches. Empty parenthesis means parent nodes with no
+children. The order in which the child matches are specified is not important.
+
+
+Descend match:
+--------------
+
+Descending into the tree looking for matches:
+foo > bar
+
+This will try to match the root node with foo, and if successful will look for
+a node matching bar anywhere below the foo-match.
+
+
+Predefined matches:
+-------------------
+
+To make rule writing a little bit more convenient, there are two types of
+predefined matches:
+
+&rest
+actual meaning: rest:'.*'*
+
+&any
+actual meaning: any:'.*'
+
+The former will match any node, any number of times and the latter will match
+any node exactly once.
+
+
+More complex example:
+---------------------
+
+module > situation+(ID, &rest > KEY_EXIT!) > NUMBER*
+
+This would find one or more situations appearing below a module node, but only
+if the situation has an ID node and does not have a KEY_EXIT node below it.
+If the situation has NUMBER-nodes below it they will be found and bound as well.
+
+
+--------------------------
+Replacement specifications
+==========================
+
+
+Referring to matches:
+----------------------
+Replacement specifications make use of the bindings produced by the match.
+Bindings can be referred to by their full path.
+In the example above this would be
+module, module.situation, module.situation.ID, module.situation.rest,
+module.situation.NUMBER
+
+However, you can also refer to bindings using only the
+end of the path, in which case you need to specify only as much of the path as
+is necessary to distinguish it from other paths. 
+
+Using the above example again you could refer to the bindings as:
+module, situation, ID, rest, NUMBER
+
+It is even possible to refer to the bindings as simply
+e, n, D, t, R
+...though this not recommended for readability reasons.
+
+
+
+A replacement specification consists of one or more replacement actions.
+Each action replaces node(s) bound to one binding with some replacement nodes.
+
+Syntax:
+binding1 := repl1, repl2
+binding2 := repl3
+
+
+Replacement nodes:
+------------------
+
+There are five types of replacement nodes: direct clones of old nodes, clones of
+parent nodes with a new set of children, new parent nodes, new leaf nodes and 
+nodes produced by a node macro.
+
+
+Parent nodes:
+-------------
+
+Parent nodes can be produced by cloning an old parent node and optionally
+replacing the children, or a new node can be created and children added.
+
+Examples:
+foo
+This clones the node(s) bound to foo.
+
+foo(bar, baz)
+This clones the node(s) bound to foo, but replaces the children with clones
+of bindings bar and baz.
+
+'foo'()
+This creates a new parent node of type foo with no children.
+
+
+Leaf nodes:
+-----------
+
+Leaf nodes can only be created as new node. Their values, however, can come from
+the values of bound nodes.
+
+Examples:
+'foo'='bar'
+This creates a leaf node of type 'foo' with the value 'bar'.
+
+'foo'=$$bar
+
+This creates a leaf node of type 'foo' with the value of the node bound to bar.
+
+
+Strings:
+--------
+
+Anywhere in the replacement spec that you are allowed to use strings (quoted
+string like 'foo') you are in fact allowed to use so called string sources.
+The following types of string sources are available:
+
+regular string:   'foo'
+node values:      $$binding
+string generator: $generator
+
+
+String generators:
+------------------
+
+String generators starts with the dollar-sign ($) followed by a generator id and
+some parameters. Currently available string generators are join, concat and
+gensym.
+
+
+    Generator 'join':
+    -----------------
+    
+    $join(separator, src1, ...)
+    
+    This generator uses the string in the first parameter to join together the
+    strings in all the other parameters. Example:
+    $join(',', $$ID)
+    
+    This would produce a string where all the values of leaf nodes bound to ID
+    are joined using comma characters.
+    
+    
+    Generator 'concat':
+    -------------------
+    
+    $concat(src1, ...)
+    
+    This generator works like the join generator, except that there is no
+    separator. The strings are simple concatenated.
+    
+    
+    Generator 'gensym':
+    -------------------
+    
+    $gensym('prefix')
+    
+    This generator generates a string starting with prefix. The generated string
+    will be different for every call to gensym during one rewrite session.
+
+
+
+Macros:
+-------
+
+The final way to produce nodes is using macros. The syntax is:
+@macro(parameters)
+
+There are currently four defined macros: children, foreach, fst and snd.
+
+
+    Macro 'children':
+    -----------------
+
+    @children(param)
+
+    This macro produces all the nodes that children of nodes produced by
+    param. Param can be a new node, a binding, etc.
+
+
+    Macro 'foreach':
+    ----------------
+
+    @foreach(binding, nodespec)
+
+    This macro will re-bind binding to each of the nodes that are currently
+    bound to it, and use node to produce new node(s) for each re-binding. This
+    is easier to explain with an example:
+
+    @foreach(foo, 'buh'(foo))
+
+    Assuming that foo binds to two nodes 'bar' and 'baz' this would produce a
+    node 'buh' containing 'bar' and a node 'buh' containing 'baz'.
+    Simply specifying 'buh'(foo) would produce one node 'buh' containing both
+    'bar' and 'baz'. If foo binds to a single node there is no difference.
+
+
+    Macro 'fst':
+    ------------
+
+    @fst(param)
+
+    This macro works just like @children, but only the first child is produced.
+
+
+    Macro snd':
+    ------------
+
+    @snd(param)
+
+    This macro works just like @children, but only the second child is produced.
+
+
+--------
+Pitfalls
+========
+
+There are a few things to watch out for:
+
+
+Match order:
+------------
+
+The repeat matching is done in the following order:
+
+  1. '!'-matches
+  2. Matches with no repeat.
+  3. '+'-matches
+  4. '?'-matches
+  5. '*'-matches
+
+Within the levels, matching is done left-to-right.
+
+All matching is greedy. This means that in
+foo(bar*, bar*)
+...the second bar can never match anything.
+
+
+
+Descend matches:
+----------------
+
+This might not mean what you think:
+root > foo! > bar
+
+This will never bind bar to anything. It DOES NOT mean
+"bar nodes under root nodes when foo does not appear in between".
+
+Instead, it means:
+"root nodes that do not have a foo > bar under them"
+
+
+Keep in mind that repeat characters spread to the right in descend matches.
+In a match
+root > foo+ > ID
+
+...there can be one OR MORE bindings for ID (one for each time foo matches).
+
+
+
+Multiple replacements:
+----------------------
+
+If you are writing a rule containing multiple replacement actions, you need to
+be careful with the order in which you specify them. One action may affect the
+nodes used by subsequent actions in ways you did not intend. If the result of an
+applied multi-action rule is not what you expected, try modifying the order.
+

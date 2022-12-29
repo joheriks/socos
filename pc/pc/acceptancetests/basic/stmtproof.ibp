@@ -1,0 +1,86 @@
+stmtproof: context begin
+
+   by "(skip)";
+
+   % strategy for assert statement
+
+   p1[]: procedure 
+   begin
+      {1<2} by "(assert)";
+      exit
+   end p1
+
+   % strategy for procedure call
+
+   p2[]: procedure 
+   pre 1<2;
+   begin
+      exit
+   end p2   
+
+   p3: procedure
+   begin
+      p2[] by "(assert)"; 
+      exit
+   end p3
+
+   % strategy for multicall
+
+   p4[]: procedure 
+   pre 1<2;
+   post1: post true;
+   begin
+      exit post1
+   end p4
+
+   p5[]: procedure 
+   begin
+      call p4[] by "(assert)";
+         post1: exit;
+      endcall
+      
+   end p5
+
+   % strategy for liveness
+
+   p6[]: procedure 
+   begin
+      if [true];
+            exit
+         [true];
+            exit
+      endif
+      by "(prop)";
+   end p6
+
+   % strategy for loop termination
+   p7[]: procedure
+   begin
+       s: situation
+       begin
+           i: pvar int;
+           * 0<=i and i<=10;
+           ** i;
+           [i>0]; 
+           i:=i-1; 
+           by "(assert)"; 
+           decreasing s by "(assert)";
+           goto s
+       end s
+       i := 10;
+       by "(assert)"; 
+       goto s;
+   end p7
+
+   % strategy for recursive call termination
+   p8[ x: int ]: procedure
+   pre x>=0;
+   ** x;
+   begin
+       [x>0]; 
+       p8[x-1] by "(assert)"; 
+       exit
+   end p8
+
+
+end stmtproof

@@ -1,0 +1,5 @@
+The files in this directory are part of the regression test suite.
+All files in this directory should fail static checking or verification. 
+The purpose is to test that various kinds of failure situations are
+caught properly.
+

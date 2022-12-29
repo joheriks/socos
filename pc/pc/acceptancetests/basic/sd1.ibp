@@ -1,0 +1,83 @@
+sd1: context
+begin
+    a,b,c,x,y,z: var real;
+    p,q,r: var bool;
+    f(x:real):real;
+    by "(grind :theories real_props)";
+
+
+    % Smallest possible derivation, conclusion not checked
+    *  d1: derivation;
+    |-
+    [] ;
+    
+
+    *  d2: theorem true;
+    - true ;
+    |- { } ;
+    [] ;
+
+
+    * d3: theorem abs( 1/a - 1/(a+1) ) = abs( (1/a) * 1 / (a+1) ) ;
+    -  [add] :: a > 0 ;
+    +  [add] :: { by "(then (use nzreal_times_nzreal_is_nzreal) (grind))" };
+       a * (a + 1) /= 0;
+    |- abs( 1/a - 1/(a+1) ) = abs( (1/a) * 1/(a+1) ) ;
+    =  { "murtolukujen kertolasku" } ;
+       abs( 1/a - 1/(a+1) ) = abs( 1/(a*(a+1)) ) ;
+    =  { "laitetaan itseisarvon murtoluvut samalle jakoviivalle" } ;
+       abs( (a+1-a) / (a*(a+1)) ) = 1/(a*(a+1)) ;
+    =  { "sievennet‰‰n" } ;
+       abs( 1/(a*(a+1)) ) = 1/(a*(a+1)) ;
+    =  { "add assumptions" } ;
+       1/(a*(a+1)) = 1/(a*(a+1)) ;
+    =  { "x=x on tosi v‰itt‰m‰" } ;
+       true ;
+    [] ;
+
+
+    *    d4: theorem "prove that", p <=> r, "assuming:" ;
+    -    a1 :: p => q ;
+    -    a2 :: q => r ;
+    -    a3 :: r => q ;
+    -    a4 :: q => p ;
+    |-   { "backwards proof"; by "(prop)" } ;
+         p <=> r ;
+    when { "prove left and right implication" } ;
+             * lemma p => r;
+             |-   { add a1,a2 };
+                  p => r ;
+             when { add a2 } ;
+                  p => q ;
+             when { add a1 } ;
+                  true ;
+             [] ;
+             * lemma r=>p;
+             |-   { add a3,a4 };
+                  r => p ;
+             when { add a4 } ;
+                  r => q ;
+             when { add a3 } ;
+                  true ;
+             [] ;
+         true ;
+         [] ;
+    
+
+    *   d5: derivation;
+    -   (p=>q) and (q=>r) and (r=>q) and (q=>p);
+    |-  { by "(prop)" } ;
+        p ;
+    <=> { add -1; use test1 };
+        r ;
+    [] ;
+
+
+    *  d7: derivation;
+    -  a[add] :: forall x : f(x) = x;
+    |- f(1);
+    =  { };
+       1;
+    [];
+
+end sd1

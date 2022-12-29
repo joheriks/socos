@@ -1,0 +1,107 @@
+multiexit: context
+begin
+    by "(then (endgame) (grind))";
+
+    p1[x:valres nat]: procedure
+    post1: post x=x__0+1;
+    post2: post x=x__0+2;
+    post3: post x=x__0+3;
+    begin
+        choice 
+          x:=x+1; exit post1;
+          x:=x+2; exit post2;
+          x:=x+3; exit post3;
+        endchoice
+    end p1
+
+    p2: procedure
+    begin
+        x: pvar nat;
+        
+        x:=1;
+        call p1[x];
+          post1: {x=2}; exit;
+          post2: {x=3}; exit;
+          post3: {x=4}; exit;
+        endcall
+    end p2
+
+
+    %% Passing the same result parameter to a multi-call procedure
+    p3[x: valres nat; y: result nat]: procedure
+    a: post begin
+        * x=1;
+        * y=2;
+    end a
+    begin
+        x,y:=1,2; exit a
+    end p3
+    p4: procedure 
+    begin
+        z: pvar nat;
+        
+        z:=0;
+        call p3[z,z];
+          a: {z=2}; exit;
+        endcall
+    end p4
+
+    % Multiple matching call-branches
+    p5: procedure 
+    begin
+        x,y: pvar nat;
+        
+        x,y:=0,0;
+        call p3[x,y];
+          a: {x=1 and y=2}; exit;
+          a: {x=1 and y=2}; exit;
+        endcall
+    end p5
+
+    % Nested multi-call statements
+    p6: procedure
+    begin
+        x: pvar nat;
+        x:=0;
+        call p1[x];
+            post1:
+                 {x=1};
+                 call p1[x];
+                     post1: {x=2}; exit;
+                     post2: {x=3}; exit;
+                     post3: {x=4}; exit;
+                 endcall
+            post2: {x=2}; exit;
+            post3: {x=3}; exit;
+        endcall
+    end p6
+
+    %% Various syntaxes for specifying postconditions
+    p7[x,y,z: result int]: procedure
+    x: post begin
+        * y/=0;
+        * x/y=0; 
+    end x
+    y: post x=1;
+       post y=2;
+    z: post begin
+    end z
+    begin
+        x,y,z:=0,0,0;
+        choice
+            x:=0; y:=11; exit x
+            x:=1; y:=2; exit y
+            exit z
+        endchoice        
+    end p7
+
+
+    % Empty pre- and postconditions
+    p8 : procedure
+    pre begin end
+    post begin end
+    begin
+        exit
+    end p8
+
+end multiexit

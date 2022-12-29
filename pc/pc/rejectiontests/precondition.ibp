@@ -1,0 +1,16 @@
+precondition: context
+begin
+    by "(endgame)";
+
+    % this precondition could never be established
+    p1: procedure
+    pre false;
+    begin
+        s: situation
+        begin
+            p1[]; exit;
+        end s
+        goto s
+    end p1
+
+end precondition
